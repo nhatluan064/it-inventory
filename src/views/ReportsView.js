@@ -110,7 +110,7 @@ const ReportsView = ({ transactions, t }) => {
     }),
     [t]
   );
-    
+
   const renderDetails = (trans) => {
     if (trans.reason === "allocate" && trans.details)
       return `${t("recipient")}: ${trans.details.recipientName}`;
@@ -166,49 +166,61 @@ const ReportsView = ({ transactions, t }) => {
     { key: "details", label: "details", sortable: false },
   ];
 
-  const headers = useMemo(() => [
-    { label: t("timestamp"), key: "timestamp" },
-    { label: t("action"), key: "action" },
-    { label: t("object"), key: "object" },
-    { label: t("quantity"), key: "quantity" },
-    { label: t("performed_by"), key: "performedBy" },
-    { label: t("details"), key: "details" },
-  ], [t]);
+  const headers = useMemo(
+    () => [
+      { label: t("timestamp"), key: "timestamp" },
+      { label: t("action"), key: "action" },
+      { label: t("object"), key: "object" },
+      { label: t("quantity"), key: "quantity" },
+      { label: t("performed_by"), key: "performedBy" },
+      { label: t("details"), key: "details" },
+    ],
+    [t]
+  );
 
   const csvData = useMemo(() => {
-      return sortedTransactions.map(trans => {
-          const detail = logDetails[`${trans.type}-${trans.reason}`] || {};
-          return {
-              timestamp: new Date(trans.timestamp).toLocaleString(t("locale_string")),
-              action: detail.text || `${trans.type}-${trans.reason}`,
-              object: trans.itemName,
-              quantity: trans.quantity || "",
-              performedBy: trans.user,
-              details: renderDetails(trans),
-          };
-      });
+    return sortedTransactions.map((trans) => {
+      const detail = logDetails[`${trans.type}-${trans.reason}`] || {};
+      return {
+        timestamp: new Date(trans.timestamp).toLocaleString(t("locale_string")),
+        action: detail.text || `${trans.type}-${trans.reason}`,
+        object: trans.itemName,
+        quantity: trans.quantity || "",
+        performedBy: trans.user,
+        details: renderDetails(trans),
+      };
+    });
   }, [sortedTransactions, logDetails, t]);
-
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
       <div className="p-6 border-b dark:border-gray-700">
         <div className="flex justify-between items-center">
-            <div>
-                <h2 className="text-2xl font-bold">{t("activity_log_history")}</h2>
-                <p className="text-sm text-gray-500 mt-1">{t("activity_log_desc")}</p>
-            </div>
-            <div className="md:hidden">
-                <button
-                    onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
-                    className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
-                >
-                    {isMobileFilterOpen ? <X className="w-5 h-5" /> : <SlidersHorizontal className="w-5 h-5" />}
-                </button>
-            </div>
+          <div>
+            <h2 className="text-2xl font-bold">{t("activity_log_history")}</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              {t("activity_log_desc")}
+            </p>
+          </div>
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
+              className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
+            >
+              {isMobileFilterOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <SlidersHorizontal className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
-      <div className={`p-4 bg-gray-50 dark:bg-gray-800/50 border-b dark:border-gray-700 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end ${isMobileFilterOpen ? 'grid' : 'hidden md:grid'}`}>
+      <div
+        className={`p-4 bg-gray-50 dark:bg-gray-800/50 border-b dark:border-gray-700 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end ${
+          isMobileFilterOpen ? "grid" : "hidden md:grid"
+        }`}
+      >
         <div className="lg:col-span-2">
           <label className="block text-sm font-medium mb-1">
             {t("search")}
@@ -218,7 +230,7 @@ const ReportsView = ({ transactions, t }) => {
             <input
               type="text"
               placeholder={t("search")}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -229,7 +241,7 @@ const ReportsView = ({ transactions, t }) => {
             {t("action_type")}
           </label>
           <select
-            className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+            className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
             value={actionType}
             onChange={(e) => setActionType(e.target.value)}
           >
@@ -248,7 +260,7 @@ const ReportsView = ({ transactions, t }) => {
             </label>
             <input
               type="date"
-              className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
             />
@@ -259,23 +271,27 @@ const ReportsView = ({ transactions, t }) => {
             </label>
             <input
               type="date"
-              className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
             />
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1 opacity-0 hidden md:block">.</label>
-            <CSVLink
-                data={csvData}
-                headers={headers}
-                filename={`IT_Inventory_Log_${new Date().toISOString().slice(0,10)}.csv`}
-                className="w-full text-center block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-            >
-              <span className="hidden md:inline">{t("Xuất file Log")}</span>
-              <Download className="w-5 h-5 md:hidden mx-auto" />
-            </CSVLink>
+          <label className="block text-sm font-medium mb-1 opacity-0 hidden md:block">
+            .
+          </label>
+          <CSVLink
+            data={csvData}
+            headers={headers}
+            filename={`IT_Inventory_Log_${new Date()
+              .toISOString()
+              .slice(0, 10)}.csv`}
+            className="w-full text-center block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          >
+            <span className="hidden md:inline">{t("Xuất file Log")}</span>
+            <Download className="w-5 h-5 md:hidden mx-auto" />
+          </CSVLink>
         </div>
       </div>
 
@@ -389,4 +405,3 @@ const ReportsView = ({ transactions, t }) => {
 };
 
 export default ReportsView;
-

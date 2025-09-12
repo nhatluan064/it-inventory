@@ -1,29 +1,22 @@
 // src/views/MasterListView.js
 import React, { useState } from "react";
-import { Plus, Package, Search, Edit2, Trash2, SlidersHorizontal, X } from "lucide-react";
+import { Plus, Package, Search, Edit2, Trash2, Filter, X } from "lucide-react";
 
 const MasterListView = ({
-  allItems,
+  allItems, // This now correctly receives only master items
   onAddType,
   onEditItem,
   onDeleteItem,
   categories,
   t,
+  // We need the full equipment list to check usage status
+  fullEquipmentList,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const uniqueItems = allItems.reduce((acc, current) => {
-    const originalName = current.name.split(" (User:")[0];
-    if (!acc.some((item) => item.name.split(" (User:")[0] === originalName)) {
-      const originalItem = allItems.find((i) => i.name === originalName);
-      acc.push(originalItem || { ...current, name: originalName });
-    }
-    return acc;
-  }, []);
-
-  const filteredItems = uniqueItems.filter((item) => {
+  const filteredItems = allItems.filter((item) => {
     const categoryMatch =
       selectedCategory === "all" || item.category === selectedCategory;
     const searchMatch = item.name
@@ -35,44 +28,41 @@ const MasterListView = ({
   return (
     <div className="space-y-6">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
-        {/* Container cho tiêu đề và nút lọc */}
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div>
             <h2 className="text-xl font-bold">{t("master_list")}</h2>
             <p className="text-sm text-gray-500 mt-1">
               {t("master_list_desc")}
             </p>
           </div>
-          {/* Nút bộ lọc cho Mobile */}
-          <div className="md:hidden">
-            <button
-                onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
-                className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
-            >
-                {isMobileFilterOpen ? <X className="w-5 h-5" /> : <SlidersHorizontal className="w-5 h-5" />}
-            </button>
-          </div>
+          <button
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className="md:hidden p-2 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md"
+          >
+            {isFilterOpen ? (
+              <X className="w-5 h-5" />
+            ) : (
+              <Filter className="w-5 h-5" />
+            )}
+          </button>
         </div>
-
-        {/* Khu vực tìm kiếm và thêm mới */}
         <div
-          className={`
-            flex-col md:flex-row md:items-center gap-4
-            ${isMobileFilterOpen ? 'flex' : 'hidden md:flex'}
-          `}
+          className={`md:flex flex-col md:flex-row md:items-center gap-4 ${
+            isFilterOpen ? "flex" : "hidden"
+          }`}
         >
           <div className="relative flex-grow">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
               placeholder={t("search_master_item_placeholder")}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <select
-            className="w-full md:w-48 py-2 px-3 border rounded-lg text-gray-600 dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600"
+            className="w-full md:w-48 py-2 px-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
@@ -92,7 +82,6 @@ const MasterListView = ({
         </div>
       </div>
 
-      {/* --- Giao diện Bảng cho Desktop --- */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -115,10 +104,10 @@ const MasterListView = ({
             <tbody className="divide-y dark:divide-gray-700">
               {filteredItems.length > 0 ? (
                 filteredItems.map((item) => {
-                  const isModelInUse = allItems.some(
+                  const isModelInUse = fullEquipmentList.some(
                     (e) =>
                       e.name.startsWith(item.name) &&
-                      e.status !== "pending-purchase"
+                      !["master", "pending-purchase"].includes(e.status)
                   );
                   const statusText = isModelInUse
                     ? t("has_been_used")
@@ -173,13 +162,13 @@ const MasterListView = ({
         </div>
       </div>
 
-      {/* --- Giao diện Card cho Mobile --- */}
       <div className="md:hidden space-y-4">
         {filteredItems.length > 0 ? (
           filteredItems.map((item) => {
-            const isModelInUse = allItems.some(
+            const isModelInUse = fullEquipmentList.some(
               (e) =>
-                e.name.startsWith(item.name) && e.status !== "pending-purchase"
+                e.name.startsWith(item.name) &&
+                !["master", "pending-purchase"].includes(e.status)
             );
             const statusText = isModelInUse
               ? t("has_been_used")
@@ -241,4 +230,3 @@ const MasterListView = ({
 };
 
 export default MasterListView;
-

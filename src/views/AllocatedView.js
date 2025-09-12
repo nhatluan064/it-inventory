@@ -1,14 +1,8 @@
 // src/views/AllocatedView.js
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import {
-  RotateCcw,
-  Search,
-  ChevronDown,
-  Wrench,
-  Filter,
-  X,
-} from "lucide-react";
+import React, { useState, useMemo } from "react";
+import { RotateCcw, Search, Wrench, Filter, X } from "lucide-react";
 import { useSort, SortableHeader } from "../hooks/useSort";
+import { departments } from "../constants";
 
 const AllocatedView = ({
   items,
@@ -16,16 +10,16 @@ const AllocatedView = ({
   onRecallItem,
   onMarkDamaged,
   categories,
-  searchQuery,
-  setSearchQuery,
-  selectedCategory,
-  setSelectedCategory,
+  filters,
+  setFilters,
   t,
 }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+
   const allColumns = useMemo(
     () => [
       { key: "name", label: "device_name", sortable: true },
+      { key: "category", label: "category", sortable: true },
       { key: "serialNumber", label: "serial_number_sn", sortable: true },
       {
         key: "allocationDetails.recipientName",
@@ -58,12 +52,6 @@ const AllocatedView = ({
     [t]
   );
 
-  const [visibleColumns, setVisibleColumns] = useState(
-    new Set(allColumns.map((c) => c.key))
-  );
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
   const {
     items: sortedItems,
     requestSort,
@@ -73,26 +61,10 @@ const AllocatedView = ({
     direction: "descending",
   });
 
-  const handleColumnToggle = (columnKey) => {
-    setVisibleColumns((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(columnKey)) newSet.delete(columnKey);
-      else newSet.add(columnKey);
-      return newSet;
-    });
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
-
-  const columnsToRender = allColumns.filter((c) => visibleColumns.has(c.key));
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -139,69 +111,79 @@ const AllocatedView = ({
         </div>
 
         <div
-          className={`md:flex flex-col md:flex-row gap-4 ${
-            isFilterOpen ? "flex" : "hidden"
+          className={`grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ${
+            isFilterOpen ? "grid" : "hidden md:grid"
           }`}
         >
-          <div className="relative flex-grow">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Tìm theo tên thiết bị, SN, người nhận..."
-              className="w-full pl-10 pr-4 py-2 border rounded-lg"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          <div className="md:col-span-2 lg:col-span-4">
+            <label className="block text-sm font-medium mb-1">
+              {t("search")}
+            </label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                name="search"
+                placeholder="Tìm theo tên thiết bị, SN, người nhận, MSNV..."
+                className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                value={filters.search}
+                onChange={handleFilterChange}
+              />
+            </div>
           </div>
-          <select
-            className="w-full md:w-auto py-2 px-3 border rounded-lg"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            {categories.map((cat) => {
-              const count =
-                cat.id === "all"
-                  ? (unfilteredAllocatedItems || []).length
-                  : categoryCounts[cat.id] || 0;
-              const displayName = `${cat.name} (${count})`;
-              return (
-                <option key={cat.id} value={cat.id}>
-                  {displayName}
-                </option>
-              );
-            })}
-          </select>
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setIsDropdownOpen((prev) => !prev)}
-              className="w-full md:w-auto flex items-center justify-between px-4 py-2 border rounded-lg bg-white dark:bg-gray-700"
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("category")}
+            </label>
+            <select
+              name="category"
+              className="w-full py-2 px-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              value={filters.category}
+              onChange={handleFilterChange}
             >
-              <span>Tùy chọn hiển thị</span>
-              <ChevronDown className="w-4 h-4 ml-2" />
-            </button>
-            {isDropdownOpen && (
-              <div className="absolute top-full right-0 mt-2 w-72 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-10 border dark:border-gray-700">
-                <div className="p-4 grid grid-cols-2 gap-2">
-                  {allColumns.map(
-                    (col) =>
-                      col.key !== "actions" && (
-                        <label
-                          key={col.key}
-                          className="flex items-center space-x-2"
-                        >
-                          <input
-                            type="checkbox"
-                            className="rounded"
-                            checked={visibleColumns.has(col.key)}
-                            onChange={() => handleColumnToggle(col.key)}
-                          />
-                          <span className="text-sm">{t(col.label)}</span>
-                        </label>
-                      )
-                  )}
-                </div>
-              </div>
-            )}
+              {categories.map((cat) => {
+                const count =
+                  cat.id === "all"
+                    ? (unfilteredAllocatedItems || []).length
+                    : categoryCounts[cat.id] || 0;
+                return (
+                  <option
+                    key={cat.id}
+                    value={cat.id}
+                  >{`${cat.name} (${count})`}</option>
+                );
+              })}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("department")}
+            </label>
+            <select
+              name="department"
+              className="w-full py-2 px-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              value={filters.department}
+              onChange={handleFilterChange}
+            >
+              <option value="all">{t("all")}</option>
+              {departments.map((dept) => (
+                <option key={dept.id} value={dept.id}>
+                  {t(dept.tKey)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              {t("handover_date")}
+            </label>
+            <input
+              name="handoverDate"
+              type="date"
+              className="w-full py-2 px-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              value={filters.handoverDate}
+              onChange={handleFilterChange}
+            />
           </div>
         </div>
       </div>
@@ -210,7 +192,7 @@ const AllocatedView = ({
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <SortableHeader
-              columns={columnsToRender}
+              columns={allColumns}
               requestSort={requestSort}
               sortConfig={sortConfig}
               t={t}
@@ -224,70 +206,53 @@ const AllocatedView = ({
                       key={item.id}
                       className="hover:bg-gray-100 dark:hover:bg-gray-700/50"
                     >
-                      {visibleColumns.has("name") && (
-                        <td className="px-6 py-4 font-medium">
-                          {item.name.split(" (User:")[0]}
-                        </td>
-                      )}
-                      {visibleColumns.has("serialNumber") && (
-                        <td className="px-6 py-4 font-mono">
-                          {item.serialNumber || "N/A"}
-                        </td>
-                      )}
-                      {visibleColumns.has(
-                        "allocationDetails.recipientName"
-                      ) && (
-                        <td className="px-6 py-4">
-                          {details.recipientName || "N/A"}
-                        </td>
-                      )}
-                      {visibleColumns.has("allocationDetails.employeeId") && (
-                        <td className="px-6 py-4">
-                          {details.employeeId || "N/A"}
-                        </td>
-                      )}
-                      {visibleColumns.has("allocationDetails.position") && (
-                        <td className="px-6 py-4">{renderPosition(details)}</td>
-                      )}
-                      {visibleColumns.has("allocationDetails.department") && (
-                        <td className="px-6 py-4">
-                          {details.department ? t(details.department) : "N/A"}
-                        </td>
-                      )}
-                      {visibleColumns.has("allocationDetails.handoverDate") && (
-                        <td className="px-6 py-4">
-                          {formatDate(details.handoverDate)}
-                        </td>
-                      )}
-                      {visibleColumns.has("actions") && (
-                        <td className="px-6 py-4 text-center">
-                          <div className="flex items-center justify-center space-x-2">
-                            <button
-                              onClick={() => onRecallItem(item)}
-                              className="p-2"
-                              title={t("recall_device")}
-                            >
-                              <RotateCcw className="w-5 h-5 text-green-600 hover:text-green-400" />
-                            </button>
-                            <button
-                              onClick={() => onMarkDamaged(item)}
-                              className="p-2"
-                              title={t("maintenance")}
-                            >
-                              <Wrench className="w-5 h-5 text-orange-500 hover:text-orange-400" />
-                            </button>
-                          </div>
-                        </td>
-                      )}
+                      <td className="px-6 py-4 font-medium">
+                        {item.name.split(" (User:")[0]}
+                      </td>
+                      <td className="px-6 py-4 capitalize">
+                        {(categories.find((c) => c.id === item.category) || {})
+                          .name || item.category}
+                      </td>
+                      <td className="px-6 py-4 font-mono">
+                        {item.serialNumber || "N/A"}
+                      </td>
+                      <td className="px-6 py-4">
+                        {details.recipientName || "N/A"}
+                      </td>
+                      <td className="px-6 py-4">
+                        {details.employeeId || "N/A"}
+                      </td>
+                      <td className="px-6 py-4">{renderPosition(details)}</td>
+                      <td className="px-6 py-4">
+                        {details.department ? t(details.department) : "N/A"}
+                      </td>
+                      <td className="px-6 py-4">
+                        {formatDate(details.handoverDate)}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <div className="flex items-center justify-center space-x-2">
+                          <button
+                            onClick={() => onRecallItem(item)}
+                            className="p-2"
+                            title={t("recall_device")}
+                          >
+                            <RotateCcw className="w-5 h-5 text-green-600 hover:text-green-400" />
+                          </button>
+                          <button
+                            onClick={() => onMarkDamaged(item)}
+                            className="p-2"
+                            title={t("maintenance")}
+                          >
+                            <Wrench className="w-5 h-5 text-orange-500 hover:text-orange-400" />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   );
                 })
               ) : (
                 <tr>
-                  <td
-                    colSpan={columnsToRender.length}
-                    className="text-center py-12"
-                  >
+                  <td colSpan={allColumns.length} className="text-center py-12">
                     {t("no_allocated_items_match_filter")}
                   </td>
                 </tr>

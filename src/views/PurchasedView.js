@@ -132,7 +132,7 @@ const PurchasedView = ({
                           handleSnChange(item.id, e.target.value)
                         }
                         placeholder={t("add_multiple_sn_placeholder")}
-                        className="w-full text-sm p-1 border rounded-md"
+                        className="w-full text-sm p-1 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400"
                       />
                     </td>
                     <td className="px-6 py-4 text-center">
@@ -191,7 +191,7 @@ const PurchasedView = ({
                         .name || item.category}
                     </p>
                   </div>
-                   {/* 3. Cập nhật lại nút "Nhập kho" cho MOBILE */}
+                  {/* 3. Cập nhật lại nút "Nhập kho" cho MOBILE */}
                   <button
                     onClick={() => handleImportClick(item)}
                     disabled={isImporting}
@@ -231,7 +231,7 @@ const PurchasedView = ({
                     value={serialNumbers[item.id] || ""}
                     onChange={(e) => handleSnChange(item.id, e.target.value)}
                     placeholder={t("add_multiple_sn_placeholder")}
-                    className="w-full text-sm p-2 border rounded-md dark:bg-gray-700"
+                    className="w-full text-sm p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400"
                     rows="2"
                   ></textarea>
                 </div>

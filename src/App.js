@@ -72,6 +72,8 @@ const App = () => {
   const [allocatedFilters, setAllocatedFilters] = useState({
     search: "",
     category: "all",
+    department: "all",
+    handoverDate: "",
   });
 
   // --- Responsive States ---
@@ -194,25 +196,37 @@ const App = () => {
     return inventory.equipment.filter((item) => {
       if (item.status !== "in-use") return false;
 
-      const search = allocatedFilters?.search?.toLowerCase() || "";
-      const category = allocatedFilters?.category || "all";
-
+      const { search, category, department, handoverDate } = allocatedFilters;
+      const query = search.toLowerCase();
       const details = item.allocationDetails || {};
 
-      const categoryMatch = category === "all" || item.category === category;
       const searchMatch =
-        !search ||
-        item.name?.toLowerCase().includes(search) ||
-        item.serialNumber?.toLowerCase().includes(search) ||
-        details.recipientName?.toLowerCase().includes(search);
+        !query ||
+        item.name?.toLowerCase().includes(query) ||
+        item.serialNumber?.toLowerCase().includes(query) ||
+        details.recipientName?.toLowerCase().includes(query) ||
+        details.employeeId?.toLowerCase().includes(query);
 
-      return categoryMatch && searchMatch;
+      const categoryMatch = category === "all" || item.category === category;
+      const departmentMatch =
+        department === "all" || details.department === department;
+      const dateMatch =
+        !handoverDate ||
+        new Date(details.handoverDate).toLocaleDateString("en-CA") ===
+          handoverDate;
+
+      return searchMatch && categoryMatch && departmentMatch && dateMatch;
     });
   }, [inventory.equipment, allocatedFilters]);
 
   const masterItems = useMemo(() => {
     return inventory.equipment.filter((item) => item.status === "master");
   }, [inventory.equipment]);
+
+  const uniqueMasterItemsCount = useMemo(() => {
+    const uniqueNames = new Set(masterItems.map((item) => item.name));
+    return uniqueNames.size;
+  }, [masterItems]);
 
   // --- UI Effects ---
   useEffect(() => {
@@ -344,6 +358,7 @@ const App = () => {
     else if (deleteType === "liquidate") inventory.liquidateItem(currentItem);
     else if (deleteType === "move-to-liquidation")
       inventory.markUnrepairable(currentItem);
+    else if (deleteType === "reset") inventory.resetData();
     closeModal("delete");
   };
 
@@ -356,7 +371,8 @@ const App = () => {
         return (
           <MasterListView
             {...viewProps}
-            allItems={inventory.equipment}
+            allItems={masterItems}
+            fullEquipmentList={inventory.equipment}
             onAddType={() => modals.openModal("type")}
             onEditItem={(item) =>
               modals.openModal("editName", { ...item, originalName: item.name })
@@ -430,14 +446,8 @@ const App = () => {
             onMarkDamaged={(item) =>
               modals.openModal("directMaintenanceNote", item)
             }
-            searchQuery={allocatedFilters.search}
-            setSearchQuery={(q) =>
-              setAllocatedFilters((prev) => ({ ...prev, search: q }))
-            }
-            selectedCategory={allocatedFilters.category}
-            setSelectedCategory={(c) =>
-              setAllocatedFilters((prev) => ({ ...prev, category: c }))
-            }
+            filters={allocatedFilters}
+            setFilters={setAllocatedFilters}
           />
         );
       case "maintenance":
@@ -473,7 +483,9 @@ const App = () => {
           <SettingsView
             {...viewProps}
             onBackupData={inventory.backupData}
-            onResetData={() => modals.openModal("resetConfirm")}
+            onResetData={() =>
+              modals.openModal("delete", null, { deleteType: "reset" })
+            }
             onImportData={(e) => inventory.importData(e.target.files[0])}
           />
         );
@@ -508,6 +520,7 @@ const App = () => {
           isMobile={isMobile}
           isMobileOpen={isMobileSidebarOpen}
           setMobileOpen={setMobileSidebarOpen}
+          onSettingsClick={() => handleTabClick("settings")}
         />
 
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -525,7 +538,7 @@ const App = () => {
                 pendingPurchaseCount={pendingPurchaseItems.length}
                 purchasingCount={purchasingItems.length}
                 purchasedCount={purchasedItems.length}
-                masterListCount={masterItems.length}
+                masterListCount={uniqueMasterItemsCount}
                 reportsCount={inventory.transactions.length}
                 setActiveTab={handleTabClick}
               />

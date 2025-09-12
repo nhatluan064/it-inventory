@@ -47,61 +47,61 @@ export const useInventory = (currentUser, t) => {
     [currentUser]
   );
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (currentUser) {
-        setDataLoading(true);
-        try {
-          const equipColRef = collection(
-            db,
-            "users",
-            currentUser.uid,
-            "equipment"
-          );
-          const equipSnapshot = await getDocs(equipColRef);
-          const equipList = equipSnapshot.docs.map((doc) => ({
-            ...doc.data(),
-            id: doc.id,
-          }));
-          setEquipment(equipList);
+  const fetchData = useCallback(async () => {
+    if (currentUser) {
+      setDataLoading(true);
+      try {
+        const equipColRef = collection(
+          db,
+          "users",
+          currentUser.uid,
+          "equipment"
+        );
+        const equipSnapshot = await getDocs(equipColRef);
+        const equipList = equipSnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        setEquipment(equipList);
 
-          const transColRef = collection(
-            db,
-            "users",
-            currentUser.uid,
-            "transactions"
-          );
-          const transSnapshot = await getDocs(transColRef);
-          const transList = transSnapshot.docs.map((doc) => ({
-            ...doc.data(),
-            id: doc.id,
-          }));
-          setTransactions(
-            transList.sort(
-              (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-            )
-          );
+        const transColRef = collection(
+          db,
+          "users",
+          currentUser.uid,
+          "transactions"
+        );
+        const transSnapshot = await getDocs(transColRef);
+        const transList = transSnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        setTransactions(
+          transList.sort(
+            (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+          )
+        );
 
-          if (
-            currentUser.metadata.creationTime !==
-            currentUser.metadata.lastSignInTime
-          ) {
-            toast.success(t("loading_database_success"));
-          }
-        } catch (error) {
-          toast.error(t("loading_database_false"));
-        } finally {
-          setDataLoading(false);
+        if (
+          currentUser.metadata.creationTime !==
+          currentUser.metadata.lastSignInTime
+        ) {
+          toast.success(t("loading_database_success"));
         }
-      } else {
-        setEquipment([]);
-        setTransactions([]);
+      } catch (error) {
+        toast.error(t("loading_database_false"));
+      } finally {
         setDataLoading(false);
       }
-    };
-
-    fetchData();
+    } else {
+      setEquipment([]);
+      setTransactions([]);
+      setDataLoading(false);
+    }
   }, [currentUser, t]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   // --- Master List Functions ---
   const addEquipmentType = useCallback(
@@ -754,21 +754,114 @@ export const useInventory = (currentUser, t) => {
   );
 
   // --- Data Management Functions ---
-  const backupData = () => {
-    /* Logic to export data as JSON */
-  };
-  const importData = (file) => {
-    /* Logic to import data from JSON */
-  };
-  const resetData = async () => {
-    /* Logic to delete all data */
-  };
+  const backupData = useCallback(() => {
+    try {
+      const dataToBackup = {
+        equipment: equipment,
+        transactions: transactions,
+      };
+      const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+        JSON.stringify(dataToBackup, null, 2)
+      )}`;
+      const link = document.createElement("a");
+      link.href = jsonString;
+      const date = new Date().toISOString().slice(0, 10);
+      link.download = `it_inventory_backup_${date}.json`;
+      link.click();
+      toast.success(t("toast_backup_successful"));
+    } catch (error) {
+      console.error("Backup failed: ", error);
+      toast.error(t("toast_backup_failed"));
+    }
+  }, [equipment, transactions, t]);
+
+  const importData = useCallback(
+    (file) => {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (!data.equipment || !data.transactions) {
+            toast.error(t("toast_invalid_backup_file"));
+            return;
+          }
+          if (!window.confirm(t("confirm_override_data"))) return;
+
+          const batch = writeBatch(db);
+          const equipColRef = collection(
+            db,
+            "users",
+            currentUser.uid,
+            "equipment"
+          );
+          const transColRef = collection(
+            db,
+            "users",
+            currentUser.uid,
+            "transactions"
+          );
+
+          const oldEquip = await getDocs(equipColRef);
+          oldEquip.forEach((doc) => batch.delete(doc.ref));
+          const oldTrans = await getDocs(transColRef);
+          oldTrans.forEach((doc) => batch.delete(doc.ref));
+
+          data.equipment.forEach((item) => {
+            const { id, ...itemData } = item;
+            const newDocRef = doc(equipColRef, id);
+            batch.set(newDocRef, itemData);
+          });
+          data.transactions.forEach((item) => {
+            const { id, ...itemData } = item;
+            const newDocRef = doc(transColRef, id);
+            batch.set(newDocRef, itemData);
+          });
+
+          await batch.commit();
+          await fetchData(); // Refresh data from Firestore
+          toast.success(t("toast_data_restored_successfully"));
+        } catch (error) {
+          console.error("Error reading or importing backup file: ", error);
+          toast.error(t("toast_error_reading_backup_file"));
+        }
+      };
+      reader.readAsText(file);
+    },
+    [currentUser, fetchData, t]
+  );
+
+  const resetData = useCallback(async () => {
+    if (!currentUser) return;
+    try {
+      const batch = writeBatch(db);
+      const equipColRef = collection(db, "users", currentUser.uid, "equipment");
+      const transColRef = collection(
+        db,
+        "users",
+        currentUser.uid,
+        "transactions"
+      );
+
+      const equipSnapshot = await getDocs(equipColRef);
+      equipSnapshot.forEach((doc) => batch.delete(doc.ref));
+      const transSnapshot = await getDocs(transColRef);
+      transSnapshot.forEach((doc) => batch.delete(doc.ref));
+
+      await batch.commit();
+      setEquipment([]);
+      setTransactions([]);
+      toast.success(t("toast_data_reset_successful"));
+    } catch (error) {
+      console.error("Error resetting data: ", error);
+      toast.error("Lỗi khi reset dữ liệu.");
+    }
+  }, [currentUser, t]);
 
   return {
     equipment,
     transactions,
     dataLoading,
-    logTransaction,
     addEquipmentType,
     updateMasterName,
     deleteMasterItem,
