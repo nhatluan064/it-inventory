@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Tùy chỉnh màu placeholder cho giao diện tối */
+  .dark ::placeholder {
+    @apply text-gray-600;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Ẩn thanh cuộn cho các trình duyệt Webkit (Chrome, Safari, Edge mới) */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ẩn thanh cuộn cho Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge cũ */
+  scrollbar-width: none;  /* Firefox */
+}

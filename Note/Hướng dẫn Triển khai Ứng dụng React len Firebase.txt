@@ -1,0 +1,100 @@
+Hướng dẫn Triển khai Ứng dụng React lên Firebase Hosting
+Chào mừng bạn đến với bước cuối cùng và thú vị nhất: đưa sản phẩm của bạn ra thế giới! Hướng dẫn này sẽ chỉ cho bạn cách triển khai ứng dụng quản lý kho của bạn lên Firebase Hosting một cách chi tiết.
+
+Tại sao lại chọn Firebase Hosting?
+Tích hợp liền mạch: Vì bạn đã sử dụng Firebase Authentication và Firestore, việc host ứng dụng trên cùng một nền tảng giúp quản lý dễ dàng hơn.
+
+Tốc độ cao: Firebase Hosting sử dụng Mạng phân phối nội dung (CDN) toàn cầu, đảm bảo người dùng ở bất kỳ đâu cũng có thể truy cập ứng dụng của bạn với tốc độ nhanh nhất.
+
+Miễn phí: Gói Spark miễn phí của Firebase cung cấp dung lượng và băng thông đủ cho các dự án cá nhân và các ứng dụng có lượng truy cập vừa phải.
+
+Bảo mật: Tự động cung cấp chứng chỉ SSL miễn phí, trang web của bạn sẽ luôn có https://.
+
+Các bước Thực hiện
+Bước 1: Cài đặt Firebase CLI (Công cụ Dòng lệnh)
+Nếu bạn chưa cài đặt, hãy mở terminal (hoặc Command Prompt/PowerShell trên Windows) và chạy lệnh sau:
+
+npm install -g firebase-tools
+
+
+Lệnh này sẽ cài đặt bộ công cụ của Firebase trên máy tính của bạn, cho phép bạn tương tác với dự án Firebase của mình từ dòng lệnh.
+
+Bước 2: Đăng nhập vào Firebase
+Tiếp theo, hãy chạy lệnh sau để đăng nhập vào tài khoản Google đã tạo dự án Firebase:
+
+firebase login
+
+
+Lệnh này sẽ mở một cửa sổ trình duyệt. Hãy đăng nhập và cấp quyền cho Firebase CLI.
+
+Bước 3: Khởi tạo Firebase trong Dự án
+Bây giờ, hãy mở terminal ngay tại thư mục gốc của dự án React của bạn và chạy lệnh:
+
+firebase init
+
+
+Bạn sẽ được hỏi một loạt câu hỏi. Hãy trả lời như sau:
+
+Are you ready to proceed? (Bạn đã sẵn sàng tiếp tục chưa?)
+
+Trả lời: Nhấn Y và Enter.
+
+Which Firebase features do you want to set up? (Bạn muốn cài đặt tính năng nào?)
+
+Trả lời: Dùng phím mũi tên xuống, di chuyển đến dòng Hosting: Configure files for Firebase Hosting..., sau đó nhấn phím cách để chọn, rồi nhấn Enter.
+
+Please select an option: (Vui lòng chọn một tùy chọn)
+
+Trả lời: Chọn Use an existing project (Sử dụng một dự án đã có).
+
+Select a default Firebase project for this directory: (Chọn một dự án Firebase mặc định)
+
+Trả lời: Dùng mũi tên để chọn đúng dự án của bạn (ví dụ: it-inventory-bbafb).
+
+What do you want to use as your public directory? (Bạn muốn dùng thư mục nào làm thư mục công khai?)
+
+Trả lời: Gõ build và nhấn Enter. (Đây là bước CỰC KỲ QUAN TRỌNG, build là thư mục chứa sản phẩm sau khi bạn build ứng dụng React).
+
+Configure as a single-page app (rewrite all urls to /index.html)? (Cấu hình như một ứng dụng trang đơn?)
+
+Trả lời: Nhấn Y và Enter. (Điều này rất quan trọng để React Router hoạt động đúng).
+
+Set up automatic builds and deploys with GitHub? (Cài đặt build và deploy tự động với GitHub?)
+
+Trả lời: Nhấn N và Enter. (Chúng ta sẽ làm thủ công cho lần đầu tiên để hiểu quy trình).
+
+Sau khi hoàn tất, bạn sẽ thấy hai tệp mới trong dự án của mình: .firebaserc và firebase.json.
+
+Bước 4: Build ứng dụng React
+Trước khi deploy, bạn cần tạo phiên bản sản phẩm (production build) của ứng dụng. Chạy lệnh:
+
+npm run build
+
+
+Lệnh này sẽ tạo ra một thư mục build trong dự án của bạn, chứa tất cả các tệp HTML, CSS và JS đã được tối ưu hóa.
+
+Bước 5: Triển khai (Deploy)!
+Đây là bước cuối cùng. Hãy chạy lệnh:
+
+firebase deploy
+
+
+Firebase CLI sẽ tải thư mục build của bạn lên server của Firebase. Quá trình này chỉ mất khoảng một phút. Khi hoàn tất, bạn sẽ thấy một kết quả tương tự như sau:
+
+✔  Deploy complete!
+
+Project Console: [https://console.firebase.google.com/project/it-inventory-bbafb/overview](https://console.firebase.google.com/project/it-inventory-bbafb/overview)
+Hosting URL: [https://it-inventory-bbafb.web.app](https://it-inventory-bbafb.web.app)
+
+
+Chúc mừng! Ứng dụng của bạn đã lên sóng!
+Bây giờ bạn có thể truy cập vào Hosting URL (ví dụ: https://it-inventory-bbafb.web.app) để xem và sử dụng ứng dụng của mình từ bất kỳ đâu trên thế giới.
+
+Làm gì tiếp theo?
+Cập nhật ứng dụng: Mỗi khi bạn có thay đổi trong mã nguồn, chỉ cần lặp lại 2 bước cuối:
+
+npm run build
+
+firebase deploy
+
+Tên miền tùy chỉnh: Bạn có thể vào trang quản lý Firebase, vào mục Hosting và kết nối với một tên miền riêng của bạn (ví dụ: quanlykho-it.com).
