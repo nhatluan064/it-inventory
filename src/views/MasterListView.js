@@ -104,11 +104,13 @@ const MasterListView = ({
             <tbody className="divide-y dark:divide-gray-700">
               {filteredItems.length > 0 ? (
                 filteredItems.map((item) => {
-                  const isModelInUse = fullEquipmentList.some(
-                    (e) =>
-                      e.name.startsWith(item.name) &&
+                  const isModelInUse = fullEquipmentList.some((e) => {
+                    const baseItemName = e.name.split(" (User:")[0].trim();
+                    return (
+                      baseItemName === item.name &&
                       !["master", "pending-purchase"].includes(e.status)
-                  );
+                    );
+                  });
                   const statusText = isModelInUse
                     ? t("has_been_used")
                     : t("never_used");
@@ -165,11 +167,13 @@ const MasterListView = ({
       <div className="md:hidden space-y-4">
         {filteredItems.length > 0 ? (
           filteredItems.map((item) => {
-            const isModelInUse = fullEquipmentList.some(
-              (e) =>
-                e.name.startsWith(item.name) &&
+            const isModelInUse = fullEquipmentList.some((e) => {
+              const baseItemName = e.name.split(" (User:")[0].trim();
+              return (
+                baseItemName === item.name &&
                 !["master", "pending-purchase"].includes(e.status)
-            );
+              );
+            });
             const statusText = isModelInUse
               ? t("has_been_used")
               : t("never_used");

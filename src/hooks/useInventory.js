@@ -185,30 +185,66 @@ export const useInventory = (currentUser, t) => {
 
   const deleteMasterItem = useCallback(
     async (itemToDelete) => {
-      const isModelInUse = equipment.some(
-        (e) =>
-          e.name.startsWith(itemToDelete.name) &&
-          e.status !== "pending-purchase" &&
-          e.status !== "master"
-      );
+      // Correct logic: Check if any non-master/pending item has the exact base name
+      const isModelInUse = equipment.some((e) => {
+        const baseItemName = e.name.split(" (User:")[0].trim();
+        return (
+          baseItemName === itemToDelete.name &&
+          !["master", "pending-purchase"].includes(e.status)
+        );
+      });
+
       if (isModelInUse) {
         toast.error(
           t("toast_cannot_delete_model_in_use", { itemName: itemToDelete.name })
         );
         return;
       }
+
       const batch = writeBatch(db);
-      const itemsToDelete = equipment.filter((item) =>
-        item.name.startsWith(itemToDelete.name)
+      // Delete the master item itself and any pending purchases of it
+      const itemsToDelete = equipment.filter(
+        (item) =>
+          item.name.split(" (User:")[0].trim() === itemToDelete.name &&
+          (item.status === "master" || item.status === "pending-purchase")
       );
-      itemsToDelete.forEach((item) => {
-        const docRef = doc(db, "users", currentUser.uid, "equipment", item.id);
-        batch.delete(docRef);
-      });
+
+      if (itemsToDelete.length === 0) {
+        // This case might happen if there are inconsistencies, but it's good to handle.
+        // It means the master item to delete wasn't even found.
+        const masterRecord = equipment.find((e) => e.id === itemToDelete.id);
+        if (masterRecord) {
+          const docRef = doc(
+            db,
+            "users",
+            currentUser.uid,
+            "equipment",
+            masterRecord.id
+          );
+          batch.delete(docRef);
+        }
+      } else {
+        itemsToDelete.forEach((item) => {
+          const docRef = doc(
+            db,
+            "users",
+            currentUser.uid,
+            "equipment",
+            item.id
+          );
+          batch.delete(docRef);
+        });
+      }
+
       await batch.commit();
+
+      // Update state
       setEquipment(
-        equipment.filter((item) => !item.name.startsWith(itemToDelete.name))
+        equipment.filter(
+          (item) => !itemsToDelete.some((deleted) => deleted.id === item.id)
+        )
       );
+
       toast.success(
         t("toast_model_deleted_successfully", { itemName: itemToDelete.name })
       );
@@ -809,12 +845,12 @@ export const useInventory = (currentUser, t) => {
 
           data.equipment.forEach((item) => {
             const { id, ...itemData } = item;
-            const newDocRef = doc(equipColRef, id);
+            const newDocRef = doc(equipColRef); // Let Firestore generate ID
             batch.set(newDocRef, itemData);
           });
           data.transactions.forEach((item) => {
             const { id, ...itemData } = item;
-            const newDocRef = doc(transColRef, id);
+            const newDocRef = doc(transColRef); // Let Firestore generate ID
             batch.set(newDocRef, itemData);
           });
 
