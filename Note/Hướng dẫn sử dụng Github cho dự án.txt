@@ -1,0 +1,73 @@
+1. Cách đưa code lên GitHub
+
+Trong thư mục project:
+
+git init
+git branch -M main
+git remote add origin https://github.com/nhatluan064/it-inventory
+git add .
+git commit -m "first commit"
+git push -u origin main
+
+
+👉 Lần đầu xong, từ giờ chỉ cần git add ., git commit -m "msg", git push.
+
+🔹 2. Clone code về máy khác
+
+Trên máy mới:
+
+git clone https://github.com/nhatluan064/it-inventory
+cd repo
+npm install   # cài lại node_modules
+
+
+👉 Làm xong có full code, chạy tiếp như bình thường.
+
+🔹 3. Push code lên (giống như sync)
+
+Sau khi sửa code:
+
+git add .
+git commit -m "update feature"
+git push
+
+
+👉 Tất cả commit sẽ được đẩy lên GitHub.
+
+🔹 4. Quay lại bản cũ khi code lỗi
+
+Xem lịch sử commit:
+
+git log --oneline
+
+
+Quay lại commit trước (tạm thời):
+
+git checkout <commit_id>
+
+
+Reset hẳn về commit cũ (xóa luôn thay đổi sau đó):
+
+git reset --hard <commit_id>
+git push --force
+
+
+👉 Git chính là “cỗ máy thời gian” cho project 😎.
+
+🔹 5. Firebase & build tay
+
+Sau khi code push lên GitHub, anh vẫn có thể build & deploy thủ công y như cũ:
+
+npm run build
+firebase deploy
+
+
+Nếu setup thêm GitHub Actions CI/CD → không cần chạy tay nữa, chỉ cần git push.
+
+👉 Kết luận:
+
+GitHub để lưu code & chia sẻ giữa nhiều máy.
+
+Firebase để deploy lên web.
+
+Anh có thể chọn build tay hoặc auto CI/CD tuỳ thích.
