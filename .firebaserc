@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "it-inventory-108a0"
-  }
+    "default": "it-inventory-108a0",
+    "prod": "it-inventory-108a0"
+  },
+  "targets": {},
+  "etags": {}
 }

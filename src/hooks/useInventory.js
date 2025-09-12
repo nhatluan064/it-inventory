@@ -106,7 +106,6 @@ export const useInventory = (currentUser, t) => {
   // --- Master List Functions ---
   const addEquipmentType = useCallback(
     async (typeData) => {
-      // Logic to add a new master item template
       if (!currentUser) return;
       const existing = equipment.some(
         (item) =>
@@ -145,11 +144,15 @@ export const useInventory = (currentUser, t) => {
 
   const updateMasterName = useCallback(
     async (itemToUpdate) => {
-      // Logic to update a master item's name and all related items
+      if (!itemToUpdate || !itemToUpdate.originalName) {
+        console.error(
+          "updateMasterName called with invalid data",
+          itemToUpdate
+        );
+        return;
+      }
       const batch = writeBatch(db);
-      const updatedItemsState = [...equipment];
-
-      equipment.forEach((item) => {
+      const updatedItemsState = equipment.map((item) => {
         if (item.name.startsWith(itemToUpdate.originalName)) {
           const newName = item.name.replace(
             itemToUpdate.originalName,
@@ -163,21 +166,25 @@ export const useInventory = (currentUser, t) => {
             item.id
           );
           batch.update(docRef, { name: newName });
-          const index = updatedItemsState.findIndex((i) => i.id === item.id);
-          if (index > -1) updatedItemsState[index].name = newName;
+          return { ...item, name: newName };
         }
+        return item;
       });
 
-      await batch.commit();
-      setEquipment(updatedItemsState);
-      toast.success(t("toast_model_name_updated_successfully"));
+      try {
+        await batch.commit();
+        setEquipment(updatedItemsState);
+        toast.success(t("toast_model_name_updated_successfully"));
+      } catch (error) {
+        console.error("Error updating master name: ", error);
+        toast.error("Lỗi khi cập nhật tên mẫu.");
+      }
     },
-    [currentUser, equipment]
+    [currentUser, equipment, t]
   );
 
   const deleteMasterItem = useCallback(
     async (itemToDelete) => {
-      // Logic to delete a master item if not in use
       const isModelInUse = equipment.some(
         (e) =>
           e.name.startsWith(itemToDelete.name) &&
@@ -190,12 +197,7 @@ export const useInventory = (currentUser, t) => {
         );
         return;
       }
-
       const batch = writeBatch(db);
-      const itemsToKeep = equipment.filter(
-        (item) => !item.name.startsWith(itemToDelete.name)
-      );
-
       const itemsToDelete = equipment.filter((item) =>
         item.name.startsWith(itemToDelete.name)
       );
@@ -203,9 +205,10 @@ export const useInventory = (currentUser, t) => {
         const docRef = doc(db, "users", currentUser.uid, "equipment", item.id);
         batch.delete(docRef);
       });
-
       await batch.commit();
-      setEquipment(itemsToKeep);
+      setEquipment(
+        equipment.filter((item) => !item.name.startsWith(itemToDelete.name))
+      );
       toast.success(
         t("toast_model_deleted_successfully", { itemName: itemToDelete.name })
       );
@@ -216,7 +219,6 @@ export const useInventory = (currentUser, t) => {
   // --- Purchasing Flow Functions ---
   const requestFromMaster = useCallback(
     async (itemToAdd) => {
-      // Logic to add an item from master list to pending purchase
       if (!currentUser) return;
       const existingItem = equipment.find(
         (item) =>
@@ -257,7 +259,6 @@ export const useInventory = (currentUser, t) => {
 
   const startPurchasing = useCallback(
     async (itemsToPurchase) => {
-      // Logic to move items from pending to purchasing
       const batch = writeBatch(db);
       let localEquipment = [...equipment];
       itemsToPurchase.forEach((itemData) => {
@@ -293,7 +294,6 @@ export const useInventory = (currentUser, t) => {
 
   const confirmPurchased = useCallback(
     async (ids) => {
-      // Logic to move items from purchasing to purchased
       const batch = writeBatch(db);
       let localEquipment = [...equipment];
       ids.forEach((id) => {
@@ -316,7 +316,6 @@ export const useInventory = (currentUser, t) => {
 
   const cancelOrRevertPurchase = useCallback(
     async (type, item) => {
-      // Logic to revert or delete a purchase request
       if (type === "revert-purchasing") {
         await updateDoc(
           doc(db, "users", currentUser.uid, "equipment", item.id),
@@ -353,7 +352,6 @@ export const useInventory = (currentUser, t) => {
 
   const cancelWithNote = useCallback(
     async (item, note) => {
-      // Logic to cancel a purchase with a note
       await deleteDoc(doc(db, "users", currentUser.uid, "equipment", item.id));
       setEquipment(equipment.filter((e) => e.id !== item.id));
       logTransaction({
@@ -372,7 +370,18 @@ export const useInventory = (currentUser, t) => {
   // --- Inventory Management Functions ---
   const importPurchasedItems = useCallback(
     async (item, serials) => {
-      // Logic to import purchased items into main inventory
+      const existingSNs = equipment
+        .map((e) => e.serialNumber?.toLowerCase())
+        .filter(Boolean);
+      const duplicateSN = serials.find((sn) =>
+        existingSNs.includes(sn.toLowerCase())
+      );
+
+      if (duplicateSN) {
+        toast.error(t("toast_sn_exists", { sn: duplicateSN }));
+        return;
+      }
+
       const batch = writeBatch(db);
       const newItems = [];
       const importDate = new Date().toISOString();
@@ -415,12 +424,11 @@ export const useInventory = (currentUser, t) => {
         })
       );
     },
-    [currentUser, logTransaction, t]
+    [currentUser, equipment, logTransaction, t]
   );
 
   const addLegacyItem = useCallback(
     async (data) => {
-      // Logic to add an item directly to inventory
       const serials = data.serialNumber
         .split(",")
         .map((s) => s.trim())
@@ -434,7 +442,19 @@ export const useInventory = (currentUser, t) => {
         );
         return false;
       }
-      //... (add checks for duplicate SNs)
+
+      const existingSNs = equipment
+        .map((e) => e.serialNumber?.toLowerCase())
+        .filter(Boolean);
+      const duplicateSN = serials.find((sn) =>
+        existingSNs.includes(sn.toLowerCase())
+      );
+
+      if (duplicateSN) {
+        toast.error(t("toast_sn_exists", { sn: duplicateSN }));
+        return false;
+      }
+
       const batch = writeBatch(db);
       const newItems = [];
       const importDate = new Date().toISOString();
@@ -465,12 +485,11 @@ export const useInventory = (currentUser, t) => {
       toast.success(t("toast_legacy_item_imported"));
       return true;
     },
-    [currentUser, logTransaction, t]
+    [currentUser, equipment, logTransaction, t]
   );
 
   const updateItem = useCallback(
     async (data) => {
-      // Logic to update an inventory item
       const docRef = doc(db, "users", currentUser.uid, "equipment", data.id);
       await updateDoc(docRef, data);
       setEquipment(equipment.map((e) => (e.id === data.id ? data : e)));
@@ -487,7 +506,6 @@ export const useInventory = (currentUser, t) => {
 
   const deleteItem = useCallback(
     async (item) => {
-      // Logic to delete an item from inventory
       await deleteDoc(doc(db, "users", currentUser.uid, "equipment", item.id));
       setEquipment(equipment.filter((e) => e.id !== item.id));
       logTransaction({

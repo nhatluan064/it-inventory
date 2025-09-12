@@ -59,7 +59,7 @@ const App = () => {
   const [activeTab, setActiveTab] = useState("inventory");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  // --- STATE MỚI CHO BỘ LỌC CỦA TRANG QUẢN LÝ KHO ---
+  // --- Filter States ---
   const [inventoryFilters, setInventoryFilters] = useState({
     search: "",
     category: "all",
@@ -69,14 +69,12 @@ const App = () => {
     location: "all",
   });
 
-  // --- STATE CHO BỘ LỌC CỦA TRANG XUẤT KHO ---
   const [allocatedFilters, setAllocatedFilters] = useState({
     search: "",
     category: "all",
-    handoverDate: "",
   });
 
-  // --- RESPONSIVE STATES ---
+  // --- Responsive States ---
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -146,78 +144,74 @@ const App = () => {
     () => inventory.equipment.filter((item) => item.status === "liquidation"),
     [inventory.equipment]
   );
-  
+
   const inventoryItems = useMemo(
     () =>
       inventory.equipment.filter(
         (item) =>
-          ![
-            "pending-purchase",
-            "purchasing",
-            "purchased",
-            "in-use",
-            "maintenance",
-            "liquidation",
-          ].includes(item.status)
+          !["pending-purchase", "purchasing", "purchased", "master"].includes(
+            item.status
+          )
       ),
     [inventory.equipment]
   );
-  
+
   const filteredInventory = useMemo(() => {
-    return inventoryItems.filter(item => {
-        const { search, category, importDate, status, condition, location } = inventoryFilters;
-        const query = search.toLowerCase();
+    return inventoryItems.filter((item) => {
+      const { search, category, importDate, status, condition } =
+        inventoryFilters;
+      const query = search.toLowerCase();
 
-        const searchMatch = !query || 
-            item.name?.toLowerCase().includes(query) ||
-            item.serialNumber?.toLowerCase().includes(query);
+      const searchMatch =
+        !query ||
+        item.name?.toLowerCase().includes(query) ||
+        item.serialNumber?.toLowerCase().includes(query);
 
-        const categoryMatch = category === 'all' || item.category === category;
-        const dateMatch = !importDate || new Date(item.importDate).toLocaleDateString('en-CA') === importDate;
-        const statusMatch = status === 'all' || item.status === status;
-        const locationMatch = location === 'all' || item.location === location;
-        
-        const getConditionKey = (cond) => {
-            if (typeof cond === 'object' && cond !== null) return cond.key;
-            return cond;
-        };
-        const conditionMatch = condition === 'all' || getConditionKey(item.condition) === condition;
+      const categoryMatch = category === "all" || item.category === category;
+      const dateMatch =
+        !importDate ||
+        new Date(item.importDate).toLocaleDateString("en-CA") === importDate;
+      const statusMatch = status === "all" || item.status === status;
 
-        return searchMatch && categoryMatch && dateMatch && statusMatch && locationMatch && conditionMatch;
+      const getConditionKey = (cond) => {
+        if (typeof cond === "object" && cond !== null) return cond.key;
+        return cond;
+      };
+      const conditionMatch =
+        condition === "all" || getConditionKey(item.condition) === condition;
+
+      return (
+        searchMatch &&
+        categoryMatch &&
+        dateMatch &&
+        statusMatch &&
+        conditionMatch
+      );
     });
   }, [inventoryItems, inventoryFilters]);
 
   const allocatedItems = useMemo(() => {
-    return inventory.equipment.filter(item => {
-        if (item.status !== 'in-use') return false;
-        
-        const { search, category, handoverDate } = allocatedFilters;
-        const query = search.toLowerCase();
-        const details = item.allocationDetails || {};
+    return inventory.equipment.filter((item) => {
+      if (item.status !== "in-use") return false;
 
-        const categoryMatch = category === 'all' || item.category === category;
-        const dateMatch = !handoverDate || new Date(details.handoverDate).toLocaleDateString('en-CA') === handoverDate;
-        const searchMatch = !query ||
-            (item.name?.toLowerCase().includes(query)) ||
-            (item.serialNumber?.toLowerCase().includes(query)) ||
-            (details.recipientName?.toLowerCase().includes(query));
+      const search = allocatedFilters?.search?.toLowerCase() || "";
+      const category = allocatedFilters?.category || "all";
 
-        return categoryMatch && dateMatch && searchMatch;
+      const details = item.allocationDetails || {};
+
+      const categoryMatch = category === "all" || item.category === category;
+      const searchMatch =
+        !search ||
+        item.name?.toLowerCase().includes(search) ||
+        item.serialNumber?.toLowerCase().includes(search) ||
+        details.recipientName?.toLowerCase().includes(search);
+
+      return categoryMatch && searchMatch;
     });
   }, [inventory.equipment, allocatedFilters]);
 
   const masterItems = useMemo(() => {
-    const uniqueNames = new Set();
-    return inventory.equipment
-      .map((item) => ({ ...item, masterName: item.name.split(" (User:")[0] }))
-      .filter((item) => {
-        if (!uniqueNames.has(item.masterName)) {
-          uniqueNames.add(item.masterName);
-          return true;
-        }
-        return false;
-      })
-      .map(({ masterName, ...rest }) => ({ ...rest, name: masterName }));
+    return inventory.equipment.filter((item) => item.status === "master");
   }, [inventory.equipment]);
 
   // --- UI Effects ---
@@ -364,7 +358,9 @@ const App = () => {
             {...viewProps}
             allItems={inventory.equipment}
             onAddType={() => modals.openModal("type")}
-            onEditItem={(item) => modals.openModal("editName", item)}
+            onEditItem={(item) =>
+              modals.openModal("editName", { ...item, originalName: item.name })
+            }
             onDeleteItem={(item) =>
               modals.openModal("delete", item, { deleteType: "master" })
             }
@@ -376,7 +372,9 @@ const App = () => {
             {...viewProps}
             items={pendingPurchaseItems}
             onStartPurchase={inventory.startPurchasing}
-            onEditItem={(item) => modals.openModal("editName", item)}
+            onEditItem={(item) =>
+              modals.openModal("editName", { ...item, originalName: item.name })
+            }
             onDeleteItem={inventory.cancelOrRevertPurchase}
             onOpenAddFromMasterModal={() => modals.openModal("addFromMaster")}
           />
@@ -425,11 +423,21 @@ const App = () => {
           <AllocatedView
             {...viewProps}
             items={allocatedItems}
-            unfilteredAllocatedItems={inventory.equipment.filter(i => i.status === 'in-use')}
+            unfilteredAllocatedItems={inventory.equipment.filter(
+              (i) => i.status === "in-use"
+            )}
             onRecallItem={(item) => modals.openModal("recall", item)}
-            onMarkDamaged={(item) => modals.openModal("directMaintenanceNote", item)}
-            filters={allocatedFilters}
-            setFilters={setAllocatedFilters}
+            onMarkDamaged={(item) =>
+              modals.openModal("directMaintenanceNote", item)
+            }
+            searchQuery={allocatedFilters.search}
+            setSearchQuery={(q) =>
+              setAllocatedFilters((prev) => ({ ...prev, search: q }))
+            }
+            selectedCategory={allocatedFilters.category}
+            setSelectedCategory={(c) =>
+              setAllocatedFilters((prev) => ({ ...prev, category: c }))
+            }
           />
         );
       case "maintenance":
@@ -479,12 +487,21 @@ const App = () => {
   return (
     <AppContext.Provider value={appContextValue}>
       <div className="flex h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 overflow-hidden">
+        {isMobile && !isMobileSidebarOpen && (
+          <button
+            onClick={() => setMobileSidebarOpen(true)}
+            className="fixed top-4 right-4 z-[60] p-2 text-gray-600 dark:text-gray-300 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 md:hidden"
+            aria-label="Open menu"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        )}
+
         <Sidebar
           activeTab={activeTab}
           setActiveTab={handleTabClick}
           currentUser={currentUser}
           onLogout={logout}
-          onSettingsClick={() => handleTabClick("settings")}
           t={t}
           isCollapsed={isSidebarCollapsed}
           toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -501,25 +518,16 @@ const App = () => {
           />
 
           <header className="p-4 sm:p-6 lg:p-8 flex items-center gap-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-             {isMobile && !isMobileSidebarOpen && (
-              <button
-                onClick={() => setMobileSidebarOpen(true)}
-                className="fixed top-4 right-4 z-[60] p-2 text-gray-600 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 bg-white dark:bg-gray-800 shadow-lg"
-                aria-label="Open menu"
-              >
-                <Menu className="w-6 h-6" />
-              </button>
-            )}
             <div className="flex-grow min-w-0">
               <DashboardView
                 t={t}
                 equipment={inventory.equipment}
-                setActiveTab={handleTabClick}
-                masterItemsCount={masterItems.length}
-                transactionsCount={inventory.transactions.length}
                 pendingPurchaseCount={pendingPurchaseItems.length}
                 purchasingCount={purchasingItems.length}
                 purchasedCount={purchasedItems.length}
+                masterListCount={masterItems.length}
+                reportsCount={inventory.transactions.length}
+                setActiveTab={handleTabClick}
               />
             </div>
           </header>
@@ -651,4 +659,3 @@ const App = () => {
 };
 
 export default App;
-

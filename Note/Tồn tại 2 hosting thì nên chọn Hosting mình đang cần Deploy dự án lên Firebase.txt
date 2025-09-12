@@ -1,0 +1,65 @@
+Hiện tại bạn có 2 project Firebase khác nhau:
+
+it-inventory-2fc9a → cái này CLI đang mặc định dùng (nên mới hiện Using project it-inventory-2fc9a).
+
+it-inventory-108a0 → cái này mới là project bạn muốn giữ lại (cái trong file firebaseConfig).
+
+🔥 Cách xử lý để chỉ giữ projectId: "it-inventory-108a0"
+
+Xem danh sách project hiện tại trên Firebase CLI
+
+firebase projects:list
+
+
+→ Nó sẽ show danh sách tất cả project mà bạn có quyền, gồm cả 2fc9a và 108a0.
+
+Đổi project mặc định trong thư mục code
+Trong thư mục dự án React của bạn chạy:
+
+firebase use it-inventory-108a0
+
+
+hoặc nếu muốn đặt alias dễ nhớ:
+
+firebase use --add
+
+
+→ chọn it-inventory-108a0 và đặt tên alias ví dụ prod.
+
+Từ đó về sau bạn deploy thì sẽ thấy:
+
+Using project it-inventory-108a0 (prod)
+
+
+Xóa project cũ ra khỏi config local (nếu không muốn thấy nữa)
+Firebase lưu alias trong file .firebaserc. Bạn mở file đó (ở thư mục gốc của project) → xóa phần it-inventory-2fc9a.
+
+Ví dụ file .firebaserc:
+
+{
+  "projects": {
+    "default": "it-inventory-2fc9a"
+  }
+}
+
+
+👉 sửa lại thành:
+
+{
+  "projects": {
+    "default": "it-inventory-108a0"
+  }
+}
+
+
+(Optional) Xóa project Firebase cũ hẳn trong console
+Nếu bạn chắc chắn không dùng it-inventory-2fc9a nữa, vào Firebase Console
+ → chọn project đó → Project settings → Shut down project.
+
+👉 Tóm gọn:
+
+Dòng Using project ... chỉ là project Firebase mà CLI đang trỏ tới.
+
+Bạn muốn dùng 108a0 thì firebase use it-inventory-108a0.
+
+Muốn dọn dẹp thì sửa .firebaserc hoặc xóa project cũ trong Firebase Console.
