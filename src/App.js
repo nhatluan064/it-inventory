@@ -20,7 +20,7 @@ import LoginPage from "./Pages/LoginPage";
 import AccountPage from "./Pages/AccountPage";
 import Sidebar from "./layouts/Sidebar";
 import AuthSuccessPopup from "./Popup/AuthSuccessPopup";
-import SetupProfilePage from "./Pages/SetupProfilePage"; 
+import SetupProfilePage from "./Pages/SetupProfilePage";
 import HomeView from "./views/HomeView";
 
 // Views
@@ -49,7 +49,7 @@ import InfoModal from "./modals/InfoModal";
 import AddFromMasterModal from "./modals/AddFromMasterModal";
 import NoteModal from "./modals/NoteModal";
 import RepairNoteModal from "./modals/RepairNoteModal";
-import UserInfoModal from "./modals/UserInfoModal"; 
+import UserInfoModal from "./modals/UserInfoModal";
 
 const App = () => {
   // --- UI and Translation States ---
@@ -60,7 +60,7 @@ const App = () => {
     () => localStorage.getItem("language") || "vi"
   );
   const [activeTab, setActiveTab] = useState("home");
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024); // Đã sửa breakpoint
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
   // --- Filter States ---
   const [inventoryFilters, setInventoryFilters] = useState({
@@ -228,10 +228,9 @@ const App = () => {
   }, [inventory.equipment]);
 
   const uniqueMasterItemsCount = useMemo(() => {
-    const uniqueNames = new Set(masterItems.map(item => item.name));
+    const uniqueNames = new Set(masterItems.map((item) => item.name));
     return uniqueNames.size;
   }, [masterItems]);
-
 
   // --- UI Effects ---
   useEffect(() => {
@@ -255,7 +254,7 @@ const App = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      const mobile = window.innerWidth < 1024; // Đã sửa breakpoint
+      const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
       if (!mobile) {
         setMobileSidebarOpen(false);
@@ -364,7 +363,7 @@ const App = () => {
   if (inventory.dataLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-        t{"loading_data"}...
+        Đang tải dữ liệu...
       </div>
     );
   }
@@ -510,7 +509,13 @@ const App = () => {
           />
         );
       case "account":
-        return <AccountPage {...viewProps} currentUser={currentUser} onPasswordReset={passwordReset} />;
+        return (
+          <AccountPage
+            {...viewProps}
+            currentUser={currentUser}
+            onPasswordReset={passwordReset}
+          />
+        );
       default:
         return <HomeView {...viewProps} />;
     }
@@ -530,8 +535,8 @@ const App = () => {
           isMobile={isMobile}
           isMobileOpen={isMobileSidebarOpen}
           setMobileOpen={setMobileSidebarOpen}
-          onSettingsClick={() => handleTabClick('settings')}
-          onViewProfile={() => modals.openModal('userInfo', currentUser)}
+          onSettingsClick={() => handleTabClick("settings")}
+          onViewProfile={() => modals.openModal("userInfo", currentUser)}
         />
 
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -541,24 +546,22 @@ const App = () => {
             containerStyle={{ top: 20, right: 20 }}
           />
 
-          {/* --- Mobile Header: Sửa md:hidden -> lg:hidden --- */}
           <header className="lg:hidden sticky top-0 z-30 bg-white dark:bg-gray-800 shadow-md p-4 flex justify-between items-center">
-             <div className="flex items-center space-x-2">
-                <Package className="w-8 h-8 text-blue-600" />
-                <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                  {t("it_inventory")}
-                </h1>
-              </div>
-              <button
-                onClick={() => setMobileSidebarOpen(true)}
-                className="p-2 text-gray-600 dark:text-gray-300"
-                aria-label="Open menu"
-              >
-                <Menu className="w-6 h-6" />
-              </button>
+            <div className="flex items-center space-x-2">
+              <Package className="w-8 h-8 text-blue-600" />
+              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                {t("it_inventory")}
+              </h1>
+            </div>
+            <button
+              onClick={() => setMobileSidebarOpen(true)}
+              className="p-2 text-gray-600 dark:text-gray-300"
+              aria-label="Open menu"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
           </header>
 
-          {/* --- Desktop Header: Sửa hidden md:block -> hidden lg:block --- */}
           <header className="hidden lg:block p-4 sm:p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
             <div className="flex-grow min-w-0">
               <DashboardView
@@ -573,22 +576,23 @@ const App = () => {
               />
             </div>
           </header>
-          
-          {/* --- Mobile Dashboard: Sửa md:hidden -> lg:hidden --- */}
-          <div className="lg:hidden p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-             <DashboardView
-                t={t}
-                equipment={inventory.equipment}
-                pendingPurchaseCount={pendingPurchaseItems.length}
-                purchasingCount={purchasingItems.length}
-                purchasedCount={purchasedItems.length}
-                masterListCount={uniqueMasterItemsCount}
-                reportsCount={inventory.transactions.length}
-                setActiveTab={handleTabClick}
-              />
-          </div>
 
           <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8">
+            <div className="lg:hidden mb-6 -mx-4 -mt-4 sm:-mx-6 sm:-mt-6">
+              <div className="p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <DashboardView
+                  t={t}
+                  equipment={inventory.equipment}
+                  pendingPurchaseCount={pendingPurchaseItems.length}
+                  purchasingCount={purchasingItems.length}
+                  purchasedCount={purchasedItems.length}
+                  masterListCount={uniqueMasterItemsCount}
+                  reportsCount={inventory.transactions.length}
+                  setActiveTab={handleTabClick}
+                />
+              </div>
+            </div>
+
             {renderCurrentView()}
           </main>
         </div>
@@ -709,9 +713,9 @@ const App = () => {
           title={t("failure_note")}
           t={t}
         />
-         <UserInfoModal
+        <UserInfoModal
           show={modals.modalState.userInfo}
-          onClose={() => modals.closeModal('userInfo')}
+          onClose={() => modals.closeModal("userInfo")}
           currentUser={modals.currentItem}
           onPasswordReset={passwordReset}
           t={t}

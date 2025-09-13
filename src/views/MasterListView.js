@@ -3,13 +3,12 @@ import React, { useState } from "react";
 import { Plus, Package, Search, Edit2, Trash2, Filter, X } from "lucide-react";
 
 const MasterListView = ({
-  allItems, // This now correctly receives only master items
+  allItems,
   onAddType,
   onEditItem,
   onDeleteItem,
   categories,
   t,
-  // We need the full equipment list to check usage status
   fullEquipmentList,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,18 +29,16 @@ const MasterListView = ({
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div>
-            {/* ĐÃ SỬA: text-xl -> text-lg */}
             <h2 className="text-lg font-bold">{t("master_list")}</h2>
-            {/* ĐÃ SỬA: text-sm -> text-xs */}
             <p className="text-xs text-gray-500 mt-1">
               {t("master_list_desc")}
             </p>
           </div>
+          {/* Sửa: md:hidden -> lg:hidden */}
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="md:hidden p-2 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md"
+            className="lg:hidden p-2 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md"
           >
-            {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
             {isFilterOpen ? (
               <X className="w-4 h-4" />
             ) : (
@@ -49,13 +46,13 @@ const MasterListView = ({
             )}
           </button>
         </div>
+        {/* Sửa: md:flex -> lg:flex */}
         <div
-          className={`md:flex flex-col md:flex-row md:items-center gap-4 ${
+          className={`lg:flex flex-col lg:flex-row lg:items-center gap-4 ${
             isFilterOpen ? "flex" : "hidden"
           }`}
         >
           <div className="relative flex-grow">
-            {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
@@ -66,7 +63,7 @@ const MasterListView = ({
             />
           </div>
           <select
-            className="w-full md:w-48 py-2 px-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 text-sm"
+            className="w-full lg:w-48 py-2 px-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 text-sm"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
@@ -78,18 +75,17 @@ const MasterListView = ({
           </select>
           <button
             onClick={onAddType}
-            className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2 flex-shrink-0 text-sm"
+            className="w-full lg:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2 flex-shrink-0 text-sm"
           >
-            {/* ĐÃ SỬA: w-4 h-4 -> w-3.5 h-3.5 */}
             <Plus className="w-3.5 h-3.5" />
             <span>{t("add_new_master_item")}</span>
           </button>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hidden md:block">
+      {/* Sửa: hidden md:block -> hidden lg:block */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hidden lg:block">
         <div className="overflow-x-auto">
-          {/* ĐÃ SỬA: text-sm -> text-xs */}
           <table className="w-full text-xs">
             <thead className="bg-gray-50 dark:bg-gray-700/50">
               <tr>
@@ -138,7 +134,6 @@ const MasterListView = ({
                       </td>
                       <td className="px-6 py-4 text-center">
                         <div className="flex items-center justify-center space-x-2">
-                          {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
                           <button
                             onClick={() => onEditItem(item)}
                             className="p-2"
@@ -171,7 +166,8 @@ const MasterListView = ({
         </div>
       </div>
 
-      <div className="md:hidden space-y-4">
+      {/* Sửa: md:hidden -> lg:hidden */}
+      <div className="lg:hidden space-y-4">
         {filteredItems.length > 0 ? (
           filteredItems.map((item) => {
             const isModelInUse = fullEquipmentList.some((e) => {
@@ -203,7 +199,6 @@ const MasterListView = ({
                     </p>
                   </div>
                   <div className="flex items-center space-x-1">
-                    {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
                     <button
                       onClick={() => onEditItem(item)}
                       className="p-2"

@@ -47,7 +47,7 @@ const Sidebar = ({
 
     return (
       <>
-        <div className="flex items-center justify-between p-4 border-b dark:border-gray-700 h-12 flex-shrink-0">
+        <div className="flex items-center justify-between p-4 border-b dark:border-gray-700 h-16 flex-shrink-0">
           <div
             className={`flex items-center space-x-3 overflow-hidden transition-opacity duration-300 ${
               isCollapsed && !isMobile ? "opacity-0 w-0" : "opacity-100"
@@ -55,8 +55,8 @@ const Sidebar = ({
           >
             {isMobile ? (
               <>
-                <SlidersHorizontal className="w-5 h-5 text-blue-600 flex-shrink-0" />
-                <h1 className="text-sm font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                <SlidersHorizontal className="w-7 h-7 text-blue-600 flex-shrink-0" />
+                <h1 className="text-base font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap">
                   {t("actioninventory")}
                 </h1>
               </>
@@ -70,30 +70,34 @@ const Sidebar = ({
             )}
           </div>
           {isCollapsed && !isMobile && (
-             <div className="flex items-center justify-center w-full">
-                <Package className="w-8 h-8 text-blue-600" />
-             </div>
-          )}
-          {!isMobile && (
-             <div className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100'}`}>
-                <button
-                  onClick={toggleSidebar}
-                  className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                  aria-label="Toggle sidebar"
-                >
-                  <ChevronsLeft />
-                </button>
+            <div className="flex items-center justify-center w-full">
+              <Package className="w-8 h-8 text-blue-600" />
             </div>
           )}
-           {isCollapsed && !isMobile && (
-             <div className="absolute top-4 right-[-14px] z-10">
-                 <button
-                    onClick={toggleSidebar}
-                    className="p-1.5 text-gray-500 bg-white dark:bg-gray-800 border dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full shadow-md"
-                    aria-label="Toggle sidebar"
-                  >
-                    <ChevronsLeft className="rotate-180 w-4 h-4" />
-                </button>
+          {!isMobile && (
+            <div
+              className={`transition-opacity duration-300 ${
+                isCollapsed ? "opacity-0 w-0" : "opacity-100"
+              }`}
+            >
+              <button
+                onClick={toggleSidebar}
+                className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                aria-label="Toggle sidebar"
+              >
+                <ChevronsLeft />
+              </button>
+            </div>
+          )}
+          {isCollapsed && !isMobile && (
+            <div className="absolute top-4 right-[-14px] z-10">
+              <button
+                onClick={toggleSidebar}
+                className="p-1.5 text-gray-500 bg-white dark:bg-gray-800 border dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full shadow-md"
+                aria-label="Toggle sidebar"
+              >
+                <ChevronsLeft className="rotate-180 w-4 h-4" />
+              </button>
             </div>
           )}
           {isMobile && (
@@ -107,7 +111,10 @@ const Sidebar = ({
           )}
         </div>
 
-        <nav ref={navRef} className="flex-grow overflow-y-auto p-4 hide-scrollbar">
+        <nav
+          ref={navRef}
+          className="flex-grow overflow-y-auto p-4 hide-scrollbar"
+        >
           <NavigationTabs
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -115,19 +122,16 @@ const Sidebar = ({
             isCollapsed={isCollapsed && !isMobile}
           />
         </nav>
-        
+
+        {/* ---- BẮT ĐẦU KHU VỰC ĐÃ TÁI CẤU TRÚC ---- */}
         <div className="p-4 border-t dark:border-gray-700 flex-shrink-0">
-          {/* Chế độ xem Mở Rộng */}
-          <div
-            className={`grid transition-all duration-300 ease-in-out ${
-              isCollapsed && !isMobile
-                ? "grid-rows-[0fr] opacity-0"
-                : "grid-rows-[1fr] opacity-100"
-            }`}
-          >
-            <div className="overflow-hidden">
+          <div className={`${isCollapsed && !isMobile ? "hidden" : "block"}`}>
+            {/* Layout cho màn hình cao (Desktop và Mobile dọc) */}
+            <div className="max-h-[720px]:hidden">
               <div className="flex flex-col items-center text-center space-y-2">
-                <p className="text-xs text-gray-500 dark:text-gray-400">{t('hello')},</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {t("hello")},
+                </p>
                 <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                   <span className="text-white text-lg font-medium">
                     {currentUser.displayName
@@ -138,60 +142,104 @@ const Sidebar = ({
                 <p className="font-semibold text-gray-800 dark:text-gray-200 truncate w-full text-sm">
                   {currentUser.displayName || currentUser.email}
                 </p>
-                <button onClick={onViewProfile} className="text-xs text-blue-500 hover:underline">
-                  ({t('view_info')})
+                <button
+                  onClick={onViewProfile}
+                  className="text-xs text-blue-500 hover:underline"
+                >
+                  ({t("view_info")})
                 </button>
               </div>
               <div className="mt-3 space-y-1 pl-4">
-                <button onClick={onLogout} className="w-full flex items-center space-x-3 py-1.5 px-4 rounded-lg font-medium text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50">
+                <button
+                  onClick={onLogout}
+                  className="w-full flex items-center space-x-3 py-1.5 px-4 rounded-lg font-medium text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                >
                   <LogOut className="w-4 h-4" />
                   <span>{t("logout")}</span>
                 </button>
-                <button onClick={onSettingsClick} className="w-full flex items-center space-x-3 py-1.5 px-4 rounded-lg font-medium text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50">
+                <button
+                  onClick={onSettingsClick}
+                  className="w-full flex items-center space-x-3 py-1.5 px-4 rounded-lg font-medium text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                >
                   <Settings className="w-4 h-4" />
-                   <span>{t("settings")}</span>
+                  <span>{t("settings")}</span>
                 </button>
               </div>
-              <div className="text-center text-xs text-gray-500 mt-3">
-                © 2025 Make by Nhật Luân
+            </div>
+
+            {/* Layout siêu gọn cho màn hình thấp (Mobile ngang) */}
+            <div className="hidden max-h-[720px]:block">
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={onViewProfile}
+                  className="p-2 flex items-center space-x-2"
+                >
+                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                    <span className="text-white text-md font-medium">
+                      {currentUser.displayName
+                        ? currentUser.displayName.charAt(0).toUpperCase()
+                        : currentUser.email.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <span className="font-semibold text-sm text-gray-800 dark:text-gray-200">
+                    {currentUser.displayName}
+                  </span>
+                </button>
+                <div className="flex items-center space-x-1">
+                  <button
+                    onClick={onLogout}
+                    title={t("logout")}
+                    className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={onSettingsClick}
+                    title={t("settings")}
+                    className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Chế độ xem Thu Gọn */}
-          <div
-            className={`grid transition-all duration-300 ease-in-out ${
-              isCollapsed && !isMobile
-                ? "grid-rows-[1fr] opacity-100"
-                : "grid-rows-[0fr] opacity-0"
-            }`}
-          >
-            <div className="overflow-hidden">
-              <div className="flex flex-col items-center justify-center">
-                <div className="w-full flex justify-center">
-                  <button onClick={onViewProfile} className="p-2">
-                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                      <span className="text-white text-md font-medium">
-                        {currentUser.displayName
-                          ? currentUser.displayName.charAt(0).toUpperCase()
-                          : currentUser.email.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  </button>
-                </div>
-                <div className="mt-2 space-y-1">
-                  <button onClick={onLogout} title={t("logout")} className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50">
-                      <LogOut className="w-4 h-4" />
-                  </button>
-                   <button onClick={onSettingsClick} title={t("settings")} className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50">
-                      <Settings className="w-4 h-4" />
-                  </button>
-                </div>
-                 <div className="text-center text-xs text-gray-500 pt-2">
-                    © 2025 Make by Nhật Luân
-                 </div>
+          {/* Chế độ xem Thu Gọn (cho desktop) */}
+          <div className={`${!isCollapsed || isMobile ? "hidden" : "block"}`}>
+            <div className="flex flex-col items-center justify-center">
+              <div className="w-full flex justify-center">
+                <button onClick={onViewProfile} className="p-2">
+                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                    <span className="text-white text-md font-medium">
+                      {currentUser.displayName
+                        ? currentUser.displayName.charAt(0).toUpperCase()
+                        : currentUser.email.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                </button>
+              </div>
+              <div className="mt-2 space-y-1">
+                <button
+                  onClick={onLogout}
+                  title={t("logout")}
+                  className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={onSettingsClick}
+                  title={t("settings")}
+                  className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                >
+                  <Settings className="w-4 h-4" />
+                </button>
               </div>
             </div>
+          </div>
+
+          <div className="text-center text-xs text-gray-500 mt-3">
+            © 2025 Make by Nhật Luân
           </div>
         </div>
       </>

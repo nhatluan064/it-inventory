@@ -153,6 +153,7 @@ const InventoryView = ({
               {t("inventory_desc")}
             </p>
           </div>
+          {/* Sửa: md:hidden -> lg:hidden */}
           <div className="lg:hidden">
             <button
               onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
