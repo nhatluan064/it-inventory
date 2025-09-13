@@ -1,15 +1,16 @@
 // src/modals/RepairNoteModal.js
 import React, { useState, useEffect } from "react";
 
-const RepairNoteModal = ({ show, onClose, onSubmit, item, t }) => {
-  const noteOptions = [
-    "repair_note_successful",
-    "repair_note_replace_pcu",
-    "repair_note_reinstall_os",
-    "repair_note_replace_screen",
-    "repair_note_other",
-  ];
+// Move constant outside the component
+const noteOptions = [
+  "repair_note_successful",
+  "repair_note_replace_pcu",
+  "repair_note_reinstall_os",
+  "repair_note_replace_screen",
+  "repair_note_other",
+];
 
+const RepairNoteModal = ({ show, onClose, onSubmit, item, t }) => {
   const [noteKey, setNoteKey] = useState(noteOptions[0]);
   const [customNote, setCustomNote] = useState("");
 
@@ -18,16 +19,15 @@ const RepairNoteModal = ({ show, onClose, onSubmit, item, t }) => {
       setNoteKey(noteOptions[0]);
       setCustomNote("");
     }
-  }, [show]);
+  }, [show]); // Now the dependency array is correct as noteOptions is stable
 
   if (!show || !item) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Luôn lấy text cuối cùng để gửi đi
     const noteValue = noteKey === "repair_note_other" ? customNote : noteKey;
     const isNoteKey = noteKey !== "repair_note_other";
-    onSubmit(item, noteValue, isNoteKey); // Cập nhật tham số cho hàm onSubmit
+    onSubmit(item, noteValue, isNoteKey);
     onClose();
   };
 
@@ -62,7 +62,7 @@ const RepairNoteModal = ({ show, onClose, onSubmit, item, t }) => {
               <textarea
                 value={customNote}
                 onChange={(e) => setCustomNote(e.target.value)}
-                className="mt-1 block w-full h-24 p-2 border rounded-md"
+                className="mt-1 block w-full h-24 p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600 dark:placeholder-gray-400"
                 required
               />
             </div>
@@ -71,7 +71,7 @@ const RepairNoteModal = ({ show, onClose, onSubmit, item, t }) => {
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg"
+              className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
             >
               {t("cancel")}
             </button>
@@ -89,3 +89,4 @@ const RepairNoteModal = ({ show, onClose, onSubmit, item, t }) => {
 };
 
 export default RepairNoteModal;
+

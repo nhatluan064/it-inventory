@@ -13,10 +13,9 @@ import {
 } from "lucide-react";
 
 const NavigationTabs = ({ activeTab, setActiveTab, t, isCollapsed }) => {
-  // Thay đổi thứ tự các nhóm trong mảng này
   const navGroups = [
     {
-      titleKey: "nav_title_purchasing", // 1. Nhóm Mua hàng
+      titleKey: "nav_title_purchasing",
       items: [
         { id: "masterList", name: t("master_list"), icon: ClipboardList },
         { id: "pendingPurchase", name: t("pending_purchase"), icon: FilePlus },
@@ -25,33 +24,33 @@ const NavigationTabs = ({ activeTab, setActiveTab, t, isCollapsed }) => {
       ],
     },
     {
-      titleKey: "nav_title_assets", // 2. Nhóm Tài sản
+      titleKey: "nav_title_assets",
       items: [
         { id: "inventory", name: t("inventory_management"), icon: Package },
         { id: "allocated", name: t("allocated"), icon: LogOut },
       ],
     },
     {
-      titleKey: "nav_title_lifecycle", // 3. Nhóm Vòng đời
+      titleKey: "nav_title_lifecycle",
       items: [
         { id: "maintenance", name: t("maintenance"), icon: Wrench },
         { id: "liquidation", name: t("liquidation"), icon: Trash2 },
       ],
     },
     {
-      titleKey: "nav_title_reports", // 4. Nhóm Báo cáo
+      titleKey: "nav_title_reports",
       items: [{ id: "reports", name: t("reports"), icon: FileText }],
     },
   ];
 
   return (
     <nav>
-      <div className="flex flex-col space-y-2">
-        {navGroups.map((group) => (
+      <div className="flex flex-col space-y-4">
+        {navGroups.map((group, groupIndex) => (
           <div key={group.titleKey}>
             <h3
-              className={`px-4 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider transition-opacity duration-300 ${
-                isCollapsed ? "opacity-0" : "opacity-100"
+              className={`px-4 mb-2 text-sm font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-opacity duration-300 ${
+                isCollapsed ? "hidden" : "opacity-100"
               }`}
             >
               {t(group.titleKey)}
@@ -65,8 +64,8 @@ const NavigationTabs = ({ activeTab, setActiveTab, t, isCollapsed }) => {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     title={isCollapsed ? tab.name : ""}
-                    className={`w-full flex items-center space-x-3 py-2 px-4 rounded-lg font-medium text-sm transition-colors ${
-                      isCollapsed ? "justify-center" : ""
+                    className={`w-full flex items-center space-x-3 py-2 rounded-lg font-medium text-sm transition-colors ${
+                      isCollapsed ? "justify-center px-2" : "px-4 ml-4"
                     } ${
                       isActive
                         ? "bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300"
@@ -81,6 +80,9 @@ const NavigationTabs = ({ activeTab, setActiveTab, t, isCollapsed }) => {
                 );
               })}
             </div>
+            {isCollapsed && groupIndex < navGroups.length - 1 && (
+              <hr className="my-2 border-gray-200 dark:border-gray-700" />
+            )}
           </div>
         ))}
       </div>
@@ -89,3 +91,4 @@ const NavigationTabs = ({ activeTab, setActiveTab, t, isCollapsed }) => {
 };
 
 export default NavigationTabs;
+
