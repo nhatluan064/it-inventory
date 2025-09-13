@@ -123,7 +123,7 @@ const AllocatedView = ({
           } md:flex md:flex-row md:items-end`}
         >
           <div className="flex-grow">
-            <label className="block text-sm font-medium mb-1">{t("search")}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t("search")}</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -137,10 +137,10 @@ const AllocatedView = ({
             </div>
           </div>
           <div className="flex-shrink-0 md:w-44">
-            <label className="block text-sm font-medium mb-1">{t("category")}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t("category")}</label>
             <select
               name="category"
-              className="w-full py-2 px-3 border rounded-lg"
+              className="w-full py-2 px-3 border rounded-lg dark:text-gray-800"
               value={filters.category}
               onChange={handleFilterChange}
             >
@@ -158,10 +158,10 @@ const AllocatedView = ({
             </select>
           </div>
           <div className="flex-shrink-0 md:w-44">
-            <label className="block text-sm font-medium mb-1">{t("department")}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t("department")}</label>
             <select
               name="department"
-              className="w-full py-2 px-3 border rounded-lg"
+              className="w-full py-2 px-3 border rounded-lg dark:text-gray-800"
               value={filters.department}
               onChange={handleFilterChange}
             >
@@ -173,11 +173,11 @@ const AllocatedView = ({
             </select>
           </div>
           <div className="flex-shrink-0 md:w-44">
-            <label className="block text-sm font-medium mb-1">{t("handover_date")}</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t("handover_date")}</label>
             <input
               name="handoverDate"
               type="date"
-              className="w-full py-2 px-3 border rounded-lg"
+              className="w-full py-2 px-3 border rounded-lg dark:text-gray-800"
               value={filters.handoverDate}
               onChange={handleFilterChange}
             />
