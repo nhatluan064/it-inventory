@@ -17,7 +17,7 @@ git push -u origin main
 Trên máy mới:
 
 git clone https://github.com/nhatluan064/it-inventory
-cd repo
+cd it-inventory
 npm install   # cài lại node_modules
 
 
