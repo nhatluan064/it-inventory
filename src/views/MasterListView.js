@@ -30,8 +30,10 @@ const MasterListView = ({
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-xl font-bold">{t("master_list")}</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            {/* ĐÃ SỬA: text-xl -> text-lg */}
+            <h2 className="text-lg font-bold">{t("master_list")}</h2>
+            {/* ĐÃ SỬA: text-sm -> text-xs */}
+            <p className="text-xs text-gray-500 mt-1">
               {t("master_list_desc")}
             </p>
           </div>
@@ -39,10 +41,11 @@ const MasterListView = ({
             onClick={() => setIsFilterOpen(!isFilterOpen)}
             className="md:hidden p-2 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md"
           >
+            {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
             {isFilterOpen ? (
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             ) : (
-              <Filter className="w-5 h-5" />
+              <Filter className="w-4 h-4" />
             )}
           </button>
         </div>
@@ -52,17 +55,18 @@ const MasterListView = ({
           }`}
         >
           <div className="relative flex-grow">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
               placeholder={t("search_master_item_placeholder")}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 text-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <select
-            className="w-full md:w-48 py-2 px-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+            className="w-full md:w-48 py-2 px-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 text-sm"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
@@ -74,9 +78,10 @@ const MasterListView = ({
           </select>
           <button
             onClick={onAddType}
-            className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2 flex-shrink-0"
+            className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2 flex-shrink-0 text-sm"
           >
-            <Plus className="w-4 h-4" />
+            {/* ĐÃ SỬA: w-4 h-4 -> w-3.5 h-3.5 */}
+            <Plus className="w-3.5 h-3.5" />
             <span>{t("add_new_master_item")}</span>
           </button>
         </div>
@@ -84,7 +89,8 @@ const MasterListView = ({
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hidden md:block">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          {/* ĐÃ SỬA: text-sm -> text-xs */}
+          <table className="w-full text-xs">
             <thead className="bg-gray-50 dark:bg-gray-700/50">
               <tr>
                 <th className="px-6 py-3 text-left font-medium uppercase">
@@ -132,19 +138,20 @@ const MasterListView = ({
                       </td>
                       <td className="px-6 py-4 text-center">
                         <div className="flex items-center justify-center space-x-2">
+                          {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
                           <button
                             onClick={() => onEditItem(item)}
                             className="p-2"
                             title={t("edit")}
                           >
-                            <Edit2 className="w-5 h-5 text-blue-600 hover:text-blue-400" />
+                            <Edit2 className="w-4 h-4 text-blue-600 hover:text-blue-400" />
                           </button>
                           <button
                             onClick={() => onDeleteItem(item)}
                             className="p-2"
                             title={t("delete")}
                           >
-                            <Trash2 className="w-5 h-5 text-red-600 hover:text-red-400" />
+                            <Trash2 className="w-4 h-4 text-red-600 hover:text-red-400" />
                           </button>
                         </div>
                       </td>
@@ -154,8 +161,8 @@ const MasterListView = ({
               ) : (
                 <tr>
                   <td colSpan="4" className="text-center py-12">
-                    <Package className="w-12 h-12 mx-auto text-gray-300" />
-                    <p className="mt-2">{t("no_master_items_found")}</p>
+                    <Package className="w-10 h-10 mx-auto text-gray-300" />
+                    <p className="mt-2 text-sm">{t("no_master_items_found")}</p>
                   </td>
                 </tr>
               )}
@@ -187,33 +194,34 @@ const MasterListView = ({
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-bold text-gray-900 dark:text-gray-100">
+                    <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">
                       {item.name}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
                       {(categories.find((c) => c.id === item.category) || {})
                         .name || item.category}
                     </p>
                   </div>
                   <div className="flex items-center space-x-1">
+                    {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
                     <button
                       onClick={() => onEditItem(item)}
                       className="p-2"
                       title={t("edit")}
                     >
-                      <Edit2 className="w-5 h-5 text-blue-600" />
+                      <Edit2 className="w-4 h-4 text-blue-600" />
                     </button>
                     <button
                       onClick={() => onDeleteItem(item)}
                       className="p-2"
                       title={t("delete")}
                     >
-                      <Trash2 className="w-5 h-5 text-red-600" />
+                      <Trash2 className="w-4 h-4 text-red-600" />
                     </button>
                   </div>
                 </div>
                 <div
-                  className={`text-sm pt-2 border-t dark:border-gray-700 ${statusColor}`}
+                  className={`text-xs pt-2 border-t dark:border-gray-700 ${statusColor}`}
                 >
                   <span>
                     {t("usage_status")}: {statusText}
@@ -224,8 +232,8 @@ const MasterListView = ({
           })
         ) : (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-lg shadow">
-            <Package className="w-12 h-12 mx-auto text-gray-300" />
-            <p className="mt-2">{t("no_master_items_found")}</p>
+            <Package className="w-10 h-10 mx-auto text-gray-300" />
+            <p className="mt-2 text-sm">{t("no_master_items_found")}</p>
           </div>
         )}
       </div>

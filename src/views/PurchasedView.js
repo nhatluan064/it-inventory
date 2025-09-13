@@ -70,16 +70,19 @@ const PurchasedView = ({
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
       <div className="p-6 border-b dark:border-gray-700">
-        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+        {/* ĐÃ SỬA: text-xl -> text-lg */}
+        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
           {t("purchased_list")}
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        {/* ĐÃ SỬA: text-sm -> text-xs */}
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           {t("purchased_desc")}
         </p>
       </div>
 
       <div className="overflow-x-auto hidden md:block">
-        <table className="w-full text-sm">
+        {/* ĐÃ SỬA: text-sm -> text-xs */}
+        <table className="w-full text-xs">
           <thead className="bg-gray-50 dark:bg-gray-700/50">
             <tr>
               <th className="px-6 py-3 text-left font-medium uppercase">
@@ -125,6 +128,7 @@ const PurchasedView = ({
                       {item.purchaseQuantity}
                     </td>
                     <td className="px-6 py-4">
+                      {/* ĐÃ SỬA: text-sm -> text-xs */}
                       <input
                         type="text"
                         value={serialNumbers[item.id] || ""}
@@ -132,11 +136,10 @@ const PurchasedView = ({
                           handleSnChange(item.id, e.target.value)
                         }
                         placeholder={t("add_multiple_sn_placeholder")}
-                        className="w-full text-sm p-1 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400"
+                        className="w-full text-xs p-1 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400"
                       />
                     </td>
                     <td className="px-6 py-4 text-center">
-                      {/* 2. Cập nhật lại nút "Nhập kho" cho DESKTOP */}
                       <button
                         onClick={() => handleImportClick(item)}
                         disabled={isImporting}
@@ -147,10 +150,11 @@ const PurchasedView = ({
                             : "bg-blue-100 text-blue-600 hover:bg-blue-200"
                         }`}
                       >
+                        {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
                         {isImporting ? (
-                          <CheckCircle className="w-5 h-5" />
+                          <CheckCircle className="w-4 h-4" />
                         ) : (
-                          <ArrowDownToLine className="w-5 h-5" />
+                          <ArrowDownToLine className="w-4 h-4" />
                         )}
                       </button>
                     </td>
@@ -160,7 +164,7 @@ const PurchasedView = ({
             ) : (
               <tr>
                 <td colSpan="6" className="text-center py-12">
-                  {t("no_data_available")}
+                  <p className="text-sm">{t("no_data_available")}</p>
                 </td>
               </tr>
             )}
@@ -183,15 +187,14 @@ const PurchasedView = ({
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-bold text-gray-900 dark:text-gray-100">
+                    <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">
                       {item.name}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
                       {(categories.find((c) => c.id === item.category) || {})
                         .name || item.category}
                     </p>
                   </div>
-                  {/* 3. Cập nhật lại nút "Nhập kho" cho MOBILE */}
                   <button
                     onClick={() => handleImportClick(item)}
                     disabled={isImporting}
@@ -202,14 +205,16 @@ const PurchasedView = ({
                         : "bg-blue-100 text-blue-600 hover:bg-blue-200"
                     }`}
                   >
+                    {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
                     {isImporting ? (
-                      <CheckCircle className="w-5 h-5" />
+                      <CheckCircle className="w-4 h-4" />
                     ) : (
-                      <ArrowDownToLine className="w-5 h-5" />
+                      <ArrowDownToLine className="w-4 h-4" />
                     )}
                   </button>
                 </div>
-                <div className="text-sm text-gray-700 dark:text-gray-300 grid grid-cols-2 gap-x-4 pt-2 border-t dark:border-gray-700">
+                {/* ĐÃ SỬA: text-sm -> text-xs */}
+                <div className="text-xs text-gray-700 dark:text-gray-300 grid grid-cols-2 gap-x-4 pt-2 border-t dark:border-gray-700">
                   <p>
                     <strong>{t("quantity")}:</strong>{" "}
                     <span className="font-semibold">
@@ -224,14 +229,15 @@ const PurchasedView = ({
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {/* ĐÃ SỬA: text-sm -> text-xs */}
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t("serial_number_sn")}
                   </label>
                   <textarea
                     value={serialNumbers[item.id] || ""}
                     onChange={(e) => handleSnChange(item.id, e.target.value)}
                     placeholder={t("add_multiple_sn_placeholder")}
-                    className="w-full text-sm p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400"
+                    className="w-full text-xs p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400"
                     rows="2"
                   ></textarea>
                 </div>
@@ -240,7 +246,7 @@ const PurchasedView = ({
           })
         ) : (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-            {t("no_data_available")}
+            <p className="text-sm">{t("no_data_available")}</p>
           </div>
         )}
       </div>

@@ -1,13 +1,8 @@
 // src/views/PurchasingView.js
-import React from "react"; // Xóa useState vì không cần selectedIds nữa
+import React from "react";
 import { CheckCircle, RotateCcw, XCircle } from "lucide-react";
-// Xóa toast vì không cần thông báo lỗi chọn item nữa
 
 const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
-  // --- XÓA BỎ STATE VÀ CÁC HÀM XỬ LÝ CHO VIỆC CHỌN NHIỀU MỤC ---
-  // const [selectedIds, setSelectedIds] = useState([]);
-  // ... (xóa các hàm handleSelect, handleConfirmPurchase, handleSelectAll)
-
   const formatCurrency = (amount) => {
     if (typeof amount !== "number") return "0";
     return new Intl.NumberFormat(t("locale_string")).format(amount);
@@ -16,21 +11,22 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
       <div className="p-6 border-b dark:border-gray-700">
-        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+        {/* ĐÃ SỬA: text-xl -> text-lg */}
+        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
           {t("purchasing_list")}
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        {/* ĐÃ SỬA: text-sm -> text-xs */}
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           {t("purchasing_desc")}
         </p>
-        {/* --- XÓA NÚT "XÁC NHẬN ĐÃ MUA" KHỎI HEADER --- */}
       </div>
 
       {/* --- Giao diện Bảng cho Desktop --- */}
       <div className="overflow-x-auto hidden md:block">
-        <table className="w-full text-sm">
+        {/* ĐÃ SỬA: text-sm -> text-xs */}
+        <table className="w-full text-xs">
           <thead className="bg-gray-50 dark:bg-gray-700/50">
             <tr>
-              {/* --- XÓA CỘT CHECKBOX --- */}
               <th className="px-6 py-3 text-left font-medium uppercase">
                 {t("device_name")}
               </th>
@@ -55,7 +51,6 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
                   key={item.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
                 >
-                  {/* --- XÓA CỘT CHECKBOX --- */}
                   <td className="px-6 py-4 font-medium">{item.name}</td>
                   <td className="px-6 py-4 capitalize">
                     {(categories.find((c) => c.id === item.category) || {})
@@ -68,28 +63,28 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
                     {formatCurrency(item.price)}
                   </td>
                   <td className="px-6 py-4 text-center">
-                    {/* --- CẬP NHẬT LẠI CỘT THAO TÁC --- */}
                     <div className="flex items-center justify-center space-x-2">
+                      {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
                       <button
-                        onClick={() => onUpdateStatus([item.id])} // Gửi đi mảng chứa 1 id
+                        onClick={() => onUpdateStatus([item.id])}
                         className="p-2"
                         title={t("confirm_purchased_count", { count: 1 })}
                       >
-                        <CheckCircle className="w-5 h-5 text-green-600 hover:text-green-400" />
+                        <CheckCircle className="w-4 h-4 text-green-600 hover:text-green-400" />
                       </button>
                       <button
                         onClick={() => onCancel("revert-purchasing", item)}
                         className="p-2"
                         title={t("revert_to_pending")}
                       >
-                        <RotateCcw className="w-5 h-5 text-yellow-600 hover:text-yellow-400" />
+                        <RotateCcw className="w-4 h-4 text-yellow-600 hover:text-yellow-400" />
                       </button>
                       <button
                         onClick={() => onCancel("cancel-purchasing", item)}
                         className="p-2"
                         title={t("cancel_purchase")}
                       >
-                        <XCircle className="w-5 h-5 text-red-600 hover:text-red-400" />
+                        <XCircle className="w-4 h-4 text-red-600 hover:text-red-400" />
                       </button>
                     </div>
                   </td>
@@ -98,7 +93,7 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
             ) : (
               <tr>
                 <td colSpan="5" className="text-center py-12">
-                  {t("no_data_available")}
+                  <p className="text-sm">{t("no_data_available")}</p>
                 </td>
               </tr>
             )}
@@ -116,40 +111,40 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-bold text-gray-900 dark:text-gray-100">
+                  <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">
                     {item.name}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
                     {(categories.find((c) => c.id === item.category) || {})
                       .name || item.category}
                   </p>
                 </div>
-                {/* --- Cập nhật cụm nút hành động cho mobile --- */}
                 <div className="flex items-center space-x-1">
+                  {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
                   <button
                     onClick={() => onUpdateStatus([item.id])}
                     className="p-2"
                     title={t("confirm_purchased_count", { count: 1 })}
                   >
-                    <CheckCircle className="w-5 h-5 text-green-600 hover:text-green-400" />
+                    <CheckCircle className="w-4 h-4 text-green-600 hover:text-green-400" />
                   </button>
                   <button
                     onClick={() => onCancel("revert-purchasing", item)}
                     className="p-2"
                     title={t("revert_to_pending")}
                   >
-                    <RotateCcw className="w-5 h-5 text-yellow-600 hover:text-yellow-400"/>
+                    <RotateCcw className="w-4 h-4 text-yellow-600 hover:text-yellow-400"/>
                   </button>
                   <button
                     onClick={() => onCancel("cancel-purchasing", item)}
                     className="p-2"
                     title={t("cancel_purchase")}
                   >
-                    <XCircle className="w-5 h-5 text-red-600 hover:text-red-400"/>
+                    <XCircle className="w-4 h-4 text-red-600 hover:text-red-400"/>
                   </button>
                 </div>
               </div>
-              <div className="text-sm text-gray-700 dark:text-gray-300 grid grid-cols-2 gap-x-4 pt-2 border-t dark:border-gray-700">
+              <div className="text-xs text-gray-700 dark:text-gray-300 grid grid-cols-2 gap-x-4 pt-2 border-t dark:border-gray-700">
                 <p>
                   <strong>{t("purchase_quantity")}:</strong>{" "}
                   <span className="font-semibold">{item.purchaseQuantity}</span>
@@ -165,7 +160,7 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
           ))
         ) : (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-            {t("no_data_available")}
+            <p className="text-sm">{t("no_data_available")}</p>
           </div>
         )}
       </div>

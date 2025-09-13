@@ -53,7 +53,8 @@ const PendingPurchaseView = ({
         className="flex items-center justify-center w-10 h-10 text-blue-600 bg-blue-100 dark:bg-blue-900/50 dark:text-blue-300 rounded-full hover:bg-blue-200 dark:hover:bg-blue-900"
         title={t("add_from_master_list")}
       >
-        <PlusCircle className="w-5 h-5" />
+        {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
+        <PlusCircle className="w-4 h-4" />
       </button>
     </div>
   );
@@ -61,17 +62,20 @@ const PendingPurchaseView = ({
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
       <div className="p-6 border-b dark:border-gray-700">
-        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+        {/* ĐÃ SỬA: text-xl -> text-lg */}
+        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
           {t("pending_purchase_list")}
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        {/* ĐÃ SỬA: text-sm -> text-xs */}
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           {t("pending_purchase_desc")}
         </p>
       </div>
 
       {/* --- Giao diện Bảng cho Desktop --- */}
       <div className="overflow-x-auto hidden md:block">
-        <table className="w-full text-sm">
+        {/* ĐÃ SỬA: text-sm -> text-xs */}
+        <table className="w-full text-xs">
           <thead className="bg-gray-50 dark:bg-gray-700/50">
             <tr>
               <th className="px-6 py-3 text-left font-medium uppercase">
@@ -118,7 +122,7 @@ const PendingPurchaseView = ({
                         onChange={(e) =>
                           handleDataChange(item.id, "quantity", e.target.value)
                         }
-                        className="w-20 p-1 border rounded-md text-right text-black"
+                        className="w-20 p-1 border rounded-md text-right text-black text-sm"
                       />
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -130,31 +134,32 @@ const PendingPurchaseView = ({
                         onChange={(e) =>
                           handleDataChange(item.id, "price", e.target.value)
                         }
-                        className="w-32 p-1 border rounded-md text-right text-black"
+                        className="w-32 p-1 border rounded-md text-right text-black text-sm"
                       />
                     </td>
                     <td className="px-6 py-4 text-center">
                       <div className="flex items-center justify-center space-x-2">
+                        {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
                         <button
                           onClick={() => handlePurchaseClick(item)}
                           className="p-2"
                           title={t("Mua")}
                         >
-                          <ShoppingCart className="w-5 h-5 text-green-600 hover:text-green-400" />
+                          <ShoppingCart className="w-4 h-4 text-green-600 hover:text-green-400" />
                         </button>
                         <button
                           onClick={() => onEditItem(item)}
                           className="p-2"
                           title={t("edit")}
                         >
-                          <Edit2 className="w-5 h-5 text-blue-600 hover:text-blue-400" />
+                          <Edit2 className="w-4 h-4 text-blue-600 hover:text-blue-400" />
                         </button>
                         <button
                           onClick={() => onDeleteItem("delete-pending", item)}
                           className="p-2"
                           title={t("delete")}
                         >
-                          <Trash2 className="w-5 h-5 text-red-600 hover:text-red-400"/>
+                          <Trash2 className="w-4 h-4 text-red-600 hover:text-red-400"/>
                         </button>
                       </div>
                     </td>
@@ -169,7 +174,7 @@ const PendingPurchaseView = ({
             ) : (
               <tr>
                 <td colSpan="5" className="text-center py-12">
-                  <p className="text-gray-500">{t("no_data_available")}</p>
+                  <p className="text-gray-500 text-sm">{t("no_data_available")}</p>
                   <div className="mt-4">
                       <AddNewButton />
                   </div>
@@ -191,42 +196,44 @@ const PendingPurchaseView = ({
                 >
                 <div className="flex items-start justify-between">
                     <div>
-                        <p className="font-bold text-gray-900 dark:text-gray-100">
+                        <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">
                         {item.name}
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
                         {(categories.find((c) => c.id === item.category) || {})
                             .name || item.category}
                         </p>
                     </div>
                     {/* --- Cụm nút hành động cho Mobile --- */}
                     <div className="flex space-x-1">
+                        {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
                         <button
                             onClick={() => handlePurchaseClick(item)}
                             className="p-2"
                             title={t("Mua")}
                         >
-                            <ShoppingCart className="w-5 h-5 text-green-500" />
+                            <ShoppingCart className="w-4 h-4 text-green-500" />
                         </button>
                         <button
                             onClick={() => onEditItem(item)}
                             className="p-2"
                             title={t("edit")}
                         >
-                            <Edit2 className="w-5 h-5 text-blue-500" />
+                            <Edit2 className="w-4 h-4 text-blue-500" />
                         </button>
                         <button
                             onClick={() => onDeleteItem("delete-pending", item)}
                             className="p-2"
                             title={t("delete")}
                         >
-                            <Trash2 className="w-5 h-5 text-red-500" />
+                            <Trash2 className="w-4 h-4 text-red-500" />
                         </button>
                     </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 pt-2 border-t dark:border-gray-700">
                     <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {/* ĐÃ SỬA: text-sm -> text-xs */}
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                         {t("purchase_quantity")}
                     </label>
                     <input
@@ -236,11 +243,11 @@ const PendingPurchaseView = ({
                         onChange={(e) =>
                         handleDataChange(item.id, "quantity", e.target.value)
                         }
-                        className="w-full p-2 border rounded-md text-center dark:bg-gray-700"
+                        className="w-full p-2 border rounded-md text-center dark:bg-gray-700 text-sm"
                     />
                     </div>
                     <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                         {t("price")} (VNĐ)
                     </label>
                     <input
@@ -251,7 +258,7 @@ const PendingPurchaseView = ({
                         onChange={(e) =>
                         handleDataChange(item.id, "price", e.target.value)
                         }
-                        className="w-full p-2 border rounded-md text-right dark:bg-gray-700"
+                        className="w-full p-2 border rounded-md text-right dark:bg-gray-700 text-sm"
                     />
                     </div>
                 </div>
@@ -264,7 +271,7 @@ const PendingPurchaseView = ({
             </>
         ) : (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-            <p>{t("no_data_available")}</p>
+            <p className="text-sm">{t("no_data_available")}</p>
              <div className="mt-4">
                 <AddNewButton />
             </div>

@@ -50,25 +50,30 @@ const NavigationTabs = ({ activeTab, setActiveTab, t, isCollapsed }) => {
 
   return (
     <nav>
-      <div className="flex flex-col space-y-2">
+      <div className="flex flex-col space-y-1">
         {navGroups.map((group, groupIndex) => (
           <div key={group.titleKey}>
-             {groupIndex > 0 && !isCollapsed && (
-              <div className="h-px bg-gray-200 dark:bg-gray-700 mx-4 my-2"></div>
+            {groupIndex > 0 && (
+              <div
+                className={`h-px transition-all duration-300 ${
+                  isCollapsed
+                    ? "w-8 mx-auto my-2 bg-gray-600"
+                    : "mx-4 my-1.5 bg-gray-200 dark:bg-gray-700"
+                }`}
+              ></div>
             )}
-            <h3
-              className={`px-4 mb-2 text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${
-                isCollapsed
-                  ? "text-center"
-                  : "text-gray-500 dark:text-gray-400"
-              }`}
-            >
-              <span className={isCollapsed ? "hidden" : "block"}>{t(group.titleKey)}</span>
-               {isCollapsed && groupIndex > 0 && <div className="h-px bg-gray-300 dark:bg-gray-600 w-8 mx-auto my-3"></div>}
-            </h3>
+
+            {!isCollapsed && (
+              <h3
+                className="px-4 mb-1 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                {t(group.titleKey)}
+              </h3>
+            )}
+            
             <div
-              className={`flex flex-col space-y-1 ${
-                isCollapsed ? "" : "pl-4"
+              className={`flex flex-col items-center space-y-0.5 ${
+                isCollapsed ? "" : "pl-4 items-stretch"
               }`}
             >
               {group.items.map((tab) => {
@@ -79,18 +84,27 @@ const NavigationTabs = ({ activeTab, setActiveTab, t, isCollapsed }) => {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     title={isCollapsed ? tab.name : ""}
-                    className={`w-full flex items-center space-x-3 py-2 px-4 rounded-lg font-medium text-sm transition-colors ${
-                      isCollapsed ? "justify-center" : ""
-                    } ${
-                      isActive
-                        ? "bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300"
-                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50"
-                    }`}
+                    className={`
+                      flex items-center font-medium text-xs transition-colors rounded-lg
+                      ${
+                        isCollapsed
+                          ? "w-10 h-10 justify-center"
+                          : "w-full space-x-3 py-1.5 px-4"
+                      }
+                      ${
+                        isActive
+                          ? "bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300"
+                          : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                      }
+                    `}
                   >
-                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    <Icon className="w-4 h-4 flex-shrink-0" />
                     <span
-                      className={`transition-opacity duration-200 ${
-                        isCollapsed ? "opacity-0 hidden" : "opacity-100 block"
+                      // ---- DÒNG ĐÃ THAY ĐỔI: Thêm class "hidden" vào trạng thái thu gọn ----
+                      className={`transition-opacity duration-300 ease-out ${
+                        isCollapsed
+                          ? "opacity-0 pointer-events-none hidden"
+                          : "opacity-100"
                       }`}
                     >
                       {tab.name}
@@ -107,4 +121,3 @@ const NavigationTabs = ({ activeTab, setActiveTab, t, isCollapsed }) => {
 };
 
 export default NavigationTabs;
-

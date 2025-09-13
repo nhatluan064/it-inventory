@@ -20,13 +20,16 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
       <div className="p-6 border-b dark:border-gray-700">
-        <h2 className="text-xl font-bold">{t("liquidation_list")}</h2>
-        <p className="text-sm text-gray-500 mt-1">{t("liquidation_desc")}</p>
+        {/* ĐÃ SỬA: text-xl -> text-lg */}
+        <h2 className="text-lg font-bold">{t("liquidation_list")}</h2>
+        {/* ĐÃ SỬA: text-sm -> text-xs */}
+        <p className="text-xs text-gray-500 mt-1">{t("liquidation_desc")}</p>
       </div>
 
       {/* --- Giao diện Bảng cho Desktop --- */}
       <div className="overflow-x-auto hidden md:block">
-        <table className="w-full text-sm">
+        {/* ĐÃ SỬA: text-sm -> text-xs */}
+        <table className="w-full text-xs">
           <SortableHeader
             columns={columns}
             requestSort={requestSort}
@@ -51,7 +54,8 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
                       className="p-2"
                       title={t("confirm_liquidated")}
                     >
-                      <Trash2 className="w-5 h-5 text-red-600 hover:text-red-400" />
+                      {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
+                      <Trash2 className="w-4 h-4 text-red-600 hover:text-red-400" />
                     </button>
                   </td>
                 </tr>
@@ -76,10 +80,12 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
               className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 shadow flex justify-between items-center"
             >
               <div>
-                <p className="font-bold text-gray-900 dark:text-gray-100">
+                {/* ĐÃ SỬA: Thêm text-sm */}
+                <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">
                   {item.name}
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
+                {/* ĐÃ SỬA: text-sm -> text-xs */}
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
                   {item.serialNumber || "N/A"}
                 </p>
                 <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 italic">
@@ -91,7 +97,8 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
                 className="p-2"
                 title={t("confirm_liquidated")}
               >
-                <Trash2 className="w-5 h-5 text-red-600 hover:text-red-400"/>
+                {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
+                <Trash2 className="w-4 h-4 text-red-600 hover:text-red-400"/>
               </button>
             </div>
           ))

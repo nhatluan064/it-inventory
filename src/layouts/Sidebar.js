@@ -1,5 +1,5 @@
 // src/layouts/Sidebar.js
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 import NavigationTabs from "./NavigationTabs";
 import {
   SlidersHorizontal,
@@ -27,26 +27,9 @@ const Sidebar = ({
   const SidebarContent = () => {
     const navRef = useRef(null);
 
-    useEffect(() => {
-      const navElement = navRef.current;
-      if (!navElement) return;
-
-      const handleWheel = (e) => {
-        if (e.deltaY !== 0) {
-          e.preventDefault();
-          navElement.scrollTop += e.deltaY;
-        }
-      };
-
-      navElement.addEventListener("wheel", handleWheel);
-
-      return () => {
-        navElement.removeEventListener("wheel", handleWheel);
-      };
-    }, []);
-
     return (
       <>
+        {/* Phần Header của Sidebar giữ nguyên */}
         <div className="flex items-center justify-between p-4 border-b dark:border-gray-700 h-16 flex-shrink-0">
           <div
             className={`flex items-center space-x-3 overflow-hidden transition-opacity duration-300 ${
@@ -55,28 +38,25 @@ const Sidebar = ({
           >
             {isMobile ? (
               <>
-                <SlidersHorizontal className="w-8 h-8 text-blue-600 flex-shrink-0" />
-                <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                <SlidersHorizontal className="w-7 h-7 text-blue-600 flex-shrink-0" />
+                <h1 className="text-base font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap">
                   {t("actioninventory")}
                 </h1>
               </>
             ) : (
               <>
-                <Package className="w-8 h-8 text-blue-600 flex-shrink-0" />
-                <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                <Package className="w-7 h-7 text-blue-600 flex-shrink-0" />
+                <h1 className="text-base font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap">
                   {t("it_inventory")}
                 </h1>
               </>
             )}
           </div>
-
-          {/* Collapsed Logo */}
           {isCollapsed && !isMobile && (
              <div className="flex items-center justify-center w-full">
                 <Package className="w-8 h-8 text-blue-600" />
              </div>
           )}
-
           {!isMobile && (
              <div className={`transition-opacity duration-300 ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100'}`}>
                 <button
@@ -88,7 +68,6 @@ const Sidebar = ({
                 </button>
             </div>
           )}
-          
            {isCollapsed && !isMobile && (
              <div className="absolute top-4 right-[-14px] z-10">
                  <button
@@ -100,20 +79,18 @@ const Sidebar = ({
                 </button>
             </div>
           )}
-
-
           {isMobile && (
             <button
               onClick={() => setMobileOpen(false)}
               className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
               aria-label="Close menu"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5" />
             </button>
           )}
         </div>
 
-        <nav ref={navRef} className="flex-grow overflow-y-auto p-4 hide-scrollbar">
+        <nav ref={navRef} className="flex-grow p-4 hide-scrollbar">
           <NavigationTabs
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -121,40 +98,62 @@ const Sidebar = ({
             isCollapsed={isCollapsed && !isMobile}
           />
         </nav>
-
+        
+        {/* ---- BẮT ĐẦU KHU VỰC ĐÃ TÁI CẤU TRÚC ---- */}
         <div className="p-4 border-t dark:border-gray-700 flex-shrink-0">
-          <div className={`space-y-3 ${isCollapsed && !isMobile ? "hidden" : ""}`}>
-            <div className="flex flex-col items-center text-center">
-              <p className="text-sm text-gray-500 dark:text-gray-400">{t('hello')},</p>
-              <div className="w-12 h-12 my-2 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-xl font-medium">
-                  {currentUser.displayName
-                    ? currentUser.displayName.charAt(0).toUpperCase()
-                    : currentUser.email.charAt(0).toUpperCase()}
-                </span>
+          {/* Chế độ xem Mở Rộng */}
+          <div
+            className={`grid transition-all duration-300 ease-in-out ${
+              isCollapsed && !isMobile
+                ? "grid-rows-[0fr] opacity-0"
+                : "grid-rows-[1fr] opacity-100"
+            }`}
+          >
+            <div className="overflow-hidden">
+              <div className="flex flex-col items-center text-center space-y-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t('hello')},</p>
+                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-white text-lg font-medium">
+                    {currentUser.displayName
+                      ? currentUser.displayName.charAt(0).toUpperCase()
+                      : currentUser.email.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <p className="font-semibold text-gray-800 dark:text-gray-200 truncate w-full text-sm">
+                  {currentUser.displayName || currentUser.email}
+                </p>
+                <button onClick={onViewProfile} className="text-xs text-blue-500 hover:underline">
+                  ({t('view_info')})
+                </button>
               </div>
-              <p className="font-semibold text-gray-800 dark:text-gray-200 truncate w-full">
-                {currentUser.displayName || currentUser.email}
-              </p>
-              <button onClick={onViewProfile} className="text-xs text-blue-500 hover:underline mt-1">
-                ({t('view_info')})
-              </button>
-            </div>
-            <div className="flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-md p-1">
-              <button onClick={onSettingsClick} className="p-2 text-gray-500 hover:text-gray-800 dark:hover:text-white rounded-md flex-1 flex justify-center" title={t("settings")}>
-                <Settings className="w-5 h-5" />
-              </button>
-              <div className="border-l border-gray-300 dark:border-gray-600 h-5"></div>
-              <button onClick={onLogout} className="p-2 text-gray-500 hover:text-red-500 dark:hover:text-red-400 rounded-md flex-1 flex justify-center" title={t("logout")}>
-                <LogOut className="w-5 h-5" />
-              </button>
+              {/* ---- KHỐI NÚT ĐÃ SỬA ---- */}
+              <div className="mt-3 space-y-1 pl-4">
+                <button onClick={onLogout} className="w-full flex items-center space-x-3 py-1.5 px-4 rounded-lg font-medium text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50">
+                  <LogOut className="w-4 h-4" />
+                  <span>{t("logout")}</span>
+                </button>
+                <button onClick={onSettingsClick} className="w-full flex items-center space-x-3 py-1.5 px-4 rounded-lg font-medium text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50">
+                  <Settings className="w-4 h-4" />
+                   <span>{t("settings")}</span>
+                </button>
+              </div>
+              <div className="text-center text-xs text-gray-500 mt-3">
+                © 2025 Make by Nhật Luân
+              </div>
             </div>
           </div>
 
-          {isCollapsed && !isMobile && (
-            <div className="flex flex-col items-center justify-center space-y-3">
-              
-              <div className="w-full flex justify-center">
+          {/* Chế độ xem Thu Gọn */}
+          <div
+            className={`grid transition-all duration-300 ease-in-out ${
+              isCollapsed && !isMobile
+                ? "grid-rows-[1fr] opacity-100"
+                : "grid-rows-[0fr] opacity-0"
+            }`}
+          >
+            <div className="overflow-hidden">
+              <div className="flex flex-col items-center justify-center">
+                <div className="w-full flex justify-center">
                   <button onClick={onViewProfile} className="p-2">
                     <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
                       <span className="text-white text-md font-medium">
@@ -162,37 +161,34 @@ const Sidebar = ({
                           ? currentUser.displayName.charAt(0).toUpperCase()
                           : currentUser.email.charAt(0).toUpperCase()}
                       </span>
-                    </div>                  
+                    </div>
                   </button>
-              </div>
-              <h4 className="text-gray-300">{currentUser.displayName}</h4>
-              <div className="flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-md p-1 space-x-2">
-                <button
-                  onClick={onSettingsClick}
-                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-lg"
-                  title={t("settings")}
-                >
-                  <Settings className="w-5 h-5" />
-                </button>
-                <button onClick={onLogout} className="p-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded-lg" title={t("logout")}>
-                  <LogOut className="w-5 h-5" />
-                </button>
+                </div>
+                {/* ---- KHỐI NÚT ĐÃ SỬA ---- */}
+                <div className="mt-2 space-y-1">
+                  <button onClick={onLogout} title={t("logout")} className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50">
+                      <LogOut className="w-4 h-4" />
+                  </button>
+                   <button onClick={onSettingsClick} title={t("settings")} className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50">
+                      <Settings className="w-4 h-4" />
+                  </button>
+                </div>
+                 <div className="text-center text-xs text-gray-500 pt-2">
+                    © 2025 Make by Nhật Luân
+                 </div>
               </div>
             </div>
-          )}
-          
-          <div className={`text-center text-xs text-gray-500 mt-4`}>
-            © 2025 Make by Nhật Luân
           </div>
         </div>
+        {/* ---- KẾT THÚC KHU VỰC TÁI CẤU TRÚC ---- */}
       </>
     );
   };
 
   const desktopClasses = `relative hidden md:flex flex-col h-full bg-white dark:bg-gray-800 shadow-lg border-r dark:border-gray-700 transition-all duration-300 ease-in-out ${
-    isCollapsed ? "w-28" : "w-72" // Increased collapsed width
+    isCollapsed ? "w-20" : "w-64"
   }`;
-  const mobileClasses = `fixed inset-y-0 right-0 z-50 transform flex flex-col h-full bg-white dark:bg-gray-800 shadow-lg border-l dark:border-gray-700 transition-transform duration-300 ease-in-out w-72 ${
+  const mobileClasses = `fixed inset-y-0 right-0 z-50 transform flex flex-col h-full bg-white dark:bg-gray-800 shadow-lg border-l dark:border-gray-700 transition-transform duration-300 ease-in-out w-64 ${
     isMobileOpen ? "translate-x-0" : "translate-x-full"
   }`;
 
@@ -213,4 +209,3 @@ const Sidebar = ({
 };
 
 export default Sidebar;
-

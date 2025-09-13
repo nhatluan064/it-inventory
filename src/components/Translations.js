@@ -232,7 +232,7 @@ export const translations = {
     mark_unrepairable: "Thanh lý thiết bị",
     // General
     admin: "Quản trị viên",
-    it_inventory: "Quản lý Kho IT",
+    it_inventory: "Quản lý Kho",
     search: "Tìm kiếm",
     category: "Danh mục",
     status: "Trạng thái",

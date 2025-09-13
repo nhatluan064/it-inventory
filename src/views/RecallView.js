@@ -6,17 +6,20 @@ const RecallView = ({ allocatedItems, onRecallItem, t }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
       <div className="p-6 border-b dark:border-gray-700">
-        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+        {/* ĐÃ SỬA: text-xl -> text-lg */}
+        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
           {t("recall_dedicated_title")}
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        {/* ĐÃ SỬA: text-sm -> text-xs */}
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           {t("recall_dedicated_desc")}
         </p>
       </div>
 
       {/* --- Giao diện Bảng cho Desktop --- */}
       <div className="overflow-x-auto hidden md:block">
-        <table className="w-full text-sm">
+        {/* ĐÃ SỬA: text-sm -> text-xs */}
+        <table className="w-full text-xs">
           <thead className="bg-gray-50 dark:bg-gray-700/50">
             <tr>
               <th className="px-6 py-3 text-left font-medium text-gray-500 dark:text-gray-300 uppercase">
@@ -49,7 +52,8 @@ const RecallView = ({ allocatedItems, onRecallItem, t }) => {
                       className="p-2 text-gray-400 hover:text-green-600 dark:hover:text-green-400 rounded-md"
                       title={t("recall_device")}
                     >
-                      <RotateCcw className="w-5 h-5" />
+                      {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
+                      <RotateCcw className="w-4 h-4" />
                     </button>
                   </td>
                 </tr>
@@ -58,7 +62,7 @@ const RecallView = ({ allocatedItems, onRecallItem, t }) => {
               <tr>
                 <td
                   colSpan="3"
-                  className="text-center py-12 text-gray-500 dark:text-gray-400"
+                  className="text-center py-12 text-gray-500 dark:text-gray-400 text-sm"
                 >
                   {t("no_allocated_items_for_recall")}
                 </td>
@@ -77,10 +81,10 @@ const RecallView = ({ allocatedItems, onRecallItem, t }) => {
               className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 shadow flex justify-between items-center"
             >
               <div>
-                <p className="font-bold text-gray-900 dark:text-gray-100">
+                <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">
                   {item.name}
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   {t("quantity")}: {item.quantity}
                 </p>
               </div>
@@ -89,12 +93,13 @@ const RecallView = ({ allocatedItems, onRecallItem, t }) => {
                 className="p-2 text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/50 rounded-full"
                 title={t("recall_device")}
               >
-                <RotateCcw className="w-5 h-5" />
+                {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
+                <RotateCcw className="w-4 h-4" />
               </button>
             </div>
           ))
         ) : (
-          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400 text-sm">
             {t("no_allocated_items_for_recall")}
           </div>
         )}

@@ -98,10 +98,12 @@ const AllocatedView = ({
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+            {/* ĐÃ SỬA: text-xl -> text-lg */}
+            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
               {t("allocated_list")}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {/* ĐÃ SỬA: text-sm -> text-xs */}
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {t("allocated_desc")}
             </p>
           </div>
@@ -109,10 +111,11 @@ const AllocatedView = ({
             onClick={() => setIsFilterOpen(!isFilterOpen)}
             className="md:hidden p-2 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md"
           >
+            {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
             {isFilterOpen ? (
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             ) : (
-              <Filter className="w-5 h-5" />
+              <Filter className="w-4 h-4" />
             )}
           </button>
         </div>
@@ -123,24 +126,25 @@ const AllocatedView = ({
           } md:flex md:flex-row md:items-end`}
         >
           <div className="flex-grow">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t("search")}</label>
+            {/* ĐÃ SỬA: text-sm -> text-xs */}
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{t("search")}</label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+              {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 name="search"
                 type="text"
                 placeholder="Tìm theo tên thiết bị, SN, người nhận, MSNV..."
-                className="w-full pl-10 pr-4 py-2 border rounded-lg dark:placeholder-gray-400"
-                value={filters.search}
-                onChange={handleFilterChange}
+                className="w-full pl-10 pr-4 py-2 border rounded-lg dark:placeholder-gray-400 text-sm"
               />
             </div>
           </div>
           <div className="flex-shrink-0 md:w-44">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t("category")}</label>
+            {/* ĐÃ SỬA: text-sm -> text-xs */}
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{t("category")}</label>
             <select
               name="category"
-              className="w-full py-2 px-3 border rounded-lg dark:text-gray-800"
+              className="w-full py-2 px-3 border rounded-lg dark:text-gray-800 text-sm"
               value={filters.category}
               onChange={handleFilterChange}
             >
@@ -158,10 +162,11 @@ const AllocatedView = ({
             </select>
           </div>
           <div className="flex-shrink-0 md:w-44">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t("department")}</label>
+            {/* ĐÃ SỬA: text-sm -> text-xs */}
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{t("department")}</label>
             <select
               name="department"
-              className="w-full py-2 px-3 border rounded-lg dark:text-gray-800"
+              className="w-full py-2 px-3 border rounded-lg dark:text-gray-800 text-sm"
               value={filters.department}
               onChange={handleFilterChange}
             >
@@ -173,11 +178,12 @@ const AllocatedView = ({
             </select>
           </div>
           <div className="flex-shrink-0 md:w-44">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t("handover_date")}</label>
+            {/* ĐÃ SỬA: text-sm -> text-xs */}
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{t("handover_date")}</label>
             <input
               name="handoverDate"
               type="date"
-              className="w-full py-2 px-3 border rounded-lg dark:text-gray-800"
+              className="w-full py-2 px-3 border rounded-lg dark:text-gray-800 text-sm"
               value={filters.handoverDate}
               onChange={handleFilterChange}
             />
@@ -187,7 +193,8 @@ const AllocatedView = ({
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          {/* ĐÃ SỬA: text-sm -> text-xs */}
+          <table className="w-full text-xs">
             <SortableHeader
               columns={columnsToRender}
               requestSort={requestSort}
@@ -232,14 +239,16 @@ const AllocatedView = ({
                             className="p-2"
                             title={t("recall_device")}
                           >
-                            <RotateCcw className="w-5 h-5 text-green-600 hover:text-green-400" />
+                            {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
+                            <RotateCcw className="w-4 h-4 text-green-600 hover:text-green-400" />
                           </button>
                           <button
                             onClick={() => onMarkDamaged(item)}
                             className="p-2"
                             title={t("maintenance")}
                           >
-                            <Wrench className="w-5 h-5 text-orange-500 hover:text-orange-400" />
+                            {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
+                            <Wrench className="w-4 h-4 text-orange-500 hover:text-orange-400" />
                           </button>
                         </div>
                       </td>
@@ -265,4 +274,3 @@ const AllocatedView = ({
 };
 
 export default AllocatedView;
-

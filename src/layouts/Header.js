@@ -13,7 +13,6 @@ import {
   LogOut,
   User,
 } from "lucide-react";
-//import AppContext from "../context/AppContext";
 
 const Header = ({
   onSettingsClick,
@@ -23,7 +22,6 @@ const Header = ({
   onLogout,
   t,
 }) => {
-  //const { language } = useContext(AppContext);
   const [isNotificationOpen, setNotificationOpen] = useState(false);
   const [isUserMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -84,8 +82,8 @@ const Header = ({
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-2 sm:space-x-4">
             <div className="flex items-center space-x-2">
-              <Package className="w-8 h-8 text-blue-600" />
-              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 hidden sm:block">
+              <Package className="w-7 h-7 text-blue-600" />
+              <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100 hidden sm:block">
                 {t("it_inventory")}
               </h1>
             </div>
@@ -96,7 +94,7 @@ const Header = ({
                 onClick={() => setNotificationOpen((prev) => !prev)}
                 className="relative p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
-                <Bell className="w-5 h-5" />
+                <Bell className="w-4 h-4" />
                 {recentActivities.length > 0 && (
                   <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                 )}
@@ -104,7 +102,7 @@ const Header = ({
 
               {isNotificationOpen && (
                 <div className="absolute top-full mt-2 right-0 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-20 border dark:border-gray-700">
-                  <div className="p-3 font-semibold border-b dark:border-gray-700 text-gray-800 dark:text-gray-200">
+                  <div className="p-3 font-semibold border-b dark:border-gray-700 text-gray-800 dark:text-gray-200 text-sm">
                     {t("notifications")}
                   </div>
                   <ul className="py-1 max-h-80 overflow-y-auto">
@@ -124,7 +122,7 @@ const Header = ({
                             <div className="flex items-start gap-3">
                               <Icon className="w-4 h-4 text-gray-500 dark:text-gray-400 mt-1 flex-shrink-0" />
                               <div>
-                                <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                                <p className="text-xs font-medium text-gray-800 dark:text-gray-200">
                                   {detail.text} -{" "}
                                   <span className="font-normal">
                                     {trans.itemName}
@@ -141,7 +139,7 @@ const Header = ({
                         );
                       })
                     ) : (
-                      <li className="px-3 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                      <li className="px-3 py-4 text-center text-xs text-gray-500 dark:text-gray-400">
                         {t("no_new_notifications")}
                       </li>
                     )}
@@ -149,7 +147,7 @@ const Header = ({
                   <div className="p-2 border-t dark:border-gray-700">
                     <button
                       onClick={handleShowAll}
-                      className="w-full text-center text-sm text-blue-600 hover:underline"
+                      className="w-full text-center text-xs text-blue-600 hover:underline"
                     >
                       {t("view_all")}
                     </button>
@@ -164,23 +162,23 @@ const Header = ({
                 className="flex items-center space-x-2 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-medium">
+                  <span className="text-white text-xs font-medium">
                     {currentUser.displayName
                       ? currentUser.displayName.charAt(0).toUpperCase()
                       : currentUser.email.charAt(0).toUpperCase()}
                   </span>
                 </div>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-200 hidden sm:block">
+                <span className="text-xs font-medium text-gray-700 dark:text-gray-200 hidden sm:block">
                   {currentUser.displayName || currentUser.email}
                 </span>
               </button>
               {isUserMenuOpen && (
                 <div className="absolute top-full mt-2 right-0 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-20 border dark:border-gray-700">
-                  <ul className="py-1">
+                  <ul className="py-1 text-xs">
                     <li>
                       <button
                         onClick={() => handleMenuClick("account")}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         <User className="w-4 h-4" />
                         <span>{t("account")}</span>
@@ -189,7 +187,7 @@ const Header = ({
                     <li>
                       <button
                         onClick={onLogout}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         <LogOut className="w-4 h-4" />
                         <span>{t("logout")}</span>
@@ -205,7 +203,7 @@ const Header = ({
               className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               title={t("settings")}
             >
-              <Settings className="w-5 h-5" />
+              <Settings className="w-4 h-4" />
             </button>
           </div>
         </div>

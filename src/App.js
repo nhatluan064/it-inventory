@@ -546,7 +546,7 @@ const App = () => {
           <header className="md:hidden sticky top-0 z-30 bg-white dark:bg-gray-800 shadow-md p-4 flex justify-between items-center">
              <div className="flex items-center space-x-2">
                 <Package className="w-8 h-8 text-blue-600" />
-                <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                <h1 className="text-xs font-bold text-gray-900 dark:text-gray-100">
                   {t("it_inventory")}
                 </h1>
               </div>

@@ -36,13 +36,16 @@ const MaintenanceView = ({
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
       <div className="p-6 border-b dark:border-gray-700">
-        <h2 className="text-xl font-bold">{t("maintenance_management")}</h2>
-        <p className="text-sm text-gray-500 mt-1">{t("maintenance_desc")}</p>
+        {/* ĐÃ SỬA: text-xl -> text-lg */}
+        <h2 className="text-lg font-bold">{t("maintenance_management")}</h2>
+        {/* ĐÃ SỬA: text-sm -> text-xs */}
+        <p className="text-xs text-gray-500 mt-1">{t("maintenance_desc")}</p>
       </div>
 
       {/* --- Giao diện Bảng cho Desktop --- */}
       <div className="overflow-x-auto hidden md:block">
-        <table className="w-full text-sm">
+        {/* ĐÃ SỬA: text-sm -> text-xs */}
+        <table className="w-full text-xs">
           <SortableHeader
             columns={columns}
             requestSort={requestSort}
@@ -66,26 +69,27 @@ const MaintenanceView = ({
                   <td className="px-6 py-4">{item.condition}</td>
                   <td className="px-6 py-4 text-center">
                     <div className="flex items-center justify-center space-x-2">
+                      {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
                       <button
                         onClick={() => onEditNote(item)}
                         className="p-2"
                         title={t("edit_failure_note")}
                       >
-                        <Edit className="w-5 h-5 text-blue-600 hover:text-blue-400" />
+                        <Edit className="w-4 h-4 text-blue-600 hover:text-blue-400" />
                       </button>
                       <button
                         onClick={() => onRepairComplete(item)}
                         className="p-2"
                         title={t("repair_completed")}
                       >
-                        <CheckCircle className="w-5 h-5 text-green-600 hover:text-green-400" />
+                        <CheckCircle className="w-4 h-4 text-green-600 hover:text-green-400" />
                       </button>
                       <button
                         onClick={() => onMarkUnrepairable(item)}
                         className="p-2"
                         title={t("mark_unrepairable")}
                       >
-                        <XCircle className="w-5 h-5 text-red-600 hover:text-red-400" />
+                        <XCircle className="w-4 h-4 text-red-600 hover:text-red-400" />
                       </button>
                     </div>
                   </td>
@@ -111,14 +115,17 @@ const MaintenanceView = ({
               className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 space-y-2 shadow"
             >
               <div>
-                <p className="font-bold text-gray-900 dark:text-gray-100">
+                {/* ĐÃ SỬA: Thêm text-sm */}
+                <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">
                   {item.name}
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
+                {/* ĐÃ SỬA: Thêm text-xs */}
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
                   {item.serialNumber || "N/A"}
                 </p>
               </div>
-              <div className="text-sm text-gray-700 dark:text-gray-300 border-t dark:border-gray-600 pt-2">
+              {/* ĐÃ SỬA: text-sm -> text-xs */}
+              <div className="text-xs text-gray-700 dark:text-gray-300 border-t dark:border-gray-600 pt-2">
                 <p>
                   <strong>{t("maintenance_date")}:</strong>{" "}
                   {formatDate(item.maintenanceDate)}
@@ -128,26 +135,27 @@ const MaintenanceView = ({
                 </p>
               </div>
               <div className="flex items-center justify-end space-x-2 border-t dark:border-gray-600 pt-2 mt-2">
+                {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
                 <button
                   onClick={() => onEditNote(item)}
                   className="p-2"
                   title={t("edit_failure_note")}
                 >
-                  <Edit className="w-5 h-5 text-blue-600" />
+                  <Edit className="w-4 h-4 text-blue-600" />
                 </button>
                 <button
                   onClick={() => onRepairComplete(item)}
                   className="p-2"
                   title={t("repair_completed")}
                 >
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <CheckCircle className="w-4 h-4 text-green-600" />
                 </button>
                 <button
                   onClick={() => onMarkUnrepairable(item)}
                   className="p-2"
                   title={t("mark_unrepairable")}
                 >
-                  <XCircle className="w-5 h-5 text-red-600" />
+                  <XCircle className="w-4 h-4 text-red-600" />
                 </button>
               </div>
             </div>
