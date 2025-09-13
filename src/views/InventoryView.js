@@ -153,7 +153,7 @@ const InventoryView = ({
               {t("inventory_desc")}
             </p>
           </div>
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <button
               onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
               className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
@@ -170,7 +170,7 @@ const InventoryView = ({
         <div
           className={`
             grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 items-end
-            ${isMobileFilterOpen ? "grid" : "hidden md:grid"}
+            ${isMobileFilterOpen ? "grid" : "hidden lg:grid"}
         `}
         >
           <div>
@@ -268,7 +268,7 @@ const InventoryView = ({
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-        <div>
+        <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <SortableHeader
               columns={columns}
