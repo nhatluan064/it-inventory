@@ -1,5 +1,5 @@
 // src/views/DashboardView.js
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useLayoutEffect } from "react";
 import {
   Package,
   FileText,
@@ -18,57 +18,45 @@ const DashboardView = ({
   t,
 }) => {
   const scrollContainerRef = useRef(null);
+  const scrollPos = useRef(0); // Use a ref to store scroll position across re-renders
+
+  const handleCardClick = (tabId) => {
+    if (scrollContainerRef.current) {
+      // Save scroll position before triggering the re-render in the parent
+      scrollPos.current = scrollContainerRef.current.scrollLeft;
+    }
+    setActiveTab(tabId);
+  };
+
+  useLayoutEffect(() => {
+    // After the parent component has re-rendered the main view,
+    // restore the scroll position. This runs after the DOM is updated.
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollLeft = scrollPos.current;
+    }
+  }); // No dependency array, runs after every render to catch the change
+
 
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
 
-    let isDown = false;
-    let startX;
-    let scrollLeft;
-
-    const startDragging = (e) => {
-      isDown = true;
-      scrollContainer.classList.add("cursor-grabbing");
-      startX = e.pageX || e.touches[0].pageX - scrollContainer.offsetLeft;
-      scrollLeft = scrollContainer.scrollLeft;
+    const handleWheel = (e) => {
+      // If the user scrolls vertically, we'll scroll horizontally instead.
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        scrollContainer.scrollLeft += e.deltaY;
+      }
     };
 
-    const stopDragging = () => {
-      isDown = false;
-      scrollContainer.classList.remove("cursor-grabbing");
-    };
-
-    const whileDragging = (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const x = e.pageX || e.touches[0].pageX - scrollContainer.offsetLeft;
-      const walk = (x - startX) * 2;
-      scrollContainer.scrollLeft = scrollLeft - walk;
-    };
-
-    scrollContainer.addEventListener("mousedown", startDragging);
-    scrollContainer.addEventListener("mouseleave", stopDragging);
-    scrollContainer.addEventListener("mouseup", stopDragging);
-    scrollContainer.addEventListener("mousemove", whileDragging);
-    
-    scrollContainer.addEventListener("touchstart", startDragging);
-    scrollContainer.addEventListener("touchend", stopDragging);
-    scrollContainer.addEventListener("touchmove", whileDragging);
-
+    scrollContainer.addEventListener("wheel", handleWheel);
 
     return () => {
-      scrollContainer.removeEventListener("mousedown", startDragging);
-      scrollContainer.removeEventListener("mouseleave", stopDragging);
-      scrollContainer.removeEventListener("mouseup", stopDragging);
-      scrollContainer.removeEventListener("mousemove", whileDragging);
-      
-      scrollContainer.removeEventListener("touchstart", startDragging);
-      scrollContainer.removeEventListener("touchend", stopDragging);
-      scrollContainer.removeEventListener("touchmove", whileDragging);
+      scrollContainer.removeEventListener("wheel", handleWheel);
     };
-  }, []);
+  }, []); // This setup effect only needs to run once
 
+  // Calculate statistics from equipment prop
   const totalInventory = equipment.filter((e) =>
     ["available", "in-use", "maintenance", "liquidation", "broken"].includes(e.status)
   ).length;
@@ -77,9 +65,10 @@ const DashboardView = ({
   const maintenanceCount = equipment.filter((e) => e.status === "maintenance").length;
   const liquidationCount = equipment.filter((e) => e.status === "liquidation").length;
 
+  // Reusable StatCard component
   const StatCard = ({ title, value, gradient, tabId, wide = false }) => (
     <button
-      onClick={() => setActiveTab(tabId)}
+      onClick={() => handleCardClick(tabId)}
       className={`rounded-lg p-4 text-white shadow-md ${gradient} ${
         wide ? "w-64" : "w-48"
       } flex-shrink-0 text-left transition-transform transform hover:-translate-y-1 cursor-pointer`}
@@ -89,12 +78,13 @@ const DashboardView = ({
     </button>
   );
 
+  // Combined StatCard for "Total Inventory" and "Available"
   const CombinedStatCard = ({ title1, value1, title2, value2, gradient, tabId }) => (
      <button
-      onClick={() => setActiveTab(tabId)}
+      onClick={() => handleCardClick(tabId)}
       className={`rounded-lg shadow-md ${gradient} w-64 flex-shrink-0 transition-transform transform hover:-translate-y-1 cursor-pointer overflow-hidden`}
     >
-        <div className="flex">
+        <div className="flex items-center">
             <div className="w-1/2 p-4 text-white text-left">
                 <p className="text-xs opacity-90 truncate">{title1}</p>
                 <p className="text-2xl font-bold">{value1}</p>
@@ -113,7 +103,7 @@ const DashboardView = ({
     <div className="overflow-hidden">
       <div
         ref={scrollContainerRef}
-        className="overflow-x-auto pb-3 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 flex space-x-4 cursor-grab hide-scrollbar"
+        className="overflow-x-auto pb-3 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 flex space-x-4 cursor-pointer hide-scrollbar"
       >
         <StatCard
             title={t("master_list")}
