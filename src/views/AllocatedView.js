@@ -61,10 +61,7 @@ const AllocatedView = ({
     direction: "descending",
   });
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
+  const columnsToRender = allColumns; // Display all columns by default now
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -79,12 +76,22 @@ const AllocatedView = ({
     return positionDisplay;
   };
 
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+  };
+
   const categoryCounts = (
     Array.isArray(unfilteredAllocatedItems) ? unfilteredAllocatedItems : []
   ).reduce((acc, item) => {
     acc[item.category] = (acc[item.category] || 0) + 1;
     return acc;
   }, {});
+
+  const departmentOptions = useMemo(
+    () => [{ id: "all", tKey: "all" }, ...departments],
+    []
+  );
 
   return (
     <div className="space-y-6">
@@ -111,33 +118,29 @@ const AllocatedView = ({
         </div>
 
         <div
-          className={`grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ${
-            isFilterOpen ? "grid" : "hidden md:grid"
-          }`}
+          className={`gap-4 ${
+            isFilterOpen ? "flex flex-col" : "hidden"
+          } md:flex md:flex-row md:items-end`}
         >
-          <div className="md:col-span-2 lg:col-span-4">
-            <label className="block text-sm font-medium mb-1">
-              {t("search")}
-            </label>
+          <div className="flex-grow">
+            <label className="block text-sm font-medium mb-1">{t("search")}</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
-                type="text"
                 name="search"
+                type="text"
                 placeholder="Tìm theo tên thiết bị, SN, người nhận, MSNV..."
-                className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                className="w-full pl-10 pr-4 py-2 border rounded-lg dark:placeholder-gray-400"
                 value={filters.search}
                 onChange={handleFilterChange}
               />
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              {t("category")}
-            </label>
+          <div className="flex-shrink-0 md:w-44">
+            <label className="block text-sm font-medium mb-1">{t("category")}</label>
             <select
               name="category"
-              className="w-full py-2 px-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              className="w-full py-2 px-3 border rounded-lg"
               value={filters.category}
               onChange={handleFilterChange}
             >
@@ -147,40 +150,34 @@ const AllocatedView = ({
                     ? (unfilteredAllocatedItems || []).length
                     : categoryCounts[cat.id] || 0;
                 return (
-                  <option
-                    key={cat.id}
-                    value={cat.id}
-                  >{`${cat.name} (${count})`}</option>
+                  <option key={cat.id} value={cat.id}>
+                    {`${cat.name} (${count})`}
+                  </option>
                 );
               })}
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              {t("department")}
-            </label>
+          <div className="flex-shrink-0 md:w-44">
+            <label className="block text-sm font-medium mb-1">{t("department")}</label>
             <select
               name="department"
-              className="w-full py-2 px-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              className="w-full py-2 px-3 border rounded-lg"
               value={filters.department}
               onChange={handleFilterChange}
             >
-              <option value="all">{t("all")}</option>
-              {departments.map((dept) => (
+              {departmentOptions.map((dept) => (
                 <option key={dept.id} value={dept.id}>
                   {t(dept.tKey)}
                 </option>
               ))}
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              {t("handover_date")}
-            </label>
+          <div className="flex-shrink-0 md:w-44">
+            <label className="block text-sm font-medium mb-1">{t("handover_date")}</label>
             <input
               name="handoverDate"
               type="date"
-              className="w-full py-2 px-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+              className="w-full py-2 px-3 border rounded-lg"
               value={filters.handoverDate}
               onChange={handleFilterChange}
             />
@@ -192,7 +189,7 @@ const AllocatedView = ({
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <SortableHeader
-              columns={allColumns}
+              columns={columnsToRender}
               requestSort={requestSort}
               sortConfig={sortConfig}
               t={t}
@@ -209,9 +206,8 @@ const AllocatedView = ({
                       <td className="px-6 py-4 font-medium">
                         {item.name.split(" (User:")[0]}
                       </td>
-                      <td className="px-6 py-4 capitalize">
-                        {(categories.find((c) => c.id === item.category) || {})
-                          .name || item.category}
+                       <td className="px-6 py-4 capitalize">
+                        {(categories.find((c) => c.id === item.category) || {}).name || item.category}
                       </td>
                       <td className="px-6 py-4 font-mono">
                         {item.serialNumber || "N/A"}
@@ -252,7 +248,10 @@ const AllocatedView = ({
                 })
               ) : (
                 <tr>
-                  <td colSpan={allColumns.length} className="text-center py-12">
+                  <td
+                    colSpan={columnsToRender.length}
+                    className="text-center py-12"
+                  >
                     {t("no_allocated_items_match_filter")}
                   </td>
                 </tr>
@@ -266,3 +265,4 @@ const AllocatedView = ({
 };
 
 export default AllocatedView;
+
