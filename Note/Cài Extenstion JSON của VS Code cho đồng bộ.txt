@@ -1,5 +1,5 @@
 Copy hết phần dưới bỏ vào Powershell là Auto chạy!
-
+-------------------------------------------------------------------------------------------
 $extensions = @"
 akamud.vscode-javascript-snippet-pack@0.1.6
 aksharpatel47.vscode-flutter-helper@0.2.5
@@ -75,3 +75,9 @@ foreach ($ext in $extensions) {
     }
 }
 Write-Host "✅ Done! All extensions installed."
+-------------------------------------------------------------------------------------------
+
+Nếu không muốn sử dụng Extensions nữa gỡ All hết thì dùng một câu
+lệnh duy nhất
+
+Remove-Item -Recurse -Force "$env:USERPROFILE\.vscode\extensions\*"
