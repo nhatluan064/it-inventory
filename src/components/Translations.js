@@ -2,6 +2,27 @@
 export const translations = {
   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   vi: {
+    home: "Trang chủ",
+    home_page_title: "Trang Chủ & Cập nhật",
+    home_page_subtitle: "Thông tin về phiên bản và các bài viết cập nhật mới nhất.",
+    welcome_to_app: "Chào mừng bạn đến với Hệ thống Quản lý Kho IT",
+    home_page_content: "Đây là nơi bạn có thể tìm thấy các thông báo, cập nhật phiên bản và hướng dẫn sử dụng mới nhất.",
+    nav_title_main: "Tổng quan",
+    hello: "Xin chào",
+    view_info: "xem thông tin",
+    user_profile: "Hồ sơ Người dùng",
+    no_name_provided: "Chưa có tên",
+    account_creation_date: "Ngày tạo tài khoản",
+    not_available: "Không có thông tin",
+    change_password_button: "Yêu cầu đổi mật khẩu",
+    password_reset_info: "Một liên kết đặt lại mật khẩu sẽ được gửi đến email của bạn.",
+    please_enter_display_name: "Vui lòng nhập tên hiển thị của bạn.",
+    profile_update_failed: "Cập nhật hồ sơ thất bại.",
+    complete_your_profile: "Hoàn tất Hồ sơ của bạn",
+    setup_profile_welcome: "Vui lòng nhập tên hiển thị của bạn để tiếp tục.",
+    enter_your_name: "Nhập tên của bạn...",
+    saving: "Đang lưu...",
+    save_and_continue: "Lưu và Tiếp tục",
     actioninventory: "THAO TÁC NHANH",
     //Nhom tieu de menu
     nav_title_assets: "Tài sản",
@@ -454,6 +475,27 @@ export const translations = {
   },
   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   en: {
+    home: "Home",
+    home_page_title: "Home & Updates",
+    home_page_subtitle: "Information about versions and latest update articles.",
+    welcome_to_app: "Welcome to the IT Inventory Management System",
+    home_page_content: "This is where you can find announcements, version updates, and the latest user guides.",
+    nav_title_main: "Overview",
+    hello: "Hello",
+    view_info: "view info",
+    user_profile: "User Profile",
+    no_name_provided: "No name provided",
+    account_creation_date: "Account Creation Date",
+    not_available: "Not available",
+    change_password_button: "Request Password Change",
+    password_reset_info: "A password reset link will be sent to your email.",
+    please_enter_display_name: "Please enter your display name.",
+    profile_update_failed: "Profile update failed.",
+    complete_your_profile: "Complete Your Profile",
+    setup_profile_welcome: "Please enter your display name to continue.",
+    enter_your_name: "Enter your name...",
+    saving: "Saving...",
+    save_and_continue: "Save and Continue",
     actioninventory: "Quick Actions",
     // Menu Title Group
     nav_title_assets: "Assets",
@@ -670,6 +712,7 @@ export const translations = {
     "recall_reason_resigned": "User resigned",
     "recall_reason_replacement": "User replaced device",
     "recall_reason_upgrade": "User upgraded device",
+    
     condition_damaged_needs_maintenance: "Damaged, needs maintenance",
     allocating: "Handover from",
     recipient_name: "Recipient's Name",
@@ -880,6 +923,20 @@ export const translations = {
   },
   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   zh: {
+    home: "首页",
+    home_page_title: "首页与更新",
+    home_page_subtitle: "关于版本和最新更新文章的信息。",
+    welcome_to_app: "欢迎使用IT库存管理系统",
+    home_page_content: "在这里您可以找到公告、版本更新和最新的用户指南。",
+    nav_title_main: "概述",
+    hello: "你好",
+    view_info: "查看信息",
+    user_profile: "用户资料",
+    no_name_provided: "未提供名称",
+    account_creation_date: "帐户创建日期",
+    not_available: "不可用",
+    change_password_button: "请求更改密码",
+    password_reset_info: "密码重置链接将发送到您的电子邮件。",
     actioninventory: "快速操作",
     // 菜单标题组
     nav_title_assets: "资产",
@@ -1206,7 +1263,7 @@ export const translations = {
     department: "部门",
     handover_date: "交接日期",
     recall: "召回",
-    no_allocated_items_match_filter: "没有符合筛选条件的已分配设备。",
+    no_allocated_items_match_filter: "沒有符合篩選條件的已分配設備。",
     maintenance_management: "维修管理",
     maintenance_desc: "等待维修或处理的设备列表。",
     failure_note: "故障说明",
@@ -1291,3 +1348,4 @@ export const translations = {
   },
   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 };
+

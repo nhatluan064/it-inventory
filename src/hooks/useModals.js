@@ -15,7 +15,8 @@ export const useModals = () => {
         note: false,
         repairNote: false,
         resetConfirm: false,
-        directMaintenanceNote: false, // THÊM STATE MỚI
+        directMaintenanceNote: false,
+        userInfo: false, // Add this for the new modal
     });
     
     const [currentItem, setCurrentItem] = useState(null);

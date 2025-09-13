@@ -20,6 +20,8 @@ import LoginPage from "./Pages/LoginPage";
 import AccountPage from "./Pages/AccountPage";
 import Sidebar from "./layouts/Sidebar";
 import AuthSuccessPopup from "./Popup/AuthSuccessPopup";
+import SetupProfilePage from "./Pages/SetupProfilePage"; 
+import HomeView from "./views/HomeView"; // Import HomeView
 
 // Views
 import DashboardView from "./views/DashboardView";
@@ -47,6 +49,7 @@ import InfoModal from "./modals/InfoModal";
 import AddFromMasterModal from "./modals/AddFromMasterModal";
 import NoteModal from "./modals/NoteModal";
 import RepairNoteModal from "./modals/RepairNoteModal";
+import UserInfoModal from "./modals/UserInfoModal"; 
 
 const App = () => {
   // --- UI and Translation States ---
@@ -56,7 +59,7 @@ const App = () => {
   const [language, setLanguage] = useState(
     () => localStorage.getItem("language") || "vi"
   );
-  const [activeTab, setActiveTab] = useState("inventory");
+  const [activeTab, setActiveTab] = useState("home"); // Set home as default
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   // --- Filter States ---
@@ -102,6 +105,7 @@ const App = () => {
     logout,
     passwordReset,
     finishAuthSuccess,
+    setupProfile,
   } = useAuth();
   const inventory = useInventory(currentUser, t);
   const modals = useModals();
@@ -344,6 +348,20 @@ const App = () => {
       </AppContext.Provider>
     );
   }
+  // Check if user needs to set up their profile
+  if (currentUser && !currentUser.displayName) {
+    return (
+      <AppContext.Provider value={appContextValue}>
+        <Toaster position="top-center" reverseOrder={false} />
+        <SetupProfilePage
+          currentUser={currentUser}
+          onProfileSetupComplete={setupProfile}
+          t={t}
+        />
+      </AppContext.Provider>
+    );
+  }
+
   if (inventory.dataLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
@@ -368,6 +386,8 @@ const App = () => {
     const viewProps = { t, categories, statusColors, statusLabels };
 
     switch (currentTab) {
+      case "home":
+        return <HomeView {...viewProps} />;
       case "masterList":
         return (
           <MasterListView
@@ -491,9 +511,9 @@ const App = () => {
           />
         );
       case "account":
-        return <AccountPage {...viewProps} currentUser={currentUser} />;
+        return <AccountPage {...viewProps} currentUser={currentUser} onPasswordReset={passwordReset} />;
       default:
-        return <InventoryView {...viewProps} equipment={filteredInventory} />;
+        return <HomeView {...viewProps} />;
     }
   };
 
@@ -512,6 +532,7 @@ const App = () => {
           isMobileOpen={isMobileSidebarOpen}
           setMobileOpen={setMobileSidebarOpen}
           onSettingsClick={() => handleTabClick('settings')}
+          onViewProfile={() => modals.openModal('userInfo', currentUser)}
         />
 
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -553,7 +574,6 @@ const App = () => {
             </div>
           </header>
           
-          {/* Add a div for mobile dashboard to separate it from the new header */}
           <div className="md:hidden p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
              <DashboardView
                 t={t}
@@ -687,6 +707,13 @@ const App = () => {
           }}
           initialNote=""
           title={t("failure_note")}
+          t={t}
+        />
+         <UserInfoModal
+          show={modals.modalState.userInfo}
+          onClose={() => modals.closeModal('userInfo')}
+          currentUser={modals.currentItem}
+          onPasswordReset={passwordReset}
           t={t}
         />
       </div>

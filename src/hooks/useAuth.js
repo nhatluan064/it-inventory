@@ -8,6 +8,7 @@ import {
   GoogleAuthProvider,
   signOut,
   sendPasswordResetEmail,
+  updateProfile, // Import updateProfile
 } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 
@@ -19,25 +20,20 @@ export const useAuth = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user && !isRegisteringFlow) {
-        setCurrentUser(user);
-      } else if (!user) {
-        setCurrentUser(null);
-        if (isRegisteringFlow) setIsRegisteringFlow(false);
-      }
+      setCurrentUser(user);
       setAuthLoading(false);
     });
     return () => unsubscribe();
-  }, [isRegisteringFlow]);
+  }, []);
 
   const login = async (email, password) => {
     await signInWithEmailAndPassword(auth, email, password);
-    setAuthSuccessType('login');
+    // Let App.js handle state change based on currentUser
   };
 
   const googleSignIn = async () => {
     await signInWithPopup(auth, new GoogleAuthProvider());
-    setAuthSuccessType('login');
+     // Let App.js handle state change based on currentUser
   };
 
   const signUp = async (email, password) => {
@@ -50,7 +46,7 @@ export const useAuth = () => {
 
   const logout = async () => {
     await signOut(auth);
-    setAuthSuccessType(null); // Reset after logout
+    setAuthSuccessType(null);
   };
 
   const passwordReset = (email) => {
@@ -59,11 +55,21 @@ export const useAuth = () => {
   
   const finishAuthSuccess = async () => {
       if (authSuccessType === "register") {
-        await signOut(auth); // Sign out user to force login after registration
+        await signOut(auth); 
       }
       setAuthSuccessType(null);
+      setIsRegisteringFlow(false);
   };
 
+  // New function to update user profile
+  const setupProfile = async (displayName) => {
+    if (auth.currentUser) {
+      await updateProfile(auth.currentUser, { displayName });
+      // To get the updated user info immediately, we need to re-fetch it.
+      // Easiest way is to update our state directly.
+      setCurrentUser({ ...auth.currentUser, displayName });
+    }
+  };
 
   return {
     currentUser,
@@ -74,6 +80,7 @@ export const useAuth = () => {
     signUp,
     logout,
     passwordReset,
-    finishAuthSuccess
+    finishAuthSuccess,
+    setupProfile, // Export the new function
   };
 };
