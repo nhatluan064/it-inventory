@@ -91,4 +91,3 @@ const NavigationTabs = ({ activeTab, setActiveTab, t, isCollapsed }) => {
 };
 
 export default NavigationTabs;
-
