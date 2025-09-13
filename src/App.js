@@ -1,7 +1,7 @@
 // src/App.js
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Toaster } from "react-hot-toast";
-import { Menu } from "lucide-react";
+import { Menu, Package } from "lucide-react";
 
 // Custom Hooks
 import { useAuth } from "./hooks/useAuth";
@@ -224,9 +224,10 @@ const App = () => {
   }, [inventory.equipment]);
 
   const uniqueMasterItemsCount = useMemo(() => {
-    const uniqueNames = new Set(masterItems.map((item) => item.name));
+    const uniqueNames = new Set(masterItems.map(item => item.name));
     return uniqueNames.size;
   }, [masterItems]);
+
 
   // --- UI Effects ---
   useEffect(() => {
@@ -499,16 +500,6 @@ const App = () => {
   return (
     <AppContext.Provider value={appContextValue}>
       <div className="flex h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 overflow-hidden">
-        {isMobile && !isMobileSidebarOpen && (
-          <button
-            onClick={() => setMobileSidebarOpen(true)}
-            className="fixed top-4 right-4 z-[60] p-2 text-gray-600 dark:text-gray-300 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 md:hidden"
-            aria-label="Open menu"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-        )}
-
         <Sidebar
           activeTab={activeTab}
           setActiveTab={handleTabClick}
@@ -520,7 +511,7 @@ const App = () => {
           isMobile={isMobile}
           isMobileOpen={isMobileSidebarOpen}
           setMobileOpen={setMobileSidebarOpen}
-          onSettingsClick={() => handleTabClick("settings")}
+          onSettingsClick={() => handleTabClick('settings')}
         />
 
         <div className="flex-1 flex flex-col overflow-hidden">
@@ -530,7 +521,24 @@ const App = () => {
             containerStyle={{ top: 20, right: 20 }}
           />
 
-          <header className="p-4 sm:p-6 lg:p-8 flex items-center gap-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          {/* --- Mobile Header --- */}
+          <header className="md:hidden sticky top-0 z-30 bg-white dark:bg-gray-800 shadow-md p-4 flex justify-between items-center">
+             <div className="flex items-center space-x-2">
+                <Package className="w-8 h-8 text-blue-600" />
+                <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                  {t("it_inventory")}
+                </h1>
+              </div>
+              <button
+                onClick={() => setMobileSidebarOpen(true)}
+                className="p-2 text-gray-600 dark:text-gray-300"
+                aria-label="Open menu"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+          </header>
+
+          <header className="hidden md:block p-4 sm:p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
             <div className="flex-grow min-w-0">
               <DashboardView
                 t={t}
@@ -544,6 +552,21 @@ const App = () => {
               />
             </div>
           </header>
+          
+          {/* Add a div for mobile dashboard to separate it from the new header */}
+          <div className="md:hidden p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+             <DashboardView
+                t={t}
+                equipment={inventory.equipment}
+                pendingPurchaseCount={pendingPurchaseItems.length}
+                purchasingCount={purchasingItems.length}
+                purchasedCount={purchasedItems.length}
+                masterListCount={uniqueMasterItemsCount}
+                reportsCount={inventory.transactions.length}
+                setActiveTab={handleTabClick}
+              />
+          </div>
+
 
           <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8">
             {renderCurrentView()}
@@ -672,3 +695,4 @@ const App = () => {
 };
 
 export default App;
+
