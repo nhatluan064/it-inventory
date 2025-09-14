@@ -5,9 +5,11 @@ export const translations = {
     loading_data: "Đang tải dữ liệu...",
     home: "Trang chủ",
     home_page_title: "Trang Chủ & Cập nhật",
-    home_page_subtitle: "Thông tin về phiên bản và các bài viết cập nhật mới nhất.",
+    home_page_subtitle:
+      "Thông tin về phiên bản và các bài viết cập nhật mới nhất.",
     welcome_to_app: "Chào mừng bạn đến với Hệ thống Quản lý Kho IT",
-    home_page_content: "Đây là nơi bạn có thể tìm thấy các thông báo, cập nhật phiên bản và hướng dẫn sử dụng mới nhất.",
+    home_page_content:
+      "Đây là nơi bạn có thể tìm thấy các thông báo, cập nhật phiên bản và hướng dẫn sử dụng mới nhất.",
     nav_title_main: "Tổng quan",
     hello: "Xin chào",
     view_info: "xem thông tin",
@@ -16,7 +18,8 @@ export const translations = {
     account_creation_date: "Ngày tạo tài khoản",
     not_available: "Không có thông tin",
     change_password_button: "Yêu cầu đổi mật khẩu",
-    password_reset_info: "Một liên kết đặt lại mật khẩu sẽ được gửi đến email của bạn.",
+    password_reset_info:
+      "Một liên kết đặt lại mật khẩu sẽ được gửi đến email của bạn.",
     please_enter_display_name: "Vui lòng nhập tên hiển thị của bạn.",
     profile_update_failed: "Cập nhật hồ sơ thất bại.",
     complete_your_profile: "Hoàn tất Hồ sơ của bạn",
@@ -25,7 +28,6 @@ export const translations = {
     saving: "Đang lưu...",
     save_and_continue: "Lưu và Tiếp tục",
     actioninventory: "THAO TÁC NHANH",
-    //Nhom tieu de menu
     nav_title_assets: "Tài sản",
     nav_title_purchasing: "Mua hàng",
     nav_title_lifecycle: "Vòng đời",
@@ -36,8 +38,6 @@ export const translations = {
     master_list_desc: "Quản lý các mẫu thiết bị có thể mua.",
     dashboard: "Tổng quan",
     dashboard_desc: "Xem nhanh tình trạng kho và các thao tác nhanh.",
-
-    //SORT
     sort_by: "Sắp xếp theo",
     sort_az: "Tên (A-Z)",
     sort_za: "Tên (Z-A)",
@@ -45,11 +45,8 @@ export const translations = {
     sort_desc: "Giảm dần",
     sort_newest: "Mới nhất",
     sort_oldest: "Cũ nhất",
-
-    loading_data: "Đang tải dữ liệu...",
     loading_database_success: "Đã tải dữ liệu thành công!",
     loading_database_false: "Không thể tải dữ liệu từ cơ sở dữ liệu.",
-    // Login Page
     login_welcome_message: "Đăng nhập để tiếp tục quản lý kho",
     login_email: "Địa chỉ Email",
     login_password: "Mật khẩu",
@@ -67,8 +64,6 @@ export const translations = {
       "Không thể gửi email. Vui lòng kiểm tra lại địa chỉ email.",
     login_enter_email_for_reset:
       "Vui lòng nhập email của bạn vào ô bên trên để khôi phục mật khẩu.",
-
-    // Register Page
     register_title: "Tạo tài khoản mới",
     register_welcome_message: "Bắt đầu quản lý kho của bạn ngay hôm nay",
     register_button: "Đăng ký",
@@ -78,8 +73,6 @@ export const translations = {
     register_success_and_login: "Đăng ký thành công! Vui lòng đăng nhập lại.",
     register_confirm_password: "Nhập lại mật khẩu",
     register_error_password_mismatch: "Mật khẩu nhập lại không khớp!",
-
-    // Auth Success Popup
     login_success_title: "Đăng nhập thành công!",
     login_success_message: "Chào mừng trở lại. Hệ thống đang chuẩn bị...",
     register_success_title: "Đăng ký thành công!",
@@ -87,15 +80,13 @@ export const translations = {
       "Tài khoản của bạn đã được tạo. Đang đăng nhập...",
     login_continue_button: "Vào hệ thống",
     register_back_to_login: "Quay lại đăng nhập",
-
-    //Chức danh
     position_president: "Chủ tịch",
     position_chairman: "Chủ tịch Hội đồng quản trị",
     position_vice_chairman: "Phó Chủ tịch Hội đồng quản trị",
     position_general_director: "Tổng giám đốc",
     position_deputy_general_director: "Phó tổng giám đốc",
     position_director: "Giám đốc",
-    position_affairs_director:"Giám đốc Nội vụ",
+    position_affairs_director: "Giám đốc Nội vụ",
     position_foreman: "Quản đốc",
     position_assistant: "Trợ lý",
     position_manager: "Trưởng phòng",
@@ -105,8 +96,6 @@ export const translations = {
     position_worker: "Công nhân",
     position_janitor: "Lao công",
     position_intern: "Thực tập sinh",
-
-    //Phòng ban
     dept_bod: "HĐQT",
     dept_director: "Giám đốc",
     dept_hr_admin: "Hành chính nhân sự",
@@ -128,9 +117,9 @@ export const translations = {
     dept_accounting: "Kế toán tài chính",
     dept_sales: "Kinh doanh",
     dept_production_management: "Điều hành sản xuất",
-    dept_general_affairs: "Tổng vụ", // DÒNG MỚI
+    dept_general_affairs: "Tổng vụ",
 
-    //Toast
+    // --- TOAST MESSAGES ---
     toast_price_is_required:
       "Vui lòng nhập giá thành cho tất cả các thiết bị được chọn.",
     toast_sn_already_exists_in_inventory:
@@ -140,7 +129,8 @@ export const translations = {
       "Chức năng đăng xuất không áp dụng cho phiên bản local.",
     toast_item_added_to_request_list:
       "Đã thêm '{itemName}' vào danh sách yêu cầu.",
-    toast_item_already_exists: "Mẫu thiết bị '{itemName}' đã tồn tại.",
+    toast_model_exists_guide_to_add:
+      "Mẫu '{itemName}' đã tồn tại. Vui lòng vào 'Yêu cầu Mua' và 'Thêm từ danh sách mẫu' để tạo đơn hàng.",
     toast_new_model_added_successfully: "Thêm mẫu mới thành công!",
     toast_model_name_updated_successfully: "Cập nhật tên mẫu thành công!",
     toast_cannot_delete_model_in_use:
@@ -173,8 +163,6 @@ export const translations = {
     toast_sn_quantity_mismatch:
       "Số lượng SN ({snCount}) phải bằng Số lượng mua ({purchaseCount}).",
     toast_duplicate_sn_error: "Không được nhập các Số Serial (SN) trùng lặp.",
-
-    // ##### NEW KEYS FOR SN MANAGEMENT #####
     serial_number_required: "Số Serial là bắt buộc.",
     toast_sn_exists: "Số Serial '{sn}' đã tồn tại trong kho.",
     toast_sn_updated_required:
@@ -197,18 +185,13 @@ export const translations = {
       "Bạn có chắc chắn muốn thực hiện hành động này không?",
     revert_to_pending: "Hoàn tác về Yêu cầu",
     cancel_purchase: "Hủy Mua",
-    // ##### END NEW KEYS #####
-
-    // Toast Messages
     toast_moved_to_maintenance:
       "Đã chuyển {quantity} {itemName} vào danh sách bảo trì.",
     toast_recalled_to_stock: "Đã thu hồi {quantity} {itemName} về kho.",
     toast_repair_complete: "Đã trả {itemName} về kho sau khi sửa.",
     toast_moved_to_liquidation:
       "Đã chuyển {itemName} vào danh sách chờ thanh lý.",
-
     locale_string: "vi-VN",
-    // Categories
     category_all: "Tất cả các loại",
     category_pc: "Máy tính PC",
     category_mini_pc: "Máy tính Mini PC",
@@ -217,21 +200,18 @@ export const translations = {
     category_keyboard: "Bàn phím máy tính",
     category_mouse: "Chuột máy tính",
     category_printer: "Máy In",
-    category_label_printer: "Máy in tem", // DÒNG MỚI
+    category_label_printer: "Máy in tem",
     category_photocopier: "Máy Photocopy",
-    category_printer_ink: "Mực in", // DÒNG MỚI
+    category_printer_ink: "Mực in",
     category_network_device: "Thiết bị mạng",
     category_network_cable: "Dây cáp mạng",
     category_other: "Vật tư khác",
-    // Locations
     location_not_imported: "Chưa nhập kho",
     location_in_stock: "Trong kho",
     location_maintenance_room: "Phòng Bảo trì",
     location_liquidation_stock: "Kho Thanh lý",
-    //Mantain
     repair_completed: "Hoàn thành sữa chữa",
     mark_unrepairable: "Thanh lý thiết bị",
-    // General
     admin: "Quản trị viên",
     it_inventory: "Quản lý Kho",
     search: "Tìm kiếm",
@@ -268,8 +248,6 @@ export const translations = {
     action_type: "Loại hành động",
     from_date: "Từ ngày",
     to_date: "Đến ngày",
-
-    // Header & Navigation
     notifications: "Thông báo gần đây",
     no_new_notifications: "Không có thông báo mới.",
     view_all: "Xem tất cả",
@@ -285,8 +263,6 @@ export const translations = {
     maintenance: "Bảo trì",
     liquidation: "Thanh lý",
     reports: "Báo cáo",
-
-    // Dashboard
     pending_purchase_requests: "Yêu cầu mua",
     in_purchasing_process: "Đang Mua",
     purchased_waiting_import: "Đã Mua",
@@ -303,8 +279,6 @@ export const translations = {
     manage_inventory: "Quản lý Kho",
     view_full_report: "Xem Báo cáo Đầy đủ",
     in_stock: "Trong kho",
-
-    // Settings
     system_settings: "Cài đặt hệ thống",
     interface: "Giao diện",
     light_mode: "Sáng",
@@ -317,7 +291,7 @@ export const translations = {
     reset_data: "Reset Toàn bộ Dữ liệu",
     reset_data_warning: "Lưu ý: Hành động này không thể hoàn tác.",
 
-    // Master List View
+    // --- MASTER LIST VIEW ---
     add_new_master_item: "Thêm Mẫu Mới",
     search_master_item_placeholder: "Tìm kiếm tên mẫu...",
     master_item_name: "Tên Mẫu Thiết bị",
@@ -325,18 +299,16 @@ export const translations = {
     has_been_used: "Đã từng sử dụng",
     never_used: "Chưa từng sử dụng",
     no_master_items_found: "Không tìm thấy mẫu thiết bị nào.",
+    cannot_edit_used_model: "Không thể sửa mẫu đã được sử dụng",
 
-    // Inventory View
+    // --- INVENTORY VIEW ---
     search_inventory_placeholder: "Tìm kiếm thiết bị trong kho, mã SN...",
     import_unlisted_device: "Nhập thiết bị không qua mua hàng",
     device_name: "Tên Thiết Bị",
     no_devices_match_search:
       "Không tìm thấy thiết bị nào khớp với tìm kiếm của bạn.",
-
-    // Other Views
     pending_purchase_list: "Danh sách Yêu cầu Mua",
-    pending_purchase_desc:
-      "Chọn thiết bị và nhập số lượng để chuyển sang giai đoạn tiếp theo.",
+    pending_purchase_desc: "Chọn thiết bị, nhập số lượng để mua.",
     add_from_master_list: "Thêm từ danh sách mẫu",
     proceed_to_purchase_count: "Tiến hành Mua ({count})",
     purchase_quantity: "Số Lượng Mua",
@@ -372,8 +344,6 @@ export const translations = {
     device_user_column: "Tên Thiết Bị & Người Dùng",
     no_allocated_items_for_recall:
       "Chưa có thiết bị nào được xuất kho cho người dùng.",
-
-    // Modals
     add_new_master_item_modal_title: "Thêm Mẫu Thiết Bị Mới",
     edit_device_modal_title: "Chỉnh sửa Thiết bị",
     confirm_delete: "Xác nhận xóa",
@@ -411,9 +381,6 @@ export const translations = {
     recall_quantity: "Số lượng",
     condition_on_recall: "Tình trạng",
     confirm_recall: "Thu hồi",
-    
-
-    // Reports View Actions
     "procurement-request": "Tạo Yêu cầu Mua",
     "procurement-purchasing": "Tiến hành Mua hàng",
     "procurement-purchased": "Xác nhận Hàng đã về",
@@ -435,15 +402,11 @@ export const translations = {
     condition_repaired: "Đã sửa chữa: {note}",
     are_you_sure_reset_data:
       "Bạn có chắc muốn xóa hết dữ liệu đang tồn tại không ?",
-
-    // Placeholders
     failure_note_placeholder:
       "Nhập ghi chú hỏng hóc (vd: không lên nguồn, màn hình bị sọc...)",
     cancellation_reason_placeholder:
       "Nhập lý do hủy (vd: tìm được nhà cung cấp tốt hơn, thay đổi nhu cầu...)",
     master_item_name_placeholder: "Nhập vào Mẫu thiết bị muốn bổ xung",
-
-    // Confirmation Modals
     confirm_move_to_liquidation_title: "Bạn có chắc muốn thanh lý nó không ?",
     confirm_move_to_liquidation_text:
       "Việc này là không thể hoàn tác, suy nghĩ kỹ trước khi xác nhận !",
@@ -479,9 +442,11 @@ export const translations = {
     loading_data: "Loading data...",
     home: "Home",
     home_page_title: "Home & Updates",
-    home_page_subtitle: "Information about versions and latest update articles.",
+    home_page_subtitle:
+      "Information about versions and latest update articles.",
     welcome_to_app: "Welcome to the IT Inventory Management System",
-    home_page_content: "This is where you can find announcements, version updates, and the latest user guides.",
+    home_page_content:
+      "This is where you can find announcements, version updates, and the latest user guides.",
     nav_title_main: "Overview",
     hello: "Hello",
     view_info: "view info",
@@ -499,7 +464,6 @@ export const translations = {
     saving: "Saving...",
     save_and_continue: "Save and Continue",
     actioninventory: "Quick Actions",
-    // Menu Title Group
     nav_title_assets: "Assets",
     nav_title_purchasing: "Purchasing",
     nav_title_lifecycle: "Lifecycle",
@@ -510,8 +474,6 @@ export const translations = {
     master_list_desc: "Manage device models available for purchase.",
     dashboard: "Dashboard",
     dashboard_desc: "Quick overview of inventory status and quick actions.",
-
-    //SORT
     sort_by: "Sort by",
     sort_az: "Name (A-Z)",
     sort_za: "Name (Z-A)",
@@ -519,11 +481,8 @@ export const translations = {
     sort_desc: "Descending",
     sort_newest: "Newest",
     sort_oldest: "Oldest",
-
-    loading_data: "Loading data...",
     loading_database_success: "Data loaded successfully!",
     loading_database_false: "Failed to load data from the database.",
-    // Login Page
     login_welcome_message: "Log in to continue managing the inventory",
     login_email: "Email Address",
     login_password: "Password",
@@ -540,8 +499,6 @@ export const translations = {
       "Unable to send email. Please check your email address.",
     login_enter_email_for_reset:
       "Please enter your email in the box above to reset your password.",
-
-    // Register Page
     register_title: "Create a new account",
     register_welcome_message: "Start managing your inventory today",
     register_button: "Register",
@@ -551,23 +508,19 @@ export const translations = {
     register_success_and_login: "Registration successful! Please log in again.",
     register_confirm_password: "Confirm Password",
     register_error_password_mismatch: "Passwords do not match!",
-
-    // Auth Success Popup
     login_success_title: "Login Successful!",
     login_success_message: "Welcome back. The system is preparing...",
     register_success_title: "Registration Successful!",
     register_success_message: "Your account has been created. Logging in...",
     login_continue_button: "Continue to App",
     register_back_to_login: "Back to Login",
-
-    //Chuc vu
     position_president: "President",
     position_chairman: "Chairman of the Board",
     position_vice_chairman: "Vice Chairman of the Board",
     position_general_director: "General Director",
     position_deputy_general_director: "Deputy General Director",
     position_director: "Director",
-    position_affairs_director:"Director of Internal Affairs",
+    position_affairs_director: "Director of Internal Affairs",
     position_foreman: "Foreman",
     position_assistant: "Assistant",
     position_manager: "Manager",
@@ -577,8 +530,6 @@ export const translations = {
     position_worker: "Worker",
     position_janitor: "Janitor",
     position_intern: "Intern",
-
-    //Phong ban
     dept_bod: "Board of Directors",
     dept_director: "Director",
     dept_hr_admin: "HR & Administration",
@@ -600,8 +551,9 @@ export const translations = {
     dept_accounting: "Accounting & Finance",
     dept_sales: "Sales",
     dept_production_management: "Production Management",
-    dept_general_affairs: "General Affairs", // NEW LINE
-    //Toast
+    dept_general_affairs: "General Affairs",
+
+    // --- TOAST MESSAGES ---
     toast_price_is_required: "Please enter a price for all selected items.",
     toast_sn_already_exists_in_inventory:
       "One or more SNs already exist in inventory (e.g., '{sn}'). Please check again.",
@@ -609,7 +561,8 @@ export const translations = {
       "Please enter Serial Number(s) to import to inventory.",
     toast_logout_local: "Logout is not available in the local version.",
     toast_item_added_to_request_list: "Added '{itemName}' to the request list.",
-    toast_item_already_exists: "Device model '{itemName}' already exists.",
+    toast_model_exists_guide_to_add:
+      "Model '{itemName}' already exists. Please go to 'Purchase Request' and 'Add from Master List' to create an order.",
     toast_new_model_added_successfully: "New model added successfully!",
     toast_model_name_updated_successfully: "Model name updated successfully!",
     toast_cannot_delete_model_in_use:
@@ -643,8 +596,6 @@ export const translations = {
     toast_sn_quantity_mismatch:
       "SN count ({snCount}) must equal purchase quantity ({purchaseCount}).",
     toast_duplicate_sn_error: "Duplicate Serial Numbers (SN) are not allowed.",
-
-    // ##### NEW KEYS FOR SN MANAGEMENT #####
     serial_number_required: "Serial Number is required.",
     toast_sn_exists: "Serial Number '{sn}' already exists in the inventory.",
     toast_sn_updated_required:
@@ -665,16 +616,11 @@ export const translations = {
     are_you_sure_generic: "Are you sure you want to perform this action?",
     revert_to_pending: "Revert to Pending",
     cancel_purchase: "Cancel Purchase",
-    // ##### END NEW KEYS #####
-
-    // Toast Messages
     toast_moved_to_maintenance:
       "Moved {quantity} {itemName} to the maintenance list.",
     toast_recalled_to_stock: "Recalled {quantity} {itemName} back to stock.",
     toast_repair_complete: "Returned {itemName} to stock after repair.",
     toast_moved_to_liquidation: "Moved {itemName} to the liquidation list.",
-
-    // Categories
     category_all: "All Categories",
     category_pc: "PC",
     category_mini_pc: "Mini PC",
@@ -689,32 +635,22 @@ export const translations = {
     category_network_device: "Network Device",
     category_network_cable: "Network Cable",
     category_other: "Other Supplies",
-
-    // Locations
     location_not_imported: "Not yet stocked",
     location_in_stock: "In stock",
     location_maintenance_room: "Maintenance Room",
     location_liquidation_stock: "Liquidation Warehouse",
-
-    // Placeholders
     failure_note_placeholder:
       "Enter failure note (e.g., does not power on, screen has stripes...)",
     cancellation_reason_placeholder:
       "Enter cancellation reason (e.g., found a better supplier, changed requirements...)",
     master_item_name_placeholder: "Enter the device model to add",
-
-    // Maintain
     repair_completed: "Repair Completed",
     mark_unrepairable: "Dispose Device",
-    // Condition
-    "condition_good_as_new": "Good as new device",
-    "condition_used": "Used device",
-
-    // Recall Reason
-    "recall_reason_resigned": "User resigned",
-    "recall_reason_replacement": "User replaced device",
-    "recall_reason_upgrade": "User upgraded device",
-    
+    condition_good_as_new: "Good as new device",
+    condition_used: "Used device",
+    recall_reason_resigned: "User resigned",
+    recall_reason_replacement: "User replaced device",
+    recall_reason_upgrade: "User upgraded device",
     condition_damaged_needs_maintenance: "Damaged, needs maintenance",
     allocating: "Handover from",
     recipient_name: "Recipient's Name",
@@ -804,6 +740,8 @@ export const translations = {
     backup_data: "Backup All Data",
     reset_data: "Reset All Data",
     reset_data_warning: "Warning: This action cannot be undone.",
+
+    // --- MASTER LIST VIEW ---
     add_new_master_item: "Add New Master Item",
     search_master_item_placeholder: "Search master item name...",
     master_item_name: "Master Item Name",
@@ -811,10 +749,14 @@ export const translations = {
     has_been_used: "Has been used",
     never_used: "Never used",
     no_master_items_found: "No master items found.",
+    cannot_edit_used_model: "Cannot edit a model that is already in use",
+
+    // --- INVENTORY VIEW ---
     search_inventory_placeholder: "Search devices in inventory...",
     import_unlisted_device: "Import device without purchasing",
     device_name: "Device Name",
     no_devices_match_search: "No devices found matching your search.",
+
     pending_purchase_list: "Pending Purchase Request List",
     pending_purchase_desc: "Select items and enter quantities to proceed.",
     add_from_master_list: "Add from Master List",
@@ -891,7 +833,6 @@ export const translations = {
     recalled_prefix: "Returned Item: {conditionText}",
     condition_legacy_import: "Legacy (non-purchased) item",
     condition_repaired: "Repaired: {note}",
-    // Confirmation Modals
     confirm_move_to_liquidation_title:
       "Are you sure you want to liquidate this item?",
     confirm_move_to_liquidation_text:
@@ -941,7 +882,6 @@ export const translations = {
     change_password_button: "请求更改密码",
     password_reset_info: "密码重置链接将发送到您的电子邮件。",
     actioninventory: "快速操作",
-    // 菜单标题组
     nav_title_assets: "资产",
     nav_title_purchasing: "采购",
     nav_title_lifecycle: "生命周期",
@@ -952,8 +892,6 @@ export const translations = {
     master_list_desc: "管理可采购的设备模板。",
     dashboard: "仪表盘",
     dashboard_desc: "快速查看库存状态和快捷操作。",
-
-    //SORT
     sort_by: "排序方式",
     sort_az: "名称 (A-Z)",
     sort_za: "名称 (Z-A)",
@@ -961,11 +899,8 @@ export const translations = {
     sort_desc: "降序",
     sort_newest: "最新",
     sort_oldest: "最旧",
-
-    loading_data: "正在加载数据...",
     loading_database_success: "数据加载成功！",
     loading_database_false: "无法从数据库加载数据。",
-    // Login Page
     login_welcome_message: "登录以继续管理库存",
     login_email: "电子邮箱地址",
     login_password: "密码",
@@ -980,8 +915,6 @@ export const translations = {
     login_password_reset_sent: "密码重置邮件已发送！",
     login_error_password_reset: "无法发送邮件，请检查您的邮箱地址。",
     login_enter_email_for_reset: "请输入您的邮箱以重置密码。",
-
-    // Register Page
     register_title: "创建新账户",
     register_welcome_message: "立即开始管理您的库存",
     register_button: "注册",
@@ -991,23 +924,19 @@ export const translations = {
     register_success_and_login: "注册成功！请重新登录。",
     register_confirm_password: "确认密码",
     register_error_password_mismatch: "两次输入的密码不一致！",
-
-    // Auth Success Popup
     login_success_title: "登录成功！",
     login_success_message: "欢迎回来，系统正在准备中...",
     register_success_title: "注册成功！",
     register_success_message: "您的账户已创建，正在登录...",
     login_continue_button: "进入系统",
     register_back_to_login: "返回登录",
-
-    //Chuc vu
     position_president: "主席",
     position_chairman: "董事长",
     position_vice_chairman: "副董事长",
     position_general_director: "总经理",
     position_deputy_general_director: "副总经理",
     position_director: "总监",
-    position_affairs_director:"内务总监",
+    position_affairs_director: "内务总监",
     position_foreman: "工头",
     position_assistant: "助理",
     position_manager: "经理",
@@ -1017,8 +946,6 @@ export const translations = {
     position_worker: "工人",
     position_janitor: "清洁工",
     position_intern: "实习生",
-    
-    //Phong ban
     dept_bod: "董事会",
     dept_director: "总监",
     dept_hr_admin: "行政人事部",
@@ -1032,7 +959,7 @@ export const translations = {
     dept_it: "信息技术",
     dept_production: "生产部",
     dept_operation: "运营部",
-    "dept_executive": "行政部门",
+    dept_executive: "行政部门",
     dept_packaging: "包装部",
     dept_marketing: "市场营销",
     dept_medical: "医务室",
@@ -1040,16 +967,17 @@ export const translations = {
     dept_accounting: "会计财务部",
     dept_sales: "销售部",
     dept_production_management: "生产管理",
-    dept_general_affairs: "总务部", // 新线
+    dept_general_affairs: "总务部",
 
-    // Toast
+    // --- TOAST MESSAGES ---
     toast_price_is_required: "请输入所有选定项目的价格。",
     toast_sn_already_exists_in_inventory:
       "一个或多个序列号已存在于库存中（例如：'{sn}'）。请重新检查。",
     toast_sn_is_required: "请输入序列号以便入库。",
     toast_logout_local: "本地版本不支持登出。",
     toast_item_added_to_request_list: "已将“{itemName}”添加到申请列表。",
-    toast_item_already_exists: "设备型号“{itemName}”已存在。",
+    toast_model_exists_guide_to_add:
+      "型号 '{itemName}' 已存在。请前往“采购请求”并从“主列表添加”以创建订单。",
     toast_new_model_added_successfully: "新型号添加成功！",
     toast_model_name_updated_successfully: "型号名称更新成功！",
     toast_cannot_delete_model_in_use:
@@ -1079,8 +1007,6 @@ export const translations = {
     toast_sn_quantity_mismatch:
       "序列号数量 ({snCount}) 必须等于采购数量 ({purchaseCount})。",
     toast_duplicate_sn_error: "不允许重复的序列号（SN）。",
-
-    // ##### NEW KEYS FOR SN MANAGEMENT #####
     serial_number_required: "序列号是必填项。",
     toast_sn_exists: "序列号 '{sn}' 已存在于库存中。",
     toast_sn_updated_required: "设备已导入临时序列号。请到库存管理中更新。",
@@ -1098,15 +1024,10 @@ export const translations = {
     are_you_sure_generic: "您确定要执行此操作吗？",
     revert_to_pending: "退回至请求列表",
     cancel_purchase: "取消采购",
-    // ##### END NEW KEYS #####
-
-    // Toast Messages
     toast_moved_to_maintenance: "已将 {quantity} 个 {itemName} 移至维修列表。",
     toast_recalled_to_stock: "已将 {quantity} 个 {itemName} 召回库存。",
     toast_repair_complete: "维修后已将 {itemName} 退回库存。",
     toast_moved_to_liquidation: "已将 {itemName} 移至清算列表。",
-
-    // Categories
     category_all: "所有类别",
     category_pc: "台式电脑",
     category_mini_pc: "迷你电脑",
@@ -1121,30 +1042,21 @@ export const translations = {
     category_network_device: "网络设备",
     category_network_cable: "网线",
     category_other: "其他物资",
-
-    // Locations
     location_not_imported: "尚未入库",
     location_in_stock: "在库",
     location_maintenance_room: "维修室",
     location_liquidation_stock: "清算仓库",
-    // Placeholders
     failure_note_placeholder: "输入故障备注（例如：无法开机，屏幕有条纹...）",
     cancellation_reason_placeholder:
       "输入取消原因（例如：找到更好的供应商，需求发生变化...）",
     master_item_name_placeholder: "输入要添加的设备型号",
-    // Maintain
     repair_completed: "维修完成",
     mark_unrepairable: "设备报废",
-
-    // Condition
-    "condition_good_as_new": "设备良好，如同全新",
-    "condition_used": "已使用的设备",
-
-    // Recall Reason
-    "recall_reason_resigned": "用户已离职",
-    "recall_reason_replacement": "用户更换了设备",
-    "recall_reason_upgrade": "用户升级了设备",
-    
+    condition_good_as_new: "设备良好，如同全新",
+    condition_used: "已使用的设备",
+    recall_reason_resigned: "用户已离职",
+    recall_reason_replacement: "用户更换了设备",
+    recall_reason_upgrade: "用户升级了设备",
     condition_damaged_needs_maintenance: "损坏，需要维修",
     allocating: "交接自",
     recipient_name: "接收人姓名",
@@ -1234,6 +1146,8 @@ export const translations = {
     backup_data: "备份所有数据",
     reset_data: "重置所有数据",
     reset_data_warning: "警告：此操作无法撤销。",
+
+    // --- MASTER LIST VIEW ---
     add_new_master_item: "新增主项目",
     search_master_item_placeholder: "搜索主项目名称...",
     master_item_name: "主项目名称",
@@ -1241,6 +1155,9 @@ export const translations = {
     has_been_used: "已使用",
     never_used: "从未使用",
     no_master_items_found: "未找到主项目。",
+    cannot_edit_used_model: "无法编辑已在使用的型号",
+
+    // --- INVENTORY VIEW ---
     search_inventory_placeholder: "搜索库存设备...",
     import_unlisted_device: "导入未通过采购的设备",
     device_name: "设备名称",
@@ -1283,7 +1200,6 @@ export const translations = {
     edit_device_modal_title: "编辑设备",
     confirm_delete: "确认删除",
     confirm_cancellation: "确认取消",
-
     are_you_sure_delete:
       '您确定要删除设备 <strong class="text-red-600">{itemName}</strong> 吗？此操作无法撤销。',
     device_details: "设备详情",
@@ -1319,7 +1235,6 @@ export const translations = {
     recalled_prefix: "退回物品: {conditionText}",
     condition_legacy_import: "非采购导入物品",
     condition_repaired: "已修复: {note}",
-    // Confirmation Modals
     confirm_move_to_liquidation_title: "您确定要将其移至清算吗？",
     confirm_move_to_liquidation_text: "此操作无法撤销，请在确认前谨慎考虑！",
     confirm_delete_master_title: "确认删除主模板",
@@ -1351,4 +1266,3 @@ export const translations = {
   },
   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 };
-

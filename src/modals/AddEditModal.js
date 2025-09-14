@@ -21,7 +21,6 @@ const AddEditModal = ({
   categories,
   t,
 }) => {
-  // Khởi tạo state với giá trị mặc định, không bao giờ là null
   const [formData, setFormData] = useState(defaultFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -29,8 +28,6 @@ const AddEditModal = ({
 
   useEffect(() => {
     if (show) {
-      // Nếu là chế độ chỉnh sửa và có dữ liệu, gán dữ liệu đó
-      // Nếu không, quay về state mặc định (cho chế độ Thêm mới)
       setFormData(isEditing ? initialData : defaultFormState);
     }
   }, [initialData, show, isEditing]);
@@ -41,17 +38,17 @@ const AddEditModal = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const isNumericField = name === 'quantity' || name === 'price';
-    const processedValue = isNumericField ? (parseFloat(value) || 0) : value;
+    const isNumericField = name === "quantity" || name === "price";
+    const processedValue = isNumericField ? parseFloat(value) || 0 : value;
     setFormData((prev) => ({ ...prev, [name]: processedValue }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     const success = await onSubmit(formData);
-    
+
     setIsSubmitting(false);
 
     if (success) {
@@ -74,13 +71,15 @@ const AddEditModal = ({
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {t("device_name")}
             </label>
+            {/* *** THAY ĐỔI CHÍNH Ở ĐÂY *** */}
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-blue-500"
+              className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-700/50 disabled:cursor-not-allowed"
               required
+              disabled={isEditing}
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -88,11 +87,13 @@ const AddEditModal = ({
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t("category")}
               </label>
+              {/* *** THAY ĐỔI CHÍNH Ở ĐÂY *** */}
               <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200"
+                className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 disabled:bg-gray-100 dark:disabled:bg-gray-700/50 disabled:cursor-not-allowed"
+                disabled={isEditing}
               >
                 {categoryOptions.map((cat) => (
                   <option key={cat.id} value={cat.id}>
@@ -115,7 +116,7 @@ const AddEditModal = ({
               </select>
             </div>
           </div>
-          
+
           {!isEditing && (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -164,7 +165,7 @@ const AddEditModal = ({
               />
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {t("serial_number_sn")}
@@ -203,7 +204,7 @@ const AddEditModal = ({
               disabled={isSubmitting}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-blue-400"
             >
-              {isSubmitting ? "..." : (isEditing ? t("save_changes") : t("add"))}
+              {isSubmitting ? "..." : isEditing ? t("save_changes") : t("add")}
             </button>
           </div>
         </form>
@@ -213,4 +214,3 @@ const AddEditModal = ({
 };
 
 export default AddEditModal;
-

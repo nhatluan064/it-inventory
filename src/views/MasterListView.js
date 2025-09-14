@@ -34,19 +34,30 @@ const MasterListView = ({
               {t("master_list_desc")}
             </p>
           </div>
-          {/* Sửa: md:hidden -> lg:hidden */}
-          <button
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="lg:hidden p-2 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md"
-          >
-            {isFilterOpen ? (
-              <X className="w-4 h-4" />
-            ) : (
-              <Filter className="w-4 h-4" />
-            )}
-          </button>
+
+          <div className="flex items-center gap-2 lg:hidden">
+            <button
+              onClick={onAddType}
+              className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2 text-xs font-semibold"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">
+                {t("add_new_master_item")}
+              </span>
+            </button>
+            <button
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className="p-2 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md"
+            >
+              {isFilterOpen ? (
+                <X className="w-4 h-4" />
+              ) : (
+                <Filter className="w-4 h-4" />
+              )}
+            </button>
+          </div>
         </div>
-        {/* Sửa: md:flex -> lg:flex */}
+
         <div
           className={`lg:flex flex-col lg:flex-row lg:items-center gap-4 ${
             isFilterOpen ? "flex" : "hidden"
@@ -75,15 +86,15 @@ const MasterListView = ({
           </select>
           <button
             onClick={onAddType}
-            className="w-full lg:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2 flex-shrink-0 text-sm"
+            className="w-full lg:w-auto flex-shrink-0 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 items-center justify-center space-x-2 text-xs font-semibold hidden lg:flex h-9"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-4 h-4" />
             <span>{t("add_new_master_item")}</span>
           </button>
         </div>
       </div>
 
-      {/* Sửa: hidden md:block -> hidden lg:block */}
+      {/* --- Giao diện Bảng cho Desktop --- */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hidden lg:block">
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
@@ -106,13 +117,12 @@ const MasterListView = ({
             <tbody className="divide-y dark:divide-gray-700">
               {filteredItems.length > 0 ? (
                 filteredItems.map((item) => {
-                  const isModelInUse = fullEquipmentList.some((e) => {
-                    const baseItemName = e.name.split(" (User:")[0].trim();
-                    return (
-                      baseItemName === item.name &&
-                      !["master", "pending-purchase"].includes(e.status)
-                    );
-                  });
+                  const isModelInUse = fullEquipmentList.some(
+                    (e) =>
+                      e.name.split(" (User:")[0].trim() === item.name &&
+                      e.category === item.category &&
+                      e.status !== "master"
+                  );
                   const statusText = isModelInUse
                     ? t("has_been_used")
                     : t("never_used");
@@ -136,10 +146,23 @@ const MasterListView = ({
                         <div className="flex items-center justify-center space-x-2">
                           <button
                             onClick={() => onEditItem(item)}
-                            className="p-2"
-                            title={t("edit")}
+                            disabled={isModelInUse}
+                            className={`p-2 ${
+                              isModelInUse ? "cursor-not-allowed" : ""
+                            }`}
+                            title={
+                              isModelInUse
+                                ? t("cannot_edit_used_model")
+                                : t("edit")
+                            }
                           >
-                            <Edit2 className="w-4 h-4 text-blue-600 hover:text-blue-400" />
+                            <Edit2
+                              className={`w-4 h-4 ${
+                                isModelInUse
+                                  ? "text-gray-400"
+                                  : "text-blue-600 hover:text-blue-400"
+                              }`}
+                            />
                           </button>
                           <button
                             onClick={() => onDeleteItem(item)}
@@ -166,17 +189,16 @@ const MasterListView = ({
         </div>
       </div>
 
-      {/* Sửa: md:hidden -> lg:hidden */}
+      {/* --- Giao diện Card cho Mobile --- */}
       <div className="lg:hidden space-y-4">
         {filteredItems.length > 0 ? (
           filteredItems.map((item) => {
-            const isModelInUse = fullEquipmentList.some((e) => {
-              const baseItemName = e.name.split(" (User:")[0].trim();
-              return (
-                baseItemName === item.name &&
-                !["master", "pending-purchase"].includes(e.status)
-              );
-            });
+            const isModelInUse = fullEquipmentList.some(
+              (e) =>
+                e.name.split(" (User:")[0].trim() === item.name &&
+                e.category === item.category &&
+                e.status !== "master"
+            );
             const statusText = isModelInUse
               ? t("has_been_used")
               : t("never_used");
@@ -186,7 +208,7 @@ const MasterListView = ({
             return (
               <div
                 key={item.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 space-y-2"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 space-y-2 min-h-32 flex flex-col justify-between"
               >
                 <div className="flex justify-between items-start">
                   <div>
@@ -201,10 +223,19 @@ const MasterListView = ({
                   <div className="flex items-center space-x-1">
                     <button
                       onClick={() => onEditItem(item)}
-                      className="p-2"
-                      title={t("edit")}
+                      disabled={isModelInUse}
+                      className={`p-2 ${
+                        isModelInUse ? "cursor-not-allowed" : ""
+                      }`}
+                      title={
+                        isModelInUse ? t("cannot_edit_used_model") : t("edit")
+                      }
                     >
-                      <Edit2 className="w-4 h-4 text-blue-600" />
+                      <Edit2
+                        className={`w-4 h-4 ${
+                          isModelInUse ? "text-gray-400" : "text-blue-600"
+                        }`}
+                      />
                     </button>
                     <button
                       onClick={() => onDeleteItem(item)}

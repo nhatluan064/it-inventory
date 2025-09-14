@@ -1,9 +1,31 @@
 // src/modals/EquipmentTypeModal.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const EquipmentTypeModal = ({ show, onClose, onSubmit, categories, t }) => {
+const EquipmentTypeModal = ({
+  show,
+  onClose,
+  onSubmit,
+  categories,
+  t,
+  initialData,
+}) => {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("pc");
+
+  const isEditing = !!initialData;
+
+  useEffect(() => {
+    if (show) {
+      if (isEditing) {
+        setName(initialData.name || "");
+        setCategory(initialData.category || "pc");
+      } else {
+        // Reset form cho chế độ Thêm mới
+        setName("");
+        setCategory("pc");
+      }
+    }
+  }, [show, initialData, isEditing]);
 
   if (!show) {
     return null;
@@ -15,19 +37,25 @@ const EquipmentTypeModal = ({ show, onClose, onSubmit, categories, t }) => {
       alert(t("please_fill_all_fields"));
       return;
     }
-    onSubmit({ name, category });
-    setName("");
-    setCategory("pc");
+    // Nếu là chế độ sửa, gửi cả ID
+    const dataToSend = isEditing
+      ? { ...initialData, name, category }
+      : { name, category };
+    onSubmit(dataToSend);
     onClose();
   };
 
   const categoryOptions = categories.filter((c) => c.id !== "all");
+  const modalTitle = isEditing
+    ? t("edit_device_modal_title")
+    : t("add_new_master_item_modal_title");
+  const buttonText = isEditing ? t("save_changes") : t("save");
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
-          {t("add_new_master_item_modal_title")}
+          {modalTitle}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -73,7 +101,7 @@ const EquipmentTypeModal = ({ show, onClose, onSubmit, categories, t }) => {
               type="submit"
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              {t("save")}
+              {buttonText}
             </button>
           </div>
         </form>

@@ -9,12 +9,15 @@ const MaintenanceView = ({
   onMarkUnrepairable,
   onEditNote,
   t,
+  statusColors,
+  statusLabels,
 }) => {
   const {
     items: sortedItems,
     requestSort,
     sortConfig,
   } = useSort(items, { key: "maintenanceDate", direction: "descending" });
+
   const columns = [
     { key: "name", label: "device_name", sortable: true },
     { key: "serialNumber", label: "serial_number_sn", sortable: true },
@@ -34,137 +37,136 @@ const MaintenanceView = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-      <div className="p-6 border-b dark:border-gray-700">
-        {/* ĐÃ SỬA: text-xl -> text-lg */}
+    <div className="space-y-6">
+      {/* Card Tiêu đề */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
         <h2 className="text-lg font-bold">{t("maintenance_management")}</h2>
-        {/* ĐÃ SỬA: text-sm -> text-xs */}
         <p className="text-xs text-gray-500 mt-1">{t("maintenance_desc")}</p>
       </div>
 
-      {/* --- Giao diện Bảng cho Desktop --- */}
-      <div className="overflow-x-auto hidden md:block">
-        {/* ĐÃ SỬA: text-sm -> text-xs */}
-        <table className="w-full text-xs">
-          <SortableHeader
-            columns={columns}
-            requestSort={requestSort}
-            sortConfig={sortConfig}
-            t={t}
-          />
-          <tbody className="divide-y dark:divide-gray-700">
-            {sortedItems.length > 0 ? (
-              sortedItems.map((item) => (
-                <tr
-                  key={item.id}
-                  className="hover:bg-gray-100 dark:hover:bg-gray-700/50"
-                >
-                  <td className="px-6 py-4 font-medium">{item.name}</td>
-                  <td className="px-6 py-4 font-mono">
-                    {item.serialNumber || "N/A"}
-                  </td>
-                  <td className="px-6 py-4">
-                    {formatDate(item.maintenanceDate)}
-                  </td>
-                  <td className="px-6 py-4">{item.condition}</td>
-                  <td className="px-6 py-4 text-center">
-                    <div className="flex items-center justify-center space-x-2">
-                      {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
-                      <button
-                        onClick={() => onEditNote(item)}
-                        className="p-2"
-                        title={t("edit_failure_note")}
-                      >
-                        <Edit className="w-4 h-4 text-blue-600 hover:text-blue-400" />
-                      </button>
-                      <button
-                        onClick={() => onRepairComplete(item)}
-                        className="p-2"
-                        title={t("repair_completed")}
-                      >
-                        <CheckCircle className="w-4 h-4 text-green-600 hover:text-green-400" />
-                      </button>
-                      <button
-                        onClick={() => onMarkUnrepairable(item)}
-                        className="p-2"
-                        title={t("mark_unrepairable")}
-                      >
-                        <XCircle className="w-4 h-4 text-red-600 hover:text-red-400" />
-                      </button>
-                    </div>
+      {/* Card Danh sách */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div className="overflow-x-auto hidden md:block">
+          <table className="w-full text-xs">
+            <SortableHeader
+              columns={columns}
+              requestSort={requestSort}
+              sortConfig={sortConfig}
+              t={t}
+            />
+            <tbody className="divide-y dark:divide-gray-700">
+              {sortedItems.length > 0 ? (
+                sortedItems.map((item) => (
+                  <tr
+                    key={item.id}
+                    className="hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                  >
+                    <td className="px-3 py-4 font-medium">{item.name}</td>
+                    <td className="px-3 py-4 font-mono">
+                      {item.serialNumber || "N/A"}
+                    </td>
+                    <td className="px-3 py-4">
+                      {formatDate(item.maintenanceDate)}
+                    </td>
+                    <td className="px-3 py-4">{item.condition}</td>
+                    <td className="px-3 py-4 text-center">
+                      <div className="flex items-center justify-center space-x-2">
+                        <button
+                          onClick={() => onEditNote(item)}
+                          className="p-2"
+                          title={t("edit_failure_note")}
+                        >
+                          <Edit className="w-4 h-4 text-blue-600 hover:text-blue-400" />
+                        </button>
+                        <button
+                          onClick={() => onRepairComplete(item)}
+                          className="p-2"
+                          title={t("repair_completed")}
+                        >
+                          <CheckCircle className="w-4 h-4 text-green-600 hover:text-green-400" />
+                        </button>
+                        <button
+                          onClick={() => onMarkUnrepairable(item)}
+                          className="p-2"
+                          title={t("mark_unrepairable")}
+                        >
+                          <XCircle className="w-4 h-4 text-red-600 hover:text-red-400" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={columns.length} className="text-center py-12">
+                    {t("no_data_available")}
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={columns.length} className="text-center py-12">
-                  {t("no_data_available")}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* --- Giao diện Card cho Mobile --- */}
-      <div className="md:hidden p-4 space-y-4">
-        {sortedItems.length > 0 ? (
-          sortedItems.map((item) => (
-            <div
-              key={item.id}
-              className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 space-y-2 shadow"
-            >
-              <div>
-                {/* ĐÃ SỬA: Thêm text-sm */}
-                <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">
-                  {item.name}
-                </p>
-                {/* ĐÃ SỬA: Thêm text-xs */}
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-                  {item.serialNumber || "N/A"}
-                </p>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="md:hidden space-y-3 p-2">
+          {sortedItems.length > 0 ? (
+            sortedItems.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-stretch gap-3 h-32"
+              >
+                <div className="flex-grow w-2/5 pr-2 border-r dark:border-gray-700 flex flex-col">
+                  <div>
+                    <p className="font-bold text-sm text-gray-900 dark:text-gray-100 truncate">
+                      {item.name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                      {item.serialNumber || "N/A"}
+                    </p>
+                  </div>
+                  <div className="mt-1">
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColors.maintenance}`}
+                    >
+                      {statusLabels.maintenance}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex-grow w-3/5 text-xs flex flex-col justify-center gap-y-1">
+                  <p>
+                    <strong>{t("maintenance_date")}:</strong>{" "}
+                    {formatDate(item.maintenanceDate)}
+                  </p>
+                  <p>
+                    <strong>{t("failure_note")}:</strong> {item.condition}
+                  </p>
+                </div>
+                <div className="flex flex-col space-y-1 justify-center">
+                  <button
+                    onClick={() => onEditNote(item)}
+                    className="p-1.5 rounded-full text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => onRepairComplete(item)}
+                    className="p-1.5 rounded-full text-green-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => onMarkUnrepairable(item)}
+                    className="p-1.5 rounded-full text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <XCircle className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-              {/* ĐÃ SỬA: text-sm -> text-xs */}
-              <div className="text-xs text-gray-700 dark:text-gray-300 border-t dark:border-gray-600 pt-2">
-                <p>
-                  <strong>{t("maintenance_date")}:</strong>{" "}
-                  {formatDate(item.maintenanceDate)}
-                </p>
-                <p>
-                  <strong>{t("failure_note")}:</strong> {item.condition}
-                </p>
-              </div>
-              <div className="flex items-center justify-end space-x-2 border-t dark:border-gray-600 pt-2 mt-2">
-                {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
-                <button
-                  onClick={() => onEditNote(item)}
-                  className="p-2"
-                  title={t("edit_failure_note")}
-                >
-                  <Edit className="w-4 h-4 text-blue-600" />
-                </button>
-                <button
-                  onClick={() => onRepairComplete(item)}
-                  className="p-2"
-                  title={t("repair_completed")}
-                >
-                  <CheckCircle className="w-4 h-4 text-green-600" />
-                </button>
-                <button
-                  onClick={() => onMarkUnrepairable(item)}
-                  className="p-2"
-                  title={t("mark_unrepairable")}
-                >
-                  <XCircle className="w-4 h-4 text-red-600" />
-                </button>
-              </div>
+            ))
+          ) : (
+            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+              {t("no_data_available")}
             </div>
-          ))
-        ) : (
-          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-            {t("no_data_available")}
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

@@ -16,6 +16,7 @@ const AllocatedView = ({
 }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
+  // Khôi phục lại đầy đủ các cột như ban đầu để hiển thị đầy đủ thông tin
   const allColumns = useMemo(
     () => [
       { key: "name", label: "device_name", sortable: true },
@@ -61,13 +62,17 @@ const AllocatedView = ({
     direction: "descending",
   });
 
-  const columnsToRender = allColumns;
-
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleString(t("locale_string"));
+    // Định dạng ngày theo chuẩn locale đã có trong t() function
+    return new Date(dateString).toLocaleDateString(t("locale_string"), {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
   };
 
+  // Hàm render chức vụ để xử lý cả trường hợp có mô tả thêm
   const renderPosition = (details) => {
     let positionDisplay = details.position ? t(details.position) : "N/A";
     if (details.positionDescription) {
@@ -95,6 +100,7 @@ const AllocatedView = ({
 
   return (
     <div className="space-y-6">
+      {/* --- BỘ LỌC ĐÃ TỐI ƯU --- */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div>
@@ -105,10 +111,9 @@ const AllocatedView = ({
               {t("allocated_desc")}
             </p>
           </div>
-          {/* Sửa: md:hidden -> lg:hidden */}
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="lg:hidden p-2 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md"
+            className="md:hidden p-2 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md"
           >
             {isFilterOpen ? (
               <X className="w-4 h-4" />
@@ -117,11 +122,10 @@ const AllocatedView = ({
             )}
           </button>
         </div>
-
         <div
           className={`gap-4 ${
-            isFilterOpen ? "flex flex-col" : "hidden"
-          } lg:flex lg:flex-row lg:items-end`}
+            isFilterOpen ? "flex" : "hidden"
+          } flex-col md:flex md:flex-row md:items-end`}
         >
           <div className="flex-grow">
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -132,43 +136,39 @@ const AllocatedView = ({
               <input
                 name="search"
                 type="text"
-                placeholder="Tìm theo tên thiết bị, SN, người nhận, MSNV..."
-                className="w-full pl-10 pr-4 py-2 border rounded-lg dark:placeholder-gray-400 text-sm"
+                placeholder={t("search_inventory_placeholder")}
+                className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400"
                 value={filters.search}
                 onChange={handleFilterChange}
               />
             </div>
           </div>
-          <div className="flex-shrink-0 lg:w-44">
+          <div className="flex-shrink-0 md:w-48">
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
               {t("category")}
             </label>
             <select
               name="category"
-              className="w-full py-2 px-3 border rounded-lg dark:text-gray-800 text-sm"
+              className="w-full py-2 px-3 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
               value={filters.category}
               onChange={handleFilterChange}
             >
-              {categories.map((cat) => {
-                const count =
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>{`${cat.name} (${
                   cat.id === "all"
                     ? (unfilteredAllocatedItems || []).length
-                    : categoryCounts[cat.id] || 0;
-                return (
-                  <option key={cat.id} value={cat.id}>
-                    {`${cat.name} (${count})`}
-                  </option>
-                );
-              })}
+                    : categoryCounts[cat.id] || 0
+                })`}</option>
+              ))}
             </select>
           </div>
-          <div className="flex-shrink-0 lg:w-44">
+          <div className="flex-shrink-0 md:w-48">
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
               {t("department")}
             </label>
             <select
               name="department"
-              className="w-full py-2 px-3 border rounded-lg dark:text-gray-800 text-sm"
+              className="w-full py-2 px-3 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
               value={filters.department}
               onChange={handleFilterChange}
             >
@@ -179,14 +179,14 @@ const AllocatedView = ({
               ))}
             </select>
           </div>
-          <div className="flex-shrink-0 lg:w-44">
+          <div className="flex-shrink-0 md:w-48">
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
               {t("handover_date")}
             </label>
             <input
               name="handoverDate"
               type="date"
-              className="w-full py-2 px-3 border rounded-lg dark:text-gray-800 text-sm"
+              className="w-full py-2 px-3 border rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
               value={filters.handoverDate}
               onChange={handleFilterChange}
             />
@@ -194,11 +194,12 @@ const AllocatedView = ({
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      {/* --- BẢNG DỮ LIỆU DESKTOP --- */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <SortableHeader
-              columns={columnsToRender}
+              columns={allColumns}
               requestSort={requestSort}
               sortConfig={sortConfig}
               t={t}
@@ -212,31 +213,31 @@ const AllocatedView = ({
                       key={item.id}
                       className="hover:bg-gray-100 dark:hover:bg-gray-700/50"
                     >
-                      <td className="px-6 py-4 font-medium">
+                      <td className="px-3 py-4 font-medium">
                         {item.name.split(" (User:")[0]}
                       </td>
-                      <td className="px-6 py-4 capitalize">
+                      <td className="px-3 py-4 capitalize">
                         {(categories.find((c) => c.id === item.category) || {})
                           .name || item.category}
                       </td>
-                      <td className="px-6 py-4 font-mono">
+                      <td className="px-3 py-4 font-mono">
                         {item.serialNumber || "N/A"}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-4">
                         {details.recipientName || "N/A"}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-4">
                         {details.employeeId || "N/A"}
                       </td>
-                      <td className="px-6 py-4">{renderPosition(details)}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-4">{renderPosition(details)}</td>
+                      <td className="px-3 py-4">
                         {details.department ? t(details.department) : "N/A"}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-4">
                         {formatDate(details.handoverDate)}
                       </td>
-                      <td className="px-6 py-4 text-center">
-                        <div className="flex items-center justify-center space-x-2">
+                      <td className="px-3 py-4 text-center">
+                        <div className="flex items-center justify-center space-x-1">
                           <button
                             onClick={() => onRecallItem(item)}
                             className="p-2"
@@ -259,8 +260,8 @@ const AllocatedView = ({
               ) : (
                 <tr>
                   <td
-                    colSpan={columnsToRender.length}
-                    className="text-center py-12"
+                    colSpan={allColumns.length}
+                    className="text-center py-12 text-sm"
                   >
                     {t("no_allocated_items_match_filter")}
                   </td>
@@ -269,6 +270,72 @@ const AllocatedView = ({
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* --- GIAO DIỆN CARD CHO MOBILE --- */}
+      <div className="md:hidden space-y-3">
+        {sortedItems.length > 0 ? (
+          sortedItems.map((item) => {
+            const details = item.allocationDetails || {};
+            return (
+              <div
+                key={item.id}
+                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-stretch gap-3 h-32"
+              >
+                {/* Cột 1: Thông tin chính */}
+                <div className="flex-grow w-2/5 pr-2 border-r dark:border-gray-700 flex flex-col justify-center gap-y-1">
+                  <p className="font-bold text-sm text-gray-900 dark:text-gray-100 truncate">
+                    {item.name.split(" (User:")[0]}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {details.recipientName || "N/A"}
+                  </p>
+                  <div className="mt-1">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">
+                      {t("in_use")}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Cột 2: Thông tin phụ */}
+                <div className="flex-grow w-3/5 text-xs flex flex-col justify-center gap-y-1">
+                  <p>
+                    <strong>{t("department")}:</strong>{" "}
+                    {details.department ? t(details.department) : "N/A"}
+                  </p>
+                  <p>
+                    <strong>{t("employee_id")}:</strong>{" "}
+                    {details.employeeId || "N/A"}
+                  </p>
+                  <p className="col-span-2">
+                    <strong>{t("handover_date")}:</strong>{" "}
+                    {formatDate(details.handoverDate)}
+                  </p>
+                </div>
+
+                {/* Cột 3: Hành động */}
+                <div className="flex flex-col space-y-1">
+                  <button
+                    onClick={() => onRecallItem(item)}
+                    className="p-1.5 rounded-full text-green-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => onMarkDamaged(item)}
+                    className="p-1.5 rounded-full text-orange-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <Wrench className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-lg shadow">
+            <p>{t("no_allocated_items_match_filter")}</p>
+          </div>
+        )}
       </div>
     </div>
   );

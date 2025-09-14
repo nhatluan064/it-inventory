@@ -9,8 +9,6 @@ import {
   addDoc,
   deleteDoc,
   updateDoc,
-  query,
-  where,
 } from "firebase/firestore";
 import toast from "react-hot-toast";
 
@@ -107,14 +105,16 @@ export const useInventory = (currentUser, t) => {
   const addEquipmentType = useCallback(
     async (typeData) => {
       if (!currentUser) return;
+      // Sửa logic kiểm tra trùng lặp: check cả name và category
       const existing = equipment.some(
         (item) =>
           item.name.toLowerCase() === typeData.name.toLowerCase() &&
+          item.category === typeData.category &&
           item.status === "master"
       );
       if (existing) {
         toast.error(
-          t("toast_item_already_exists", { itemName: typeData.name })
+          t("toast_model_exists_guide_to_add", { itemName: typeData.name })
         );
         return false;
       }
@@ -185,64 +185,57 @@ export const useInventory = (currentUser, t) => {
 
   const deleteMasterItem = useCallback(
     async (itemToDelete) => {
-      // Correct logic: Check if any non-master/pending item has the exact base name
+      // Logic kiểm tra xem mẫu này có đang được sử dụng trong kho không
       const isModelInUse = equipment.some((e) => {
         const baseItemName = e.name.split(" (User:")[0].trim();
         return (
           baseItemName === itemToDelete.name &&
-          !["master", "pending-purchase"].includes(e.status)
+          e.category === itemToDelete.category &&
+          e.status !== "master" &&
+          e.status !== "pending-purchase"
         );
       });
 
       if (isModelInUse) {
-        toast.error(
-          t("toast_cannot_delete_model_in_use", { itemName: itemToDelete.name })
+        // *** LOGIC MỚI: KIỂM TRA NẾU ĐÂY LÀ MỘT BẢN GHI BỊ TRÙNG LẶP ***
+        // Đếm xem có bao nhiêu Mẫu trùng khớp cả tên và danh mục
+        const duplicateMasters = equipment.filter(
+          (e) =>
+            e.status === "master" &&
+            e.name === itemToDelete.name &&
+            e.category === itemToDelete.category
         );
-        return;
+
+        // Nếu có nhiều hơn 1 Mẫu như vậy, tức là đang có Mẫu bị trùng lặp
+        // Trong trường hợp này, chúng ta cho phép xóa để dọn dẹp dữ liệu
+        if (duplicateMasters.length <= 1) {
+          toast.error(
+            t("toast_cannot_delete_model_in_use", {
+              itemName: itemToDelete.name,
+            })
+          );
+          return; // Dừng lại nếu Mẫu là duy nhất và đang được sử dụng
+        }
+        // Nếu có bản trùng lặp, code sẽ tiếp tục chạy xuống dưới để thực hiện xóa
       }
 
       const batch = writeBatch(db);
-      // Delete the master item itself and any pending purchases of it
-      const itemsToDelete = equipment.filter(
-        (item) =>
-          item.name.split(" (User:")[0].trim() === itemToDelete.name &&
-          (item.status === "master" || item.status === "pending-purchase")
-      );
 
-      if (itemsToDelete.length === 0) {
-        // This case might happen if there are inconsistencies, but it's good to handle.
-        // It means the master item to delete wasn't even found.
-        const masterRecord = equipment.find((e) => e.id === itemToDelete.id);
-        if (masterRecord) {
-          const docRef = doc(
-            db,
-            "users",
-            currentUser.uid,
-            "equipment",
-            masterRecord.id
-          );
-          batch.delete(docRef);
-        }
-      } else {
-        itemsToDelete.forEach((item) => {
-          const docRef = doc(
-            db,
-            "users",
-            currentUser.uid,
-            "equipment",
-            item.id
-          );
-          batch.delete(docRef);
-        });
-      }
+      // Chỉ xóa MỘT bản ghi được click, không xóa các bản ghi khác
+      const docRef = doc(
+        db,
+        "users",
+        currentUser.uid,
+        "equipment",
+        itemToDelete.id
+      );
+      batch.delete(docRef);
 
       await batch.commit();
 
-      // Update state
-      setEquipment(
-        equipment.filter(
-          (item) => !itemsToDelete.some((deleted) => deleted.id === item.id)
-        )
+      // Cập nhật lại giao diện bằng cách lọc ra item đã bị xóa
+      setEquipment((prevEquipment) =>
+        prevEquipment.filter((item) => item.id !== itemToDelete.id)
       );
 
       toast.success(
@@ -250,6 +243,61 @@ export const useInventory = (currentUser, t) => {
       );
     },
     [currentUser, equipment, t]
+  );
+
+  const updateMasterItem = useCallback(
+    async (itemData) => {
+      // *** LOGIC KIỂM TRA TRÙNG LẶP KHI SỬA ***
+      const isDuplicate = equipment.some(
+        (e) =>
+          e.id !== itemData.id && // Phải đảm bảo nó không so sánh với chính nó
+          e.name.toLowerCase() === itemData.name.toLowerCase() &&
+          e.category === itemData.category &&
+          e.status === "master"
+      );
+
+      if (isDuplicate) {
+        toast.error(
+          `Một mẫu khác có tên '${itemData.name}' và danh mục '${t(
+            itemData.category
+          )}' đã tồn tại.`
+        );
+        return false; // Dừng việc cập nhật
+      }
+      // *** KẾT THÚC LOGIC KIỂM TRA ***
+
+      const docRef = doc(
+        db,
+        "users",
+        currentUser.uid,
+        "equipment",
+        itemData.id
+      );
+
+      const dataToUpdate = {
+        name: itemData.name,
+        category: itemData.category,
+      };
+
+      await updateDoc(docRef, dataToUpdate);
+
+      setEquipment(
+        equipment.map((e) =>
+          e.id === itemData.id ? { ...e, ...dataToUpdate } : e
+        )
+      );
+
+      logTransaction({
+        type: "inventory",
+        reason: "update",
+        itemName: itemData.name,
+        details: { action: "Updated master item" },
+      });
+
+      toast.success(t("toast_info_updated_successfully"));
+      return true;
+    },
+    [currentUser, equipment, logTransaction, t]
   );
 
   // --- Purchasing Flow Functions ---
@@ -262,7 +310,7 @@ export const useInventory = (currentUser, t) => {
       );
       if (existingItem) {
         toast.error(
-          t("toast_item_already_exists", { itemName: itemToAdd.name })
+          t("toast_model_exists_guide_to_add", { itemName: itemToAdd.name })
         );
         return;
       }
@@ -370,7 +418,6 @@ export const useInventory = (currentUser, t) => {
           itemName: item.name,
         });
       } else {
-        // 'delete-pending'
         await deleteDoc(
           doc(db, "users", currentUser.uid, "equipment", item.id)
         );
@@ -494,6 +541,39 @@ export const useInventory = (currentUser, t) => {
       const batch = writeBatch(db);
       const newItems = [];
       const importDate = new Date().toISOString();
+
+      // *** BẮT ĐẦU LOGIC MỚI: TỰ ĐỘNG TẠO MASTER ITEM NẾU CHƯA TỒN TẠI ***
+      const masterExists = equipment.some(
+        (item) =>
+          item.name.toLowerCase() === data.name.toLowerCase() &&
+          item.category === data.category && // Thêm dòng này
+          item.status === "master"
+      );
+
+      if (!masterExists) {
+        // Nếu mẫu chưa tồn tại, tạo một mẫu mới
+        const newMasterItem = {
+          name: data.name,
+          category: data.category,
+          status: "master",
+          location: "master-list",
+          quantity: 0,
+          price: 0,
+        };
+        const newMasterDocRef = doc(
+          collection(db, "users", currentUser.uid, "equipment")
+        );
+        batch.set(newMasterDocRef, newMasterItem);
+        // Ghi log cho hành động tạo mẫu tự động
+        logTransaction({
+          type: "master-list",
+          reason: "add-legacy", // Lý do mới để phân biệt
+          itemName: data.name,
+          details: { category: data.category, autoCreated: true },
+        });
+      }
+      // *** KẾT THÚC LOGIC MỚI ***
+
       for (const sn of serials) {
         const newItemData = {
           ...data,
@@ -510,18 +590,23 @@ export const useInventory = (currentUser, t) => {
         batch.set(newDocRef, newItemData);
         newItems.push({ ...newItemData, id: newDocRef.id });
       }
+
       await batch.commit();
-      setEquipment((prev) => [...prev, ...newItems]);
+      // Sau khi commit, ta cần fetch lại dữ liệu để state 'equipment' được cập nhật
+      // với cả mẫu mới và thiết bị mới, thay vì chỉ cập nhật thủ công.
+      await fetchData();
+
       logTransaction({
         type: "import",
         reason: "legacy",
         itemName: data.name,
         quantity: data.quantity,
       });
+
       toast.success(t("toast_legacy_item_imported"));
       return true;
     },
-    [currentUser, equipment, logTransaction, t]
+    [currentUser, equipment, logTransaction, t, fetchData] // Thêm fetchData vào dependency array
   );
 
   const updateItem = useCallback(
@@ -845,17 +930,17 @@ export const useInventory = (currentUser, t) => {
 
           data.equipment.forEach((item) => {
             const { id, ...itemData } = item;
-            const newDocRef = doc(equipColRef); // Let Firestore generate ID
+            const newDocRef = doc(equipColRef);
             batch.set(newDocRef, itemData);
           });
           data.transactions.forEach((item) => {
             const { id, ...itemData } = item;
-            const newDocRef = doc(transColRef); // Let Firestore generate ID
+            const newDocRef = doc(transColRef);
             batch.set(newDocRef, itemData);
           });
 
           await batch.commit();
-          await fetchData(); // Refresh data from Firestore
+          await fetchData();
           toast.success(t("toast_data_restored_successfully"));
         } catch (error) {
           console.error("Error reading or importing backup file: ", error);
@@ -901,6 +986,7 @@ export const useInventory = (currentUser, t) => {
     addEquipmentType,
     updateMasterName,
     deleteMasterItem,
+    updateMasterItem,
     requestFromMaster,
     startPurchasing,
     confirmPurchased,

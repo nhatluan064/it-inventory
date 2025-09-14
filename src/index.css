@@ -3,55 +3,61 @@
 @tailwind utilities;
 
 @layer base {
-  /* Cải thiện độ tương phản cho placeholder ở chế độ tối */
-  .dark input::placeholder {
-    @apply text-gray-400;
+  /*
+    Thiết lập font chữ, màu nền, và màu chữ mặc định cho toàn bộ trang.
+    Sử dụng @apply để lấy giá trị từ theme của Tailwind, giúp body
+    tự động đổi màu theo giao diện Sáng/Tối.
+  */
+  body {
+    @apply bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+      "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+      "Helvetica Neue", sans-serif;
+    font-size: 12px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition-property: color, background-color;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
   }
+
+  /*
+    Cải thiện độ tương phản cho placeholder ở chế độ tối.
+    Phần này bạn đã làm rất tốt, mình giữ lại.
+  */
+  .dark input::placeholder,
   .dark textarea::placeholder {
     @apply text-gray-400;
   }
-  
 }
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #f9fafb; /* Màu nền sáng */
-  color: #111827; /* Màu chữ tối */
-  font-size: 12px; /* Kích thước chữ mặc định */
-  
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
-}
-
-/* Ẩn thanh cuộn cho các trình duyệt Webkit (Chrome, Safari, Edge mới) */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Ẩn thanh cuộn cho Firefox */
-.hide-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge cũ */
-}
-
-/* Thêm vào cuối file src/index.css */
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+@layer utilities {
+  /*
+    Class tiện ích để ẩn thanh cuộn.
+    Giữ lại từ code gốc của bạn.
+  */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
   }
-  to {
-    opacity: 1;
+  .hide-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
-}
 
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-in-out;
+  /*
+    Keyframes và class cho hiệu ứng xuất hiện (fade-in).
+    Giữ lại từ code gốc của bạn.
+  */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 }

@@ -43,7 +43,7 @@ import EquipmentDetailModal from "./modals/EquipmentDetailModal";
 import EquipmentTypeModal from "./modals/EquipmentTypeModal";
 import AllocationModal from "./modals/AllocationModal";
 import CancelNoteModal from "./modals/CancelNoteModal";
-import EditNameModal from "./modals/EditNameModal";
+// import EditNameModal from "./modals/EditNameModal";
 import RecallModal from "./modals/RecallModal";
 import InfoModal from "./modals/InfoModal";
 import AddFromMasterModal from "./modals/AddFromMasterModal";
@@ -228,8 +228,7 @@ const App = () => {
   }, [inventory.equipment]);
 
   const uniqueMasterItemsCount = useMemo(() => {
-    const uniqueNames = new Set(masterItems.map((item) => item.name));
-    return uniqueNames.size;
+    return masterItems.length;
   }, [masterItems]);
 
   // --- UI Effects ---
@@ -392,10 +391,10 @@ const App = () => {
             {...viewProps}
             allItems={masterItems}
             fullEquipmentList={inventory.equipment}
+            // Mở modal EquipmentType ở chế độ Thêm mới
             onAddType={() => modals.openModal("type")}
-            onEditItem={(item) =>
-              modals.openModal("editName", { ...item, originalName: item.name })
-            }
+            // Mở modal EquipmentType ở chế độ Sửa
+            onEditItem={(item) => modals.openModal("type", item)}
             onDeleteItem={(item) =>
               modals.openModal("delete", item, { deleteType: "master" })
             }
@@ -407,9 +406,7 @@ const App = () => {
             {...viewProps}
             items={pendingPurchaseItems}
             onStartPurchase={inventory.startPurchasing}
-            onEditItem={(item) =>
-              modals.openModal("editName", { ...item, originalName: item.name })
-            }
+            // Dòng onEditItem đã được xóa
             onDeleteItem={inventory.cancelOrRevertPurchase}
             onOpenAddFromMasterModal={() => modals.openModal("addFromMaster")}
           />
@@ -474,6 +471,9 @@ const App = () => {
           <MaintenanceView
             {...viewProps}
             items={maintenanceItems}
+            // Thêm 2 dòng dưới đây
+            statusLabels={statusLabels}
+            statusColors={statusColors}
             onRepairComplete={(item) => modals.openModal("repairNote", item)}
             onMarkUnrepairable={(item) =>
               modals.openModal("delete", item, {
@@ -601,9 +601,16 @@ const App = () => {
         <EquipmentTypeModal
           show={modals.modalState.type}
           onClose={() => modals.closeModal("type")}
-          onSubmit={inventory.addEquipmentType}
+          // Thêm logic để gọi đúng hàm onSubmit
+          onSubmit={
+            modals.currentItem?.id
+              ? inventory.updateMasterItem
+              : inventory.addEquipmentType
+          }
           categories={categories}
           t={t}
+          // Truyền initialData cho chế độ Sửa
+          initialData={modals.currentItem}
         />
         <AddEditModal
           show={modals.modalState.addEdit}
@@ -615,13 +622,13 @@ const App = () => {
           categories={categories}
           t={t}
         />
-        <EditNameModal
+        {/* <EditNameModal
           show={modals.modalState.editName}
           onClose={() => modals.closeModal("editName")}
           onSubmit={inventory.updateMasterName}
           initialData={modals.currentItem}
           t={t}
-        />
+        /> */}
         <ConfirmDeleteModal
           show={modals.modalState.delete}
           onClose={() => modals.closeModal("delete")}

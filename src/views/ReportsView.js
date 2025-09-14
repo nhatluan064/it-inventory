@@ -193,13 +193,12 @@ const ReportsView = ({ transactions, t }) => {
   }, [sortedTransactions, logDetails, t]);
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-      <div className="p-6 border-b dark:border-gray-700">
-        <div className="flex justify-between items-center">
+    <div className="space-y-6">
+      {/* Card Tiêu đề & Lọc */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+        <div className="flex justify-between items-center mb-4">
           <div>
-            {/* ĐÃ SỬA: text-2xl -> text-xl */}
-            <h2 className="text-xl font-bold">{t("activity_log_history")}</h2>
-            {/* ĐÃ SỬA: text-sm -> text-xs */}
+            <h2 className="text-lg font-bold">{t("activity_log_history")}</h2>
             <p className="text-xs text-gray-500 mt-1">
               {t("activity_log_desc")}
             </p>
@@ -209,7 +208,6 @@ const ReportsView = ({ transactions, t }) => {
               onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
               className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
             >
-              {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
               {isMobileFilterOpen ? (
                 <X className="w-4 h-4" />
               ) : (
@@ -218,195 +216,199 @@ const ReportsView = ({ transactions, t }) => {
             </button>
           </div>
         </div>
-      </div>
-      <div
-        className={`p-4 bg-gray-50 dark:bg-gray-800/50 border-b dark:border-gray-700 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end ${
-          isMobileFilterOpen ? "grid" : "hidden md:grid"
-        }`}
-      >
-        <div className="lg:col-span-2">
-          {/* ĐÃ SỬA: text-sm -> text-xs */}
-          <label className="block text-xs font-medium mb-1">
-            {t("search")}
-          </label>
-          <div className="relative">
-            {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder={t("search")}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400 text-sm"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </div>
-        <div>
-          <label className="block text-xs font-medium mb-1">
-            {t("action_type")}
-          </label>
-          <select
-            className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 text-sm"
-            value={actionType}
-            onChange={(e) => setActionType(e.target.value)}
-          >
-            <option value="all">{t("all")}</option>
-            {Object.entries(logDetails).map(([key, value]) => (
-              <option key={key} value={key}>
-                {value.text}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
+        <div
+          className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end ${
+            isMobileFilterOpen ? "grid" : "hidden md:grid"
+          }`}
+        >
+          <div className="lg:col-span-2">
             <label className="block text-xs font-medium mb-1">
-              {t("from_date")}
+              {t("search")}
             </label>
-            <input
-              type="date"
-              className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 text-sm"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder={t("search")}
+                className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-400 text-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
           <div>
             <label className="block text-xs font-medium mb-1">
-              {t("to_date")}
+              {t("action_type")}
             </label>
-            <input
-              type="date"
+            <select
               className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 text-sm"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
+              value={actionType}
+              onChange={(e) => setActionType(e.target.value)}
+            >
+              <option value="all">{t("all")}</option>
+              {Object.entries(logDetails).map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value.text}
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
-        <div>
-          <label className="block text-xs font-medium mb-1 opacity-0 hidden md:block">
-            .
-          </label>
-          <CSVLink
-            data={csvData}
-            headers={headers}
-            filename={`IT_Inventory_Log_${new Date()
-              .toISOString()
-              .slice(0, 10)}.csv`}
-            className="w-full text-center block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
-          >
-            <span className="hidden md:inline">{t("Xuất file Log")}</span>
-            <Download className="w-4 h-4 md:hidden mx-auto" />
-          </CSVLink>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium mb-1">
+                {t("from_date")}
+              </label>
+              <input
+                type="date"
+                className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 text-sm"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1">
+                {t("to_date")}
+              </label>
+              <input
+                type="date"
+                className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 text-sm"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium mb-1 opacity-0 hidden md:block">
+              .
+            </label>
+            <CSVLink
+              data={csvData}
+              headers={headers}
+              filename={`IT_Inventory_Log_${new Date()
+                .toISOString()
+                .slice(0, 10)}.csv`}
+              className="w-full text-center block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
+            >
+              <span className="hidden md:inline">{t("Xuất file Log")}</span>
+              <Download className="w-4 h-4 md:hidden mx-auto" />
+            </CSVLink>
+          </div>
         </div>
       </div>
 
-      <div className="overflow-y-auto max-h-[calc(100vh-420px)] hidden md:block">
-        {/* ĐÃ SỬA: text-sm -> text-xs */}
-        <table className="w-full text-xs">
-          <SortableHeader
-            columns={columns}
-            requestSort={requestSort}
-            sortConfig={sortConfig}
-            t={t}
-          />
-          <tbody className="divide-y dark:divide-gray-700">
-            {sortedTransactions.length > 0 ? (
-              sortedTransactions.map((trans) => {
-                const detail = logDetails[`${trans.type}-${trans.reason}`] || {
-                  text: `${trans.type} - ${trans.reason}`,
-                  icon: Edit,
-                  color: "text-gray-500",
-                };
-                const Icon = detail.icon;
-                return (
-                  <tr
-                    key={trans.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
+      {/* Card Danh sách */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <div className="overflow-x-auto hidden md:block">
+          <table className="w-full text-xs">
+            <SortableHeader
+              columns={columns}
+              requestSort={requestSort}
+              sortConfig={sortConfig}
+              t={t}
+            />
+            <tbody className="divide-y dark:divide-gray-700">
+              {sortedTransactions.length > 0 ? (
+                sortedTransactions.map((trans) => {
+                  const detail = logDetails[
+                    `${trans.type}-${trans.reason}`
+                  ] || {
+                    text: `${trans.type} - ${trans.reason}`,
+                    icon: Edit,
+                    color: "text-gray-500",
+                  };
+                  const Icon = detail.icon;
+                  return (
+                    <tr
+                      key={trans.id}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                    >
+                      <td className="px-3 py-4 whitespace-nowrap">
+                        {new Date(trans.timestamp).toLocaleString(
+                          t("locale_string")
+                        )}
+                      </td>
+                      <td className="px-3 py-4">
+                        <div
+                          className={`inline-flex items-center gap-2 font-semibold ${detail.color}`}
+                        >
+                          <Icon className="w-4 h-4" />
+                          <span>{detail.text}</span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-4 font-medium">
+                        {trans.itemName}
+                      </td>
+                      <td className="px-3 py-4 text-right font-bold">
+                        {trans.quantity || "-"}
+                      </td>
+                      <td className="px-3 py-4">{trans.user}</td>
+                      <td className="px-3 py-4">{renderDetails(trans)}</td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td
+                    colSpan={columns.length}
+                    className="text-center py-12 text-sm"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    {t("no_data_available")}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="md:hidden p-4 space-y-4">
+          {sortedTransactions.length > 0 ? (
+            sortedTransactions.map((trans) => {
+              const detail = logDetails[`${trans.type}-${trans.reason}`] || {
+                text: `${trans.type} - ${trans.reason}`,
+                icon: Edit,
+                color: "text-gray-500",
+              };
+              const Icon = detail.icon;
+              return (
+                <div
+                  key={trans.id}
+                  className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 space-y-2 shadow"
+                >
+                  <div className="flex justify-between items-start gap-2">
+                    <div
+                      className={`flex items-center gap-2 font-semibold ${detail.color} text-sm`}
+                    >
+                      <Icon className="w-4 h-4 flex-shrink-0" />
+                      <span>{detail.text}</span>
+                    </div>
+                    <span className="text-right text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                       {new Date(trans.timestamp).toLocaleString(
                         t("locale_string")
                       )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div
-                        className={`inline-flex items-center gap-2 font-semibold ${detail.color}`}
-                      >
-                        <Icon className="w-4 h-4" />
-                        <span>{detail.text}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 font-medium">{trans.itemName}</td>
-                    <td className="px-6 py-4 text-right font-bold">
-                      {trans.quantity || "-"}
-                    </td>
-                    <td className="px-6 py-4">{trans.user}</td>
-                    <td className="px-6 py-4">{renderDetails(trans)}</td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan={columns.length} className="text-center py-12 text-sm">
-                  {t("no_data_available")}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="md:hidden p-4 space-y-4 overflow-y-auto max-h-[calc(100vh-380px)]">
-        {sortedTransactions.length > 0 ? (
-          sortedTransactions.map((trans) => {
-            const detail = logDetails[`${trans.type}-${trans.reason}`] || {
-              text: `${trans.type} - ${trans.reason}`,
-              icon: Edit,
-              color: "text-gray-500",
-            };
-            const Icon = detail.icon;
-            return (
-              <div
-                key={trans.id}
-                className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 space-y-2 shadow"
-              >
-                <div className="flex justify-between items-start gap-2">
-                  <div
-                    className={`flex items-center gap-2 font-semibold ${detail.color} text-sm`}
-                  >
-                    {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
-                    <Icon className="w-4 h-4 flex-shrink-0" />
-                    <span>{detail.text}</span>
+                    </span>
                   </div>
-                  <span className="text-right text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                    {new Date(trans.timestamp).toLocaleString(
-                      t("locale_string")
-                    )}
-                  </span>
-                </div>
-                {/* ĐÃ SỬA: text-sm -> text-xs */}
-                <div className="text-xs text-gray-700 dark:text-gray-300 border-t dark:border-gray-600 pt-2">
-                  <p>
-                    <strong>{t("object")}:</strong> {trans.itemName}{" "}
-                    {trans.quantity ? `(SL: ${trans.quantity})` : ""}
-                  </p>
-                  <p>
-                    <strong>{t("performed_by")}:</strong> {trans.user}
-                  </p>
-                  {renderDetails(trans) && (
+                  <div className="text-xs text-gray-700 dark:text-gray-300 border-t dark:border-gray-600 pt-2">
                     <p>
-                      <strong>{t("details")}:</strong> {renderDetails(trans)}
+                      <strong>{t("object")}:</strong> {trans.itemName}{" "}
+                      {trans.quantity ? `(SL: ${trans.quantity})` : ""}
                     </p>
-                  )}
+                    <p>
+                      <strong>{t("performed_by")}:</strong> {trans.user}
+                    </p>
+                    {renderDetails(trans) && (
+                      <p>
+                        <strong>{t("details")}:</strong> {renderDetails(trans)}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })
-        ) : (
-          <div className="text-center py-12 text-gray-500 dark:text-gray-400 text-sm">
-            {t("no_data_available")}
-          </div>
-        )}
+              );
+            })
+          ) : (
+            <div className="text-center py-12 text-gray-500 dark:text-gray-400 text-sm">
+              {t("no_data_available")}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
