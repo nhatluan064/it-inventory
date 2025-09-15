@@ -1,0 +1,32 @@
+Cách xử lý
+
+Kiểm tra xem repo có remote nào chưa:
+
+git remote -v
+
+
+Nếu không thấy gì → repo này chưa gắn với GitHub.
+
+Nếu chưa có remote thì add lại:
+
+git remote add origin https://github.com/nhatluan064/it-inventory.git
+
+
+Kéo code mới nhất về (tránh conflict):
+
+git pull origin main --rebase
+
+
+Sau đó mới push code của bạn lên:
+
+git push origin main
+
+⚡️ Trick để tránh rối
+
+Nếu bạn lỡ clone sai hoặc bị lung tung folder thì đơn giản nhất:
+
+cd D:\Developer\vscode\Github Clone
+git clone https://github.com/nhatluan064/it-inventory.git
+
+
+→ Tạo luôn một folder repo sạch, không bị lỗi remote.
