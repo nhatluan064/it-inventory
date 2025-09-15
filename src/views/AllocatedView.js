@@ -244,7 +244,7 @@ const AllocatedView = ({
                             className="p-2"
                             title={t("recall_device")}
                           >
-                            <RotateCcw classNam5="w-4 h-4 text-green-600 hover:text-green-400" />
+                            <RotateCcw className="w-4 h-4 text-green-600 hover:text-green-400" />
                           </button>
                           <button
                             onClick={() => onMarkDamaged(item)}

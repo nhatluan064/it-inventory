@@ -1,6 +1,6 @@
 // src/views/MasterListView.js
 import React, { useState } from "react";
-import { Plus, Package, Search, PlusCircle, Edit2, Trash2, Filter, X } from "lucide-react";
+import { Plus, Package, Search, PlusCircle, Edit, Edit2, Trash2, Filter, X } from "lucide-react";
 
 const MasterListView = ({
   allItems,
@@ -126,7 +126,7 @@ const MasterListView = ({
                             className={`p-2 ${isModelInUse ? "cursor-not-allowed" : ""}`}
                             title={isModelInUse ? t("cannot_edit_used_model") : t("edit")}
                           >
-                            <Edit2 className={`w-4 h-4 ${isModelInUse ? "text-gray-400" : "text-blue-600 hover:text-blue-400"}`}/>
+                            <Edit2 className={`w-4 h-4 ${isModelInUse ? "text-gray-600" : "text-yellow-400 hover:text-blue-400"}`}/>
                           </button>
                           <button
                             onClick={() => onDeleteItem(item)}
@@ -170,7 +170,7 @@ const MasterListView = ({
                       className={`p-2 ${isModelInUse ? "cursor-not-allowed" : ""}`}
                       title={isModelInUse ? t("cannot_edit_used_model") : t("edit")}
                     >
-                      <Edit2 className={`w-4 h-4 ${isModelInUse ? "text-gray-400" : "text-blue-600"}`} />
+                      <Edit className={`w-4 h-4 ${isModelInUse ? "text-gray-600" : "text-yellow-400"}`} />
                     </button>
                     
                   </div>

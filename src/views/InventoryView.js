@@ -1,5 +1,5 @@
 // src/views/InventoryView.js
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import {
   Search,
   Edit,
@@ -9,10 +9,10 @@ import {
   Plus,
   SlidersHorizontal,
   X,
+  User,
   CirclePlus,
 } from "lucide-react";
 import { useSort, SortableHeader } from "../hooks/useSort";
-import { User } from "lucide-react";
 
 const InventoryView = ({
   equipment,
@@ -31,24 +31,26 @@ const InventoryView = ({
 }) => {
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
-  // --- HELPER FUNCTIONS ---
-  const renderCondition = (item) => {
-    if (!item.condition) return "---";
-    if (typeof item.condition === "object" && item.condition.key) {
-      const finalParams = { ...item.condition.params };
-      if (finalParams.note && typeof finalParams.note === "object") {
-        const noteObject = finalParams.note;
-        finalParams.note = noteObject.isKey
-          ? t(noteObject.value)
-          : noteObject.value;
+  const renderCondition = useCallback(
+    (item) => {
+      if (!item.condition) return "---";
+      if (typeof item.condition === "object" && item.condition.key) {
+        const finalParams = { ...item.condition.params };
+        if (finalParams.note && typeof finalParams.note === "object") {
+          const noteObject = finalParams.note;
+          finalParams.note = noteObject.isKey
+            ? t(noteObject.value)
+            : noteObject.value;
+        }
+        return t(item.condition.key, finalParams);
       }
-      return t(item.condition.key, finalParams);
-    }
-    const conditionText = t(String(item.condition));
-    return item.isRecalled
-      ? t("recalled_prefix", { conditionText })
-      : conditionText;
-  };
+      const conditionText = t(String(item.condition));
+      return item.isRecalled
+        ? t("recalled_prefix", { conditionText })
+        : conditionText;
+    },
+    [t]
+  );
 
   const formatCurrency = (amount) => {
     if (typeof amount !== "number") return "N/A";
@@ -69,14 +71,13 @@ const InventoryView = ({
     });
   };
 
-  // --- MEMOIZED DATA ---
   const equipmentWithSortableCondition = useMemo(
     () =>
       equipment.map((item) => ({
         ...item,
         conditionText: renderCondition(item),
       })),
-    [equipment, t]
+    [equipment, renderCondition]
   );
   const {
     items: sortedEquipment,
@@ -89,21 +90,16 @@ const InventoryView = ({
 
   const columns = useMemo(
     () => [
-      { key: "importDate", label: "import_date", sortable: true },
-      { key: "name", label: "device_name", sortable: true },
-      { key: "serialNumber", label: "serial_number_sn", sortable: true },
-      { key: "category", label: "category", sortable: true },
-      { key: "status", label: "status", sortable: true },
-      { key: "user", label: "user_in_use", sortable: true }, // THÊM CỘT MỚI
-      { key: "conditionText", label: "condition", sortable: true },
-      { key: "price", label: "price", sortable: true, className: "text-right" },
-      { key: "location", label: "location", sortable: true },
-      {
-        key: "actions",
-        label: "actions",
-        sortable: false,
-        className: "text-center",
-      },
+      { key: "importDate", label: "import_date", sortable: true, className: "min-w-[140px]" },
+      { key: "name", label: "device_name", sortable: true, className: "min-w-[250px] w-1/6" },
+      { key: "serialNumber", label: "serial_number_sn", sortable: true, className: "min-w-[150px]" },
+      { key: "category", label: "category", sortable: true, className: "min-w-[120px]" },
+      { key: "status", label: "status", sortable: true, className: "text-center min-w-[120px]" },
+      { key: "user", label: "user_in_use", sortable: true, className: "min-w-[150px]" },
+      { key: "conditionText", label: "condition", sortable: true, className: "min-w-[200px]" },
+      { key: "price", label: "price", sortable: true, className: "text-right min-w-[100px]" },
+      { key: "location", label: "location", sortable: true, className: "min-w-[120px]" },
+      { key: "actions", label: "actions", sortable: false, className: "text-center min-w-[120px]" },
     ],
     [t]
   );
@@ -133,7 +129,7 @@ const InventoryView = ({
   return (
     <div className="space-y-6">
       {/* --- BỘ LỌC VÀ TIÊU ĐỀ --- */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-4">
         <div className="flex justify-between items-center mb-4">
           <div>
             <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
@@ -253,7 +249,7 @@ const InventoryView = ({
       {/* --- BẢNG DỮ LIỆU DESKTOP --- */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hidden md:block">
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="text-left w-full text-xs">
             <SortableHeader
               columns={columns}
               requestSort={requestSort}
@@ -265,31 +261,22 @@ const InventoryView = ({
                 sortedEquipment.map((item) => (
                   <tr
                     key={item.id}
-                    className="hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                    className="text-left hover:bg-gray-100 dark:hover:bg-gray-700/50"
                   >
                     <td className="px-3 py-4">{formatDate(item.importDate)}</td>
                     <td className="px-3 py-4 font-medium">{item.name}</td>
-                    <td className="px-3 py-4 font-mono">
-                     {item.serialNumber || "N/A"}
-                    </td>
-                    <td className="px-3 py-4 capitalize">
-                      {(categories.find((c) => c.id === item.category) || {})
-                        .name || item.category}
-                    </td>
-                    <td className="px-3 py-4">
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                          statusColors[item.status] || "bg-gray-100"
-                        }`}
-                      >
+                    <td className="px-3 py-4 font-mono">{item.serialNumber || "N/A"}</td>
+                    <td className="px-3 py-4 capitalize">{(categories.find((c) => c.id === item.category) || {}).name || item.category}</td>
+                    <td className="px-3 py-4 text-center">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[item.status] || "bg-gray-100"}`}>
                         {statusLabels[item.status] || item.status}
                       </span>
                     </td>
-                    <td className="px-3 py-4 font-semibold text-xs">
-                            {item.status === 'in-use' ? item.allocationDetails?.recipientName || '' : t('user_not_use')}
-                        </td>
+                    <td className="px-3 py-4 font-semibold">
+                      {item.status === 'in-use' ? item.allocationDetails?.recipientName || '' : t('user_not_use')}
+                    </td>
                     <td className="px-3 py-4">{renderCondition(item)}</td>
-                    <td className="px-3 py-4 text-right">
+                    <td className="px-3 py-4 text-right font-mono">
                       {formatCurrency(item.price)}
                     </td>
                     <td className="px-3 py-4">
@@ -297,33 +284,16 @@ const InventoryView = ({
                     </td>
                     <td className="px-3 py-4 text-center">
                       <div className="flex items-center justify-center space-x-1">
-                        <button
-                          onClick={() => onAllocateItem(item)}
-                          className="p-2 text-blue-600 hover:text-blue-400 disabled:text-gray-400"
-                          title={t("allocate_device")}
-                          disabled={item.status !== "available"}
-                        >
+                        <button onClick={() => onAllocateItem(item)} className="p-2 text-blue-600 hover:text-blue-400 disabled:text-gray-400" title={t("allocate_device")} disabled={item.status !== "available"}>
                           <LogOut className="w-5 h-5" />
                         </button>
-                        <button
-                          onClick={() => onViewItem(item)}
-                          className="p-2 text-green-600 hover:text-green-400"
-                          title={t("view")}
-                        >
+                        <button onClick={() => onViewItem(item)} className="p-2 text-green-600 hover:text-green-400" title={t("view")}>
                           <Eye className="w-5 h-5" />
                         </button>
-                        <button
-                          onClick={() => onEditItem(item)}
-                          className="p-2 text-yellow-600 hover:text-yellow-400"
-                          title={t("edit")}
-                        >
+                        <button onClick={() => onEditItem(item)} className="p-2 text-yellow-600 hover:text-yellow-400" title={t("edit")}>
                           <Edit className="w-5 h-5" />
                         </button>
-                        <button
-                          onClick={() => onDeleteItem(item)}
-                          className="p-2 text-red-600 hover:text-red-400"
-                          title={t("delete")}
-                        >
+                        <button onClick={() => onDeleteItem(item)} className="p-2 text-red-600 hover:text-red-400" title={t("delete")}>
                           <Trash2 className="w-5 h-5" />
                         </button>
                       </div>
@@ -348,28 +318,51 @@ const InventoryView = ({
           sortedEquipment.map((item) => (
             <div
               key={item.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow p-2 flex items-center gap-1"
+              className="bg-white dark:bg-gray-800 rounded-lg shadow px-2 flex items-center gap-2"
             >
-              <div className="flex-grow w-2/5 pr-2 border-r dark:border-gray-700 p-2">
-                <p className="font-bold text-xs text-gray-900 dark:text-gray-100 truncate">
-                  {item.name}
+              <div className="flex-grow min-w-[150px] w-2/5 pr-2 border-r dark:border-gray-700 p-2 space-y-3">
+                <p className="font-bold text-xs text-gray-900 dark:text-gray-200 truncate">
+                  - {item.name}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-                   SN:{item.serialNumber || "N/A"}
+                <p className="col-span-2">
+                  <strong>- {t("serial_number_sn_mobile")}:</strong>
+                  <div className="inline ml-1 text-xs text-gray-500 dark:text-gray-400">
+                    {item.serialNumber || "N/A"}
+                  </div> 
                 </p>
-                {/* THÊM THÔNG TIN NGƯỜI DÙNG VÀO ĐÂY */}
-                        {item.status === 'in-use' && (
-                            <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400">
-                                <User className="w-3 h-3"/>
-                                <span>{item.allocationDetails?.recipientName || ''}</span>
-                            </div>
-                        )}
-                        {item.status !== 'in-use' && (
-                            <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-gray-500 dark:text-gray-400">
-                                <User className="w-3 h-3"/>
-                                <span>{t('user_not_use')}</span>
-                            </div>
-                        )}
+                <p>
+                  <strong>- {t("category")}: </strong>
+                  <div className="inline ml-1 text-xs text-gray-500 dark:text-gray-400">
+                    {(categories.find((c) => c.id === item.category) || {})
+                    .name || item.category}
+                  </div>
+                </p>
+                <p className="col-span-2">
+                  - <strong>{t("condition")}:</strong> 
+                  <div className="inline ml-1 text-xs text-gray-500 dark:text-gray-400">
+                    {renderCondition(item)}
+                  </div>
+                </p>
+              </div>
+              <div className="flex-grow pl-2 w-3/5 text-xs space-y-3 p-2">
+                <p>
+                  - <strong>{t("location")}:</strong>{" "}
+                  <div className="inline ml-1 text-xs text-gray-500 dark:text-gray-400">
+                    {t(item.location) || t("in_stock")}
+                  </div>
+                </p>
+                {item.status === 'in-use' && (
+                  <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400">
+                      <User className="w-4 h-4"/>
+                      <span>{item.allocationDetails?.recipientName || ''}</span>
+                  </div>
+                )}
+                {item.status !== 'in-use' && (
+                  <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-gray-500 dark:text-gray-400">
+                      <User className="w-4 h-4"/>
+                      <span className="text-gray-500">{t('user_not_use')}</span>
+                  </div>
+                )}
                 <span
                   className={`mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                     statusColors[item.status] || "bg-gray-100"
@@ -377,20 +370,6 @@ const InventoryView = ({
                 >
                   {statusLabels[item.status] || item.status}
                 </span>
-              </div>
-              <div className="flex-grow pl-2 w-3/5 text-xs space-y-1 p-2">
-                <p>
-                  <strong>{t("category")}:</strong>{" "}
-                  {(categories.find((c) => c.id === item.category) || {})
-                    .name || item.category}
-                </p>
-                <p>
-                  <strong>{t("location")}:</strong>{" "}
-                  {t(item.location) || t("in_stock")}
-                </p>
-                <p className="col-span-2">
-                  <strong>{t("condition")}:</strong> {renderCondition(item)}
-                </p>
               </div>
               <div className="flex flex-col space-y-1">
                 <button

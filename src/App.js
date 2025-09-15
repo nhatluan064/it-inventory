@@ -643,6 +643,7 @@ const App = () => {
           item={modals.currentItem}
           categories={categories}
           statusLabels={statusLabels}
+          statusColors={statusColors} // <-- THÊM DÒNG NÀY
           t={t}
         />
         <AllocationModal

@@ -221,6 +221,7 @@ export const translations = {
     price: "Giá thành",
     location: "Vị trí",
     serial_number_sn: "Số serial (SN)",
+    serial_number_sn_mobile: "SN",
     actions: "Thao tác",
     all_categories: "Tất cả danh mục",
     close: "Đóng",
@@ -305,6 +306,7 @@ export const translations = {
     search_inventory_placeholder: "Tìm kiếm thiết bị trong kho, mã SN...",
     import_unlisted_device: "Nhập thiết bị không qua mua hàng",
     device_name: "Tên Thiết Bị",
+    device_name_mobile: "Tên Thiết Bị",
     user_in_use: "Người dùng",
     user_not_use: "Chưa có người dùng",
     no_devices_match_search:
@@ -400,7 +402,7 @@ export const translations = {
     "inventory-repair-complete": "Hoàn tất sửa chữa",
     "inventory-unrepairable": "Chuyển sang thanh lý",
     "inventory-liquidated": "Đã thanh lý",
-    condition_legacy_import: "Hàng tồn kho",
+    condition_legacy_import: "Hàng tồn kho không qua mua hàng",
     recalled_prefix: "Hàng thu hồi: {conditionText}",
     condition_repaired: "Đã sửa chữa: {note}",
     are_you_sure_reset_data:
