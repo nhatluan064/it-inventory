@@ -399,39 +399,20 @@ export const useInventory = (currentUser, t) => {
   );
 
   const cancelOrRevertPurchase = useCallback(
-    async (type, item) => {
-      if (type === "revert-purchasing") {
-        await updateDoc(
-          doc(db, "users", currentUser.uid, "equipment", item.id),
-          { status: "pending-purchase", price: 0 }
-        );
-        setEquipment(
-          equipment.map((e) =>
-            e.id === item.id
-              ? { ...e, status: "pending-purchase", price: 0 }
-              : e
-          )
-        );
-        logTransaction({
-          type: "procurement",
-          reason: "reverted",
-          itemName: item.name,
-        });
-      } else {
-        await deleteDoc(
-          doc(db, "users", currentUser.uid, "equipment", item.id)
-        );
-        setEquipment(equipment.filter((e) => e.id !== item.id));
-        logTransaction({
-          type: "procurement",
-          reason: "deleted",
-          itemName: item.name,
-        });
-        toast.success(t("toast_purchase_request_deleted"));
-      }
-    },
-    [currentUser, equipment, logTransaction, t]
-  );
+  async (type, item) => {
+    // Logic hoàn tác (revert-purchasing) đã được xóa
+    // Giờ hàm này chỉ còn chức năng xóa yêu cầu mua
+    await deleteDoc(doc(db, "users", currentUser.uid, "equipment", item.id));
+    setEquipment(equipment.filter((e) => e.id !== item.id));
+    logTransaction({
+      type: "procurement",
+      reason: "deleted",
+      itemName: item.name,
+    });
+    toast.success(t("toast_purchase_request_deleted"));
+  },
+  [currentUser, equipment, logTransaction, t]
+);
 
   const cancelWithNote = useCallback(
     async (item, note) => {

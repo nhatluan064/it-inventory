@@ -50,6 +50,7 @@ const AllocatedView = ({
         className: "text-center",
       },
     ],
+    
     [t]
   );
 
@@ -116,9 +117,9 @@ const AllocatedView = ({
             className="md:hidden p-2 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md"
           >
             {isFilterOpen ? (
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             ) : (
-              <Filter className="w-4 h-4" />
+              <Filter className="w-5 h-5" />
             )}
           </button>
         </div>
@@ -132,7 +133,7 @@ const AllocatedView = ({
               {t("search")}
             </label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-450 w-4 h-4" />
               <input
                 name="search"
                 type="text"
@@ -243,7 +244,7 @@ const AllocatedView = ({
                             className="p-2"
                             title={t("recall_device")}
                           >
-                            <RotateCcw className="w-4 h-4 text-green-600 hover:text-green-400" />
+                            <RotateCcw classNam5="w-4 h-4 text-green-600 hover:text-green-400" />
                           </button>
                           <button
                             onClick={() => onMarkDamaged(item)}
@@ -288,7 +289,7 @@ const AllocatedView = ({
                     {item.name.split(" (User:")[0]}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {details.recipientName || "N/A"}
+                    SN: {item.serialNumber || "N/A"}
                   </p>
                   <div className="mt-1">
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">
@@ -304,6 +305,10 @@ const AllocatedView = ({
                     {details.department ? t(details.department) : "N/A"}
                   </p>
                   <p>
+                    <strong>{t("user_in_use")}: </strong>
+                    {details.recipientName || "N/A"}
+                  </p>
+                  <p>
                     <strong>{t("employee_id")}:</strong>{" "}
                     {details.employeeId || "N/A"}
                   </p>
@@ -314,16 +319,16 @@ const AllocatedView = ({
                 </div>
 
                 {/* Cột 3: Hành động */}
-                <div className="flex flex-col space-y-1">
+                <div className="flex flex-col space-y-1 justify-center space-y-4">
                   <button
                     onClick={() => onRecallItem(item)}
-                    className="p-1.5 rounded-full text-green-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="rounded-full text-green-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     <RotateCcw className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => onMarkDamaged(item)}
-                    className="p-1.5 rounded-full text-orange-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="rounded-full text-orange-500 hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     <Wrench className="w-4 h-4" />
                   </button>

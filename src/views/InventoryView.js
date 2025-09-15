@@ -9,6 +9,7 @@ import {
   Plus,
   SlidersHorizontal,
   X,
+  CirclePlus,
 } from "lucide-react";
 import { useSort, SortableHeader } from "../hooks/useSort";
 import { User } from "lucide-react";
@@ -145,19 +146,19 @@ const InventoryView = ({
           <div className="flex items-center gap-2 md:hidden">
             <button
               onClick={onAddLegacyItem}
-              className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 flex items-center justify-center"
+              className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 flex items-center justify-center"
               title={t("import_unlisted_device")}
             >
-              <Plus className="w-4 h-4" />
+              <CirclePlus className="w-5 h-5" />
             </button>
             <button
               onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
               className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
             >
               {isMobileFilterOpen ? (
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               ) : (
-                <SlidersHorizontal className="w-4 h-4" />
+                <SlidersHorizontal className="w-5 h-5" />
               )}
             </button>
           </div>
@@ -173,7 +174,7 @@ const InventoryView = ({
               {t("search")}
             </label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 name="search"
                 type="text"
@@ -269,7 +270,7 @@ const InventoryView = ({
                     <td className="px-3 py-4">{formatDate(item.importDate)}</td>
                     <td className="px-3 py-4 font-medium">{item.name}</td>
                     <td className="px-3 py-4 font-mono">
-                      {item.serialNumber || "N/A"}
+                     {item.serialNumber || "N/A"}
                     </td>
                     <td className="px-3 py-4 capitalize">
                       {(categories.find((c) => c.id === item.category) || {})
@@ -302,28 +303,28 @@ const InventoryView = ({
                           title={t("allocate_device")}
                           disabled={item.status !== "available"}
                         >
-                          <LogOut className="w-4 h-4" />
+                          <LogOut className="w-5 h-5" />
                         </button>
                         <button
                           onClick={() => onViewItem(item)}
                           className="p-2 text-green-600 hover:text-green-400"
                           title={t("view")}
                         >
-                          <Eye className="w-4 h-4" />
+                          <Eye className="w-5 h-5" />
                         </button>
                         <button
                           onClick={() => onEditItem(item)}
                           className="p-2 text-yellow-600 hover:text-yellow-400"
                           title={t("edit")}
                         >
-                          <Edit className="w-4 h-4" />
+                          <Edit className="w-5 h-5" />
                         </button>
                         <button
                           onClick={() => onDeleteItem(item)}
                           className="p-2 text-red-600 hover:text-red-400"
                           title={t("delete")}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-5 h-5" />
                         </button>
                       </div>
                     </td>
@@ -347,14 +348,14 @@ const InventoryView = ({
           sortedEquipment.map((item) => (
             <div
               key={item.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow p-3 flex items-center gap-3"
+              className="bg-white dark:bg-gray-800 rounded-lg shadow p-2 flex items-center gap-1"
             >
-              <div className="flex-grow w-2/5 pr-2 border-r dark:border-gray-700">
-                <p className="font-bold text-sm text-gray-900 dark:text-gray-100 truncate">
+              <div className="flex-grow w-2/5 pr-2 border-r dark:border-gray-700 p-2">
+                <p className="font-bold text-xs text-gray-900 dark:text-gray-100 truncate">
                   {item.name}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-                  {item.serialNumber || "N/A"}
+                   SN:{item.serialNumber || "N/A"}
                 </p>
                 {/* THÊM THÔNG TIN NGƯỜI DÙNG VÀO ĐÂY */}
                         {item.status === 'in-use' && (
@@ -377,7 +378,7 @@ const InventoryView = ({
                   {statusLabels[item.status] || item.status}
                 </span>
               </div>
-              <div className="flex-grow w-3/5 grid grid-cols-2 gap-x-2 gap-y-1 text-xs">
+              <div className="flex-grow pl-2 w-3/5 text-xs space-y-1 p-2">
                 <p>
                   <strong>{t("category")}:</strong>{" "}
                   {(categories.find((c) => c.id === item.category) || {})

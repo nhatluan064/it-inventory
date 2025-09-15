@@ -1,6 +1,6 @@
 // src/views/PurchasingView.js
 import React from "react";
-import { CheckCircle, RotateCcw, XCircle } from "lucide-react";
+import { CheckCircle, RotateCcw, TrashIcon, XCircle } from "lucide-react";
 
 const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
   const formatCurrency = (amount) => {
@@ -98,7 +98,7 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
             </tbody>
           </table>
         </div>
-        <div className="md:hidden p-4 space-y-4">
+        
           {items && items.length > 0 ? (
             items.map((item) => (
               <div
@@ -124,22 +124,15 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
                       <CheckCircle className="w-4 h-4 text-green-600 hover:text-green-400" />
                     </button>
                     <button
-                      onClick={() => onCancel("revert-purchasing", item)}
-                      className="p-2"
-                      title={t("revert_to_pending")}
-                    >
-                      <RotateCcw className="w-4 h-4 text-yellow-600 hover:text-yellow-400" />
-                    </button>
-                    <button
                       onClick={() => onCancel("cancel-purchasing", item)}
                       className="p-2"
                       title={t("cancel_purchase")}
                     >
-                      <XCircle className="w-4 h-4 text-red-600 hover:text-red-400" />
+                      <TrashIcon className="w-4 h-4 text-red-600 hover:text-red-400" />
                     </button>
                   </div>
                 </div>
-                <div className="text-xs text-gray-700 dark:text-gray-300 grid grid-cols-2 gap-x-4 pt-2 border-t dark:border-gray-700">
+                <div className="flex justify-between text-xs text-gray-700 dark:text-gray-300 pt-2 border-t dark:border-gray-700">
                   <p>
                     <strong>{t("purchase_quantity")}:</strong>{" "}
                     <span className="font-semibold">
@@ -160,7 +153,7 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
               <p className="text-sm">{t("no_data_available")}</p>
             </div>
           )}
-        </div>
+        
       </div>
     </div>
   );

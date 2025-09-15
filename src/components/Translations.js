@@ -376,6 +376,7 @@ export const translations = {
     allocating: "Bàn giao từ",
     recipient_name: "Họ tên người nhận bàn giao",
     employee_id: "Mã số Nhân viên",
+    employee_id_mobile: "MSNV",
     condition_on_handover: "Tình trạng thiết bị",
     confirm_allocation: "Xác nhận",
     good_condition: "Tốt",

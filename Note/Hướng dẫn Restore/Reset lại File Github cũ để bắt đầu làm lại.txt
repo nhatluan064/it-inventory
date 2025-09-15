@@ -1,0 +1,7 @@
+🔥 2. Bạn muốn reset toàn bộ về bản cũ (xoá luôn code mới)
+
+👉 Cẩn thận, cái này sẽ xoá sạch thay đổi sau commit đó:
+
+git log --oneline        # lấy commit_id lúc vừa deploy
+git reset --hard <commit_id>
+git push --force

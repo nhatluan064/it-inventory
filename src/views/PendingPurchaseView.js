@@ -68,7 +68,7 @@ const PendingPurchaseView = ({
           <div className="lg:hidden">
             <button
               onClick={onOpenAddFromMasterModal}
-              className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 flex items-center justify-center"
+              className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 flex items-center justify-center"
               title={t("add_from_master_list")}
             >
               <PlusCircle className="w-5 h-5" />
@@ -97,175 +97,79 @@ const PendingPurchaseView = ({
         </div>
       </div>
 
-      {/* Card Danh sách */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto hidden md:block">
+      {/* Card Danh sách cho Desktop */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hidden md:block">
+        <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead className="bg-gray-50 dark:bg-gray-700/50">
               <tr>
-                <th className="px-6 py-3 text-left font-medium uppercase">
-                  {t("device_name")}
-                </th>
-                <th className="px-6 py-3 text-left font-medium uppercase">
-                  {t("category")}
-                </th>
-                <th
-                  className="px-6 py-3 text-center font-medium uppercase"
-                  style={{ width: "120px" }}
-                >
-                  {t("purchase_quantity")}
-                </th>
-                <th
-                  className="px-6 py-3 text-right font-medium uppercase"
-                  style={{ width: "150px" }}
-                >
-                  {t("price")} (VNĐ)
-                </th>
-                <th className="px-6 py-3 text-center font-medium uppercase">
-                  {t("actions")}
-                </th>
+                <th className="px-6 py-3 text-left font-medium uppercase">{t("device_name")}</th>
+                <th className="px-6 py-3 text-left font-medium uppercase">{t("category")}</th>
+                <th className="px-6 py-3 text-center font-medium uppercase" style={{ width: "120px" }}>{t("purchase_quantity")}</th>
+                <th className="px-6 py-3 text-right font-medium uppercase" style={{ width: "150px" }}>{t("price")} (VNĐ)</th>
+                <th className="px-6 py-3 text-center font-medium uppercase">{t("actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y dark:divide-gray-700">
               {filteredItems && filteredItems.length > 0 ? (
                 filteredItems.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                  >
+                  <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                     <td className="px-6 py-4 font-medium">{item.name}</td>
-                    <td className="px-6 py-4 capitalize">
-                      {(categories.find((c) => c.id === item.category) || {})
-                        .name || item.category}
-                    </td>
+                    <td className="px-6 py-4 capitalize">{(categories.find((c) => c.id === item.category) || {}).name || item.category}</td>
                     <td className="px-6 py-4 text-center">
-                      <input
-                        type="number"
-                        min="1"
-                        value={purchaseData[item.id]?.quantity || 1}
-                        onChange={(e) =>
-                          handleDataChange(item.id, "quantity", e.target.value)
-                        }
-                        className="w-20 p-1 border rounded-md text-right dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 text-sm"
-                      />
+                      <input type="number" min="1" value={purchaseData[item.id]?.quantity || 1} onChange={(e) => handleDataChange(item.id, "quantity", e.target.value)} className="w-20 p-1 border rounded-md text-right dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 text-sm"/>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        value={purchaseData[item.id]?.price || ""}
-                        onChange={(e) =>
-                          handleDataChange(item.id, "price", e.target.value)
-                        }
-                        className="w-32 p-1 border rounded-md text-right dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 text-sm"
-                      />
+                      <input type="number" min="0" placeholder="0" value={purchaseData[item.id]?.price || ""} onChange={(e) => handleDataChange(item.id, "price", e.target.value)} className="w-32 p-1 border rounded-md text-right dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 text-sm"/>
                     </td>
                     <td className="px-6 py-4 text-center">
                       <div className="flex items-center justify-center space-x-2">
-                        <button
-                          onClick={() => handlePurchaseClick(item)}
-                          className="p-2"
-                          title={t("purchasing")}
-                        >
-                          <ShoppingCart className="w-4 h-4 text-green-600 hover:text-green-400" />
-                        </button>
-                        <button
-                          onClick={() => onDeleteItem("delete-pending", item)}
-                          className="p-2"
-                          title={t("delete")}
-                        >
-                          <Trash2 className="w-4 h-4 text-red-600 hover:text-red-400" />
-                        </button>
+                        <button onClick={() => handlePurchaseClick(item)} className="p-2" title={t("purchasing")}><ShoppingCart className="w-4 h-4 text-green-600 hover:text-green-400" /></button>
+                        <button onClick={() => onDeleteItem("delete-pending", item)} className="p-2" title={t("delete")}><Trash2 className="w-4 h-4 text-red-600 hover:text-red-400" /></button>
                       </div>
                     </td>
                   </tr>
                 ))
               ) : (
-                <tr>
-                  <td colSpan="5" className="text-center py-12">
-                    <p className="text-gray-500 text-sm">
-                      {t("no_data_available")}
-                    </p>
-                  </td>
-                </tr>
+                <tr><td colSpan="5" className="text-center py-12"><p className="text-gray-500 text-sm">{t("no_data_available")}</p></td></tr>
               )}
             </tbody>
           </table>
         </div>
-        <div className="md:hidden p-4 space-y-4">
-          {filteredItems && filteredItems.length > 0 ? (
-            filteredItems.map((item) => (
-              <div
-                key={item.id}
-                className="rounded-lg p-4 space-y-3 shadow bg-white dark:bg-gray-800"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">
-                      {item.name}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                      {(categories.find((c) => c.id === item.category) || {})
-                        .name || item.category}
-                    </p>
-                  </div>
-                  <div className="flex space-x-1">
-                    <button
-                      onClick={() => handlePurchaseClick(item)}
-                      className="p-2"
-                      title={t("purchasing")}
-                    >
-                      <ShoppingCart className="w-4 h-4 text-green-500" />
-                    </button>
-                    <button
-                      onClick={() => onDeleteItem("delete-pending", item)}
-                      className="p-2"
-                      title={t("delete")}
-                    >
-                      <Trash2 className="w-4 h-4 text-red-500" />
-                    </button>
-                  </div>
+      </div>
+      
+      {/* Danh sách Card cho Mobile (nằm riêng, không bị bọc bởi card khác) */}
+      <div className="md:hidden space-y-3">
+        {filteredItems && filteredItems.length > 0 ? (
+          filteredItems.map((item) => (
+            <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 space-y-3">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">{item.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{(categories.find((c) => c.id === item.category) || {}).name || item.category}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4 pt-2 border-t dark:border-gray-700">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {t("purchase_quantity")}
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={purchaseData[item.id]?.quantity || 1}
-                      onChange={(e) =>
-                        handleDataChange(item.id, "quantity", e.target.value)
-                      }
-                      className="w-full p-2 border rounded-md text-center dark:bg-gray-700 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {t("price")} (VNĐ)
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      placeholder="0"
-                      value={purchaseData[item.id]?.price || ""}
-                      onChange={(e) =>
-                        handleDataChange(item.id, "price", e.target.value)
-                      }
-                      className="w-full p-2 border rounded-md text-right dark:bg-gray-700 text-sm"
-                    />
-                  </div>
+                <div className="flex space-x-1">
+                  <button onClick={() => onDeleteItem("delete-pending", item)} className="p-2" title={t("delete")}><Trash2 className="w-4 h-4 text-red-500" /></button>
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-              <p className="text-sm">{t("no_data_available")}</p>
+              <div className="flex flex-items items-center gap-8 pt-2 border-t dark:border-gray-700">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{t("purchase_quantity")}</label>
+                  <input type="number" min="1" value={purchaseData[item.id]?.quantity || 1} onChange={(e) => handleDataChange(item.id, "quantity", e.target.value)} className="w-full p-2 border rounded-md text-center dark:bg-gray-700 text-sm"/>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">{t("price")} (VNĐ)</label>
+                  <input type="number" min="0" placeholder="0" value={purchaseData[item.id]?.price || ""} onChange={(e) => handleDataChange(item.id, "price", e.target.value)} className="w-full p-2 border rounded-md text-right dark:bg-gray-700 text-sm"/>
+                </div>
+                <button onClick={() => handlePurchaseClick(item)} className="p-2 pt-6" title={t("purchasing")}><ShoppingCart className="w-4 h-4 text-green-500" /></button>
+              </div>
             </div>
-          )}
-        </div>
+          ))
+        ) : (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow text-center py-12 text-gray-500 dark:text-gray-400">
+            <p className="text-sm">{t("no_data_available")}</p>
+          </div>
+        )}
       </div>
     </div>
   );

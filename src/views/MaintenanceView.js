@@ -45,7 +45,7 @@ const MaintenanceView = ({
       </div>
 
       {/* Card Danh sách */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+      
         <div className="overflow-x-auto hidden md:block">
           <table className="w-full text-xs">
             <SortableHeader
@@ -106,16 +106,16 @@ const MaintenanceView = ({
             </tbody>
           </table>
         </div>
-        <div className="md:hidden space-y-3 p-2">
+        <div className="md:hidden space-y-3">
           {sortedItems.length > 0 ? (
             sortedItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-stretch gap-3 h-32"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow p-2 flex items-stretch gap-1 h-32"
               >
-                <div className="flex-grow w-2/5 pr-2 border-r dark:border-gray-700 flex flex-col">
+                <div className="flex-grow pl-2 w-2/5 pr-2 border-r dark:border-gray-700 flex flex-col justify-center">
                   <div>
-                    <p className="font-bold text-sm text-gray-900 dark:text-gray-100 truncate">
+                    <p className="font-bold text-xs text-gray-900 dark:text-gray-100 truncate">
                       {item.name}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
@@ -130,7 +130,7 @@ const MaintenanceView = ({
                     </span>
                   </div>
                 </div>
-                <div className="flex-grow w-3/5 text-xs flex flex-col justify-center gap-y-1">
+                <div className="flex-grow w-3/5 pl-2 text-xs flex flex-col justify-center gap-y-1">
                   <p>
                     <strong>{t("maintenance_date")}:</strong>{" "}
                     {formatDate(item.maintenanceDate)}
@@ -167,7 +167,7 @@ const MaintenanceView = ({
             </div>
           )}
         </div>
-      </div>
+      
     </div>
   );
 };

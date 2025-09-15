@@ -1,6 +1,6 @@
 // src/views/MasterListView.js
 import React, { useState } from "react";
-import { Plus, Package, Search, Edit2, Trash2, Filter, X } from "lucide-react";
+import { Plus, Package, Search, PlusCircle, Edit2, Trash2, Filter, X } from "lucide-react";
 
 const MasterListView = ({
   allItems,
@@ -36,23 +36,23 @@ const MasterListView = ({
           </div>
 
           <div className="flex items-center gap-2 lg:hidden">
+            {/* --- NÚT THÊM MỚI CHO MOBILE ĐÃ ĐƯỢC CẬP NHẬT --- */}
+            {/* Nút Thêm mới (đúng) */}
             <button
               onClick={onAddType}
-              className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2 text-xs font-semibold"
+              className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 flex items-center justify-center"
+              title={t("add_new_master_item")}
             >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">
-                {t("add_new_master_item")}
-              </span>
+              <PlusCircle className="w-5 h-5" />
             </button>
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className="p-2 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md"
             >
               {isFilterOpen ? (
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               ) : (
-                <Filter className="w-4 h-4" />
+                <Filter className="w-5 h-5" />
               )}
             </button>
           </div>
@@ -94,75 +94,39 @@ const MasterListView = ({
         </div>
       </div>
 
-      {/* --- Giao diện Bảng cho Desktop --- */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hidden lg:block">
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead className="bg-gray-50 dark:bg-gray-700/50">
               <tr>
-                <th className="px-6 py-3 text-left font-medium uppercase">
-                  {t("master_item_name")}
-                </th>
-                <th className="px-6 py-3 text-left font-medium uppercase">
-                  {t("category")}
-                </th>
-                <th className="px-6 py-3 text-left font-medium uppercase">
-                  {t("usage_status")}
-                </th>
-                <th className="px-6 py-3 text-center font-medium uppercase">
-                  {t("actions")}
-                </th>
+                <th className="px-6 py-3 text-left font-medium uppercase">{t("master_item_name")}</th>
+                <th className="px-6 py-3 text-left font-medium uppercase">{t("category")}</th>
+                <th className="px-6 py-3 text-left font-medium uppercase">{t("usage_status")}</th>
+                <th className="px-6 py-3 text-center font-medium uppercase">{t("actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y dark:divide-gray-700">
               {filteredItems.length > 0 ? (
                 filteredItems.map((item) => {
                   const isModelInUse = fullEquipmentList.some(
-                    (e) =>
-                      e.name.split(" (User:")[0].trim() === item.name &&
-                      e.category === item.category &&
-                      e.status !== "master"
+                    (e) => e.name.split(" (User:")[0].trim() === item.name && e.category === item.category && e.status !== "master"
                   );
-                  const statusText = isModelInUse
-                    ? t("has_been_used")
-                    : t("never_used");
-                  const statusColor = isModelInUse
-                    ? "text-green-600 dark:text-green-400 font-semibold"
-                    : "text-gray-500 dark:text-gray-400";
+                  const statusText = isModelInUse ? t("has_been_used") : t("never_used");
+                  const statusColor = isModelInUse ? "text-green-600 dark:text-green-400 font-semibold" : "text-gray-500 dark:text-gray-400";
                   return (
-                    <tr
-                      key={item.id}
-                      className="hover:bg-gray-100 dark:hover:bg-gray-700/50"
-                    >
+                    <tr key={item.id} className="hover:bg-gray-100 dark:hover:bg-gray-700/50">
                       <td className="px-6 py-4 font-medium">{item.name}</td>
-                      <td className="px-6 py-4 capitalize">
-                        {(categories.find((c) => c.id === item.category) || {})
-                          .name || item.category}
-                      </td>
-                      <td className={`px-6 py-4 ${statusColor}`}>
-                        {statusText}
-                      </td>
+                      <td className="px-6 py-4 capitalize">{(categories.find((c) => c.id === item.category) || {}).name || item.category}</td>
+                      <td className={`px-6 py-4 ${statusColor}`}>{statusText}</td>
                       <td className="px-6 py-4 text-center">
                         <div className="flex items-center justify-center space-x-2">
                           <button
                             onClick={() => onEditItem(item)}
                             disabled={isModelInUse}
-                            className={`p-2 ${
-                              isModelInUse ? "cursor-not-allowed" : ""
-                            }`}
-                            title={
-                              isModelInUse
-                                ? t("cannot_edit_used_model")
-                                : t("edit")
-                            }
+                            className={`p-2 ${isModelInUse ? "cursor-not-allowed" : ""}`}
+                            title={isModelInUse ? t("cannot_edit_used_model") : t("edit")}
                           >
-                            <Edit2
-                              className={`w-4 h-4 ${
-                                isModelInUse
-                                  ? "text-gray-400"
-                                  : "text-blue-600 hover:text-blue-400"
-                              }`}
-                            />
+                            <Edit2 className={`w-4 h-4 ${isModelInUse ? "text-gray-400" : "text-blue-600 hover:text-blue-400"}`}/>
                           </button>
                           <button
                             onClick={() => onDeleteItem(item)}
@@ -177,81 +141,49 @@ const MasterListView = ({
                   );
                 })
               ) : (
-                <tr>
-                  <td colSpan="4" className="text-center py-12">
-                    <Package className="w-10 h-10 mx-auto text-gray-300" />
-                    <p className="mt-2 text-sm">{t("no_master_items_found")}</p>
-                  </td>
-                </tr>
+                <tr><td colSpan="4" className="text-center py-12"><Package className="w-10 h-10 mx-auto text-gray-300" /><p className="mt-2 text-sm">{t("no_master_items_found")}</p></td></tr>
               )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* --- Giao diện Card cho Mobile --- */}
       <div className="lg:hidden space-y-4">
         {filteredItems.length > 0 ? (
           filteredItems.map((item) => {
             const isModelInUse = fullEquipmentList.some(
-              (e) =>
-                e.name.split(" (User:")[0].trim() === item.name &&
-                e.category === item.category &&
-                e.status !== "master"
+              (e) => e.name.split(" (User:")[0].trim() === item.name && e.category === item.category && e.status !== "master"
             );
-            const statusText = isModelInUse
-              ? t("has_been_used")
-              : t("never_used");
-            const statusColor = isModelInUse
-              ? "text-green-600 dark:text-green-400 font-semibold"
-              : "text-gray-500 dark:text-gray-400";
+            const statusText = isModelInUse ? t("has_been_used") : t("never_used");
+            const statusColor = isModelInUse ? "text-green-600 dark:text-green-400 font-semibold" : "text-gray-500 dark:text-gray-400";
             return (
-              <div
-                key={item.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 space-y-2 min-h-32 flex flex-col justify-between"
-              >
+              <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 space-y-2 min-h-26 flex flex-col justify-between">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">
-                      {item.name}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                      {(categories.find((c) => c.id === item.category) || {})
-                        .name || item.category}
-                    </p>
+                    <p className="font-bold text-gray-900 dark:text-gray-100 text-xs">{item.name}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{(categories.find((c) => c.id === item.category) || {}).name || item.category}</p>
                   </div>
                   <div className="flex items-center space-x-1">
                     <button
                       onClick={() => onEditItem(item)}
                       disabled={isModelInUse}
-                      className={`p-2 ${
-                        isModelInUse ? "cursor-not-allowed" : ""
-                      }`}
-                      title={
-                        isModelInUse ? t("cannot_edit_used_model") : t("edit")
-                      }
+                      className={`p-2 ${isModelInUse ? "cursor-not-allowed" : ""}`}
+                      title={isModelInUse ? t("cannot_edit_used_model") : t("edit")}
                     >
-                      <Edit2
-                        className={`w-4 h-4 ${
-                          isModelInUse ? "text-gray-400" : "text-blue-600"
-                        }`}
-                      />
+                      <Edit2 className={`w-4 h-4 ${isModelInUse ? "text-gray-400" : "text-blue-600"}`} />
                     </button>
-                    <button
+                    
+                  </div>
+                </div>
+                <div className={`text-xs pt-4 border-t dark:border-gray-700 ${statusColor}`}>
+                  <span>{t("usage_status")}: {statusText}</span>
+                  <button
                       onClick={() => onDeleteItem(item)}
-                      className="p-2"
+                      className="p-2 pt-1 float-right"
                       title={t("delete")}
                     >
                       <Trash2 className="w-4 h-4 text-red-600" />
                     </button>
-                  </div>
-                </div>
-                <div
-                  className={`text-xs pt-2 border-t dark:border-gray-700 ${statusColor}`}
-                >
-                  <span>
-                    {t("usage_status")}: {statusText}
-                  </span>
                 </div>
               </div>
             );
