@@ -16,7 +16,6 @@ const AllocatedView = ({
 }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // Khôi phục lại đầy đủ các cột như ban đầu để hiển thị đầy đủ thông tin
   const allColumns = useMemo(
     () => [
       { key: "name", label: "device_name", sortable: true },
@@ -50,7 +49,6 @@ const AllocatedView = ({
         className: "text-center",
       },
     ],
-    
     [t]
   );
 
@@ -65,7 +63,6 @@ const AllocatedView = ({
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
-    // Định dạng ngày theo chuẩn locale đã có trong t() function
     return new Date(dateString).toLocaleDateString(t("locale_string"), {
       year: "numeric",
       month: "2-digit",
@@ -73,7 +70,6 @@ const AllocatedView = ({
     });
   };
 
-  // Hàm render chức vụ để xử lý cả trường hợp có mô tả thêm
   const renderPosition = (details) => {
     let positionDisplay = details.position ? t(details.position) : "N/A";
     if (details.positionDescription) {
@@ -281,15 +277,16 @@ const AllocatedView = ({
             return (
               <div
                 key={item.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-stretch gap-3 h-32"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex items-stretch gap-y-2 h-40"
               >
                 {/* Cột 1: Thông tin chính */}
-                <div className="flex-grow w-2/5 pr-2 border-r dark:border-gray-700 flex flex-col justify-center gap-y-1">
+                <div className="flex-grow w-2/5 pr-2 border-r dark:border-gray-700 flex flex-col justify-center gap-y-2">
                   <p className="font-bold text-sm text-gray-900 dark:text-gray-100 truncate">
-                    {item.name.split(" (User:")[0]}
+                    - {item.name.split(" (User:")[0]}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    SN: {item.serialNumber || "N/A"}
+                    <strong className="text-gray-100">- SN: </strong> 
+                    {item.serialNumber || "N/A"}
                   </p>
                   <div className="mt-1">
                     <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">
@@ -299,21 +296,21 @@ const AllocatedView = ({
                 </div>
 
                 {/* Cột 2: Thông tin phụ */}
-                <div className="flex-grow w-3/5 text-xs flex flex-col justify-center gap-y-1">
+                <div className="flex-grow w-3/5 text-xs flex flex-col justify-center gap-y-2 pl-2">
                   <p>
-                    <strong>{t("department")}:</strong>{" "}
+                    - <strong>{t("department")}:</strong>{" "}
                     {details.department ? t(details.department) : "N/A"}
                   </p>
                   <p>
-                    <strong>{t("user_in_use")}: </strong>
+                    - <strong>{t("user_in_use_mobile")}: </strong>
                     {details.recipientName || "N/A"}
                   </p>
                   <p>
-                    <strong>{t("employee_id")}:</strong>{" "}
+                    - <strong>{t("employee_id_mobile")}:</strong>{" "}
                     {details.employeeId || "N/A"}
                   </p>
                   <p className="col-span-2">
-                    <strong>{t("handover_date")}:</strong>{" "}
+                    - <strong>{t("handover_date")}:</strong>{" "}
                     {formatDate(details.handoverDate)}
                   </p>
                 </div>

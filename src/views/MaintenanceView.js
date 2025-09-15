@@ -46,7 +46,7 @@ const MaintenanceView = ({
 
       {/* Card Danh sách */}
       
-        <div className="overflow-x-auto hidden md:block">
+        <div className="overflow-x-auto hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow">
           <table className="w-full text-xs">
             <SortableHeader
               columns={columns}
@@ -115,14 +115,17 @@ const MaintenanceView = ({
               >
                 <div className="flex-grow pl-2 w-2/5 pr-2 border-r dark:border-gray-700 flex flex-col justify-center">
                   <div>
-                    <p className="font-bold text-xs text-gray-900 dark:text-gray-100 truncate">
-                      {item.name}
+                    <p className="py-1 font-bold text-xs text-gray-900 dark:text-gray-200 truncate">
+                      - {item.name}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-                      {item.serialNumber || "N/A"}
+                    <p className="py-1 col-span-2">
+                      <strong>- {t("serial_number_sn_mobile")}:</strong>
+                      <div className="inline ml-1 text-xs text-gray-500 dark:text-gray-400">
+                        {item.serialNumber || "N/A"}
+                      </div> 
                     </p>
                   </div>
-                  <div className="mt-1">
+                  <div className="py-1 mt-1">
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColors.maintenance}`}
                     >
@@ -131,11 +134,11 @@ const MaintenanceView = ({
                   </div>
                 </div>
                 <div className="flex-grow w-3/5 pl-2 text-xs flex flex-col justify-center gap-y-1">
-                  <p>
+                  <p className="py-3 col-span-2">
                     <strong>{t("maintenance_date")}:</strong>{" "}
                     {formatDate(item.maintenanceDate)}
                   </p>
-                  <p>
+                  <p className="py-3 col-span-2">
                     <strong>{t("failure_note")}:</strong> {item.condition}
                   </p>
                 </div>

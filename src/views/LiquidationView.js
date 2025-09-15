@@ -5,6 +5,7 @@ import { useSort, SortableHeader } from "../hooks/useSort";
 
 const LiquidationView = ({ items, onLiquidateItem, t }) => {
   const { items: sortedItems, requestSort, sortConfig } = useSort(items);
+  
   const columns = [
     { key: "name", label: "device_name", sortable: true },
     { key: "serialNumber", label: "serial_number_sn", sortable: true },
@@ -21,12 +22,13 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
     <div className="space-y-6">
       {/* Card Tiêu đề */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
-        <h2 className="text-lg font-bold">{t("liquidation_list")}</h2>
-        <p className="text-xs text-gray-500 mt-1">{t("liquidation_desc")}</p>
+        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">{t("liquidation_list")}</h2>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t("liquidation_desc")}</p>
       </div>
 
-      {/* Card Danh sách */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      {/* Container chung cho cả desktop và mobile */}
+      
+        {/* BẢNG DÀNH CHO DESKTOP (display: hidden on mobile) */}
         <div className="overflow-x-auto hidden md:block">
           <table className="w-full text-xs">
             <SortableHeader
@@ -68,31 +70,37 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
             </tbody>
           </table>
         </div>
-        <div className="md:hidden p-4 space-y-4">
+
+        {/* GIAO DIỆN CARD CHO MOBILE (display: block on mobile) */}
+        <div className="md:hidden space-y-3 ">
           {sortedItems.length > 0 ? (
             sortedItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 shadow flex justify-between items-center"
+                className="bg-gray-50 dark:bg-gray-700/50 rounded-lg shadow p-4 space-y-3"
               >
-                <div>
-                  <p className="font-bold text-gray-900 dark:text-gray-100 text-sm">
-                    {item.name}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-                    {item.serialNumber || "N/A"}
-                  </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 italic">
-                    {item.condition}
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-bold text-sm text-gray-900 dark:text-gray-100">
+                      {item.name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      SN: {item.serialNumber || "N/A"}
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => onLiquidateItem(item)} 
+                    className="p-2 -mt-2 -mr-2" 
+                    title={t("confirm_liquidated")}
+                  >
+                    <Trash2 className="w-5 h-5 text-red-600" />
+                  </button>
+                </div>
+                <div className="text-xs pt-2 border-t dark:border-gray-600">
+                  <p className="text-gray-600 dark:text-gray-300">
+                    <strong>{t("failure_note")}:</strong> {item.condition}
                   </p>
                 </div>
-                <button
-                  onClick={() => onLiquidateItem(item)}
-                  className="p-2"
-                  title={t("confirm_liquidated")}
-                >
-                  <Trash2 className="w-4 h-4 text-red-600 hover:text-red-400" />
-                </button>
               </div>
             ))
           ) : (
@@ -101,7 +109,7 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
             </div>
           )}
         </div>
-      </div>
+      
     </div>
   );
 };

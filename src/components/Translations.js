@@ -308,6 +308,7 @@ export const translations = {
     device_name: "Tên Thiết Bị",
     device_name_mobile: "Tên Thiết Bị",
     user_in_use: "Người dùng",
+    user_in_use_mobile: "User",
     user_not_use: "Chưa có người dùng",
     no_devices_match_search:
       "Không tìm thấy thiết bị nào khớp với tìm kiếm của bạn.",
@@ -330,7 +331,7 @@ export const translations = {
     recipient: "Người Nhận",
     employee_info: "MSNV & Chức Vụ",
     position: "Chức vụ",
-    department: "Phòng Ban",
+    department: "Phòng/Ban",
     handover_date: "Ngày Bàn Giao",
     recall: "Thu Hồi",
     no_allocated_items_match_filter:
