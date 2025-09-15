@@ -305,6 +305,8 @@ export const translations = {
     search_inventory_placeholder: "Tìm kiếm thiết bị trong kho, mã SN...",
     import_unlisted_device: "Nhập thiết bị không qua mua hàng",
     device_name: "Tên Thiết Bị",
+    user_in_use: "Người dùng",
+    user_not_use: "Chưa có người dùng",
     no_devices_match_search:
       "Không tìm thấy thiết bị nào khớp với tìm kiếm của bạn.",
     pending_purchase_list: "Danh sách Yêu cầu Mua",
@@ -755,6 +757,8 @@ export const translations = {
     search_inventory_placeholder: "Search devices in inventory...",
     import_unlisted_device: "Import device without purchasing",
     device_name: "Device Name",
+    user_in_use: "Current User",
+    user_not_use: "No User",
     no_devices_match_search: "No devices found matching your search.",
 
     pending_purchase_list: "Pending Purchase Request List",
@@ -1161,6 +1165,8 @@ export const translations = {
     search_inventory_placeholder: "搜索库存设备...",
     import_unlisted_device: "导入未通过采购的设备",
     device_name: "设备名称",
+    user_in_use: "当前用户",
+    user_not_use: "无用户",
     no_devices_match_search: "未找到与您搜索匹配的设备。",
     pending_purchase_list: "待采购请求列表",
     pending_purchase_desc: "选择项目并输入数量以进入下一阶段。",

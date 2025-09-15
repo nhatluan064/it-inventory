@@ -653,9 +653,7 @@ export const useInventory = (currentUser, t) => {
         location: details.department,
         allocationDetails: { ...details },
         serialNumber: details.serialNumber,
-        name: `${targetItem.name.split(" (User:")[0]} (User: ${
-          details.recipientName
-        })`,
+        // *** XÓA DÒNG NÀY ĐI: name: `${targetItem.name.split(" (User:")[0]} (User: ${details.recipientName})`, ***
       };
       await updateDoc(
         doc(db, "users", currentUser.uid, "equipment", targetItem.id),
@@ -669,14 +667,14 @@ export const useInventory = (currentUser, t) => {
       logTransaction({
         type: "export",
         reason: "allocate",
-        itemName: targetItem.name.split(" (User:")[0],
+        itemName: targetItem.name, // Giờ đây chỉ cần lấy tên gốc
         quantity: 1,
         details: { ...details },
         timestamp: details.handoverDate,
       });
       toast.success(
         t("toast_item_allocated_successfully", {
-          itemName: targetItem.name.split(" (User:")[0],
+          itemName: targetItem.name,
           recipientName: details.recipientName,
         })
       );
@@ -688,15 +686,17 @@ export const useInventory = (currentUser, t) => {
     async (recalledItem) => {
       const { recallReason, maintenanceNote } = recalledItem;
       let dataToUpdate;
+      const originalName = recalledItem.name.split(" (User:")[0]; // Vẫn giữ logic này để dọn dẹp dữ liệu cũ
+
       if (recallReason === "condition_damaged_needs_maintenance") {
         dataToUpdate = {
           status: "maintenance",
           location: "location_maintenance_room",
           condition: maintenanceNote || "N/A",
-          name: recalledItem.name.split(" (User:")[0],
+          name: originalName, // Đảm bảo tên được trả về trạng thái gốc
           maintenanceDate: new Date().toISOString(),
           isRecalled: false,
-          allocationDetails: null,
+          allocationDetails: null, // Xóa thông tin cấp phát
         };
         toast.success(
           t("toast_moved_to_maintenance", {
@@ -709,8 +709,8 @@ export const useInventory = (currentUser, t) => {
           status: "available",
           location: "location_in_stock",
           condition: recallReason,
-          name: recalledItem.name.split(" (User:")[0],
-          allocationDetails: null,
+          name: originalName, // Đảm bảo tên được trả về trạng thái gốc
+          allocationDetails: null, // Xóa thông tin cấp phát
           isRecalled: true,
         };
         toast.success(

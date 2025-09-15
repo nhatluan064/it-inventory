@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { useSort, SortableHeader } from "../hooks/useSort";
+import { User } from "lucide-react";
 
 const InventoryView = ({
   equipment,
@@ -92,6 +93,7 @@ const InventoryView = ({
       { key: "serialNumber", label: "serial_number_sn", sortable: true },
       { key: "category", label: "category", sortable: true },
       { key: "status", label: "status", sortable: true },
+      { key: "user", label: "user_in_use", sortable: true }, // THÊM CỘT MỚI
       { key: "conditionText", label: "condition", sortable: true },
       { key: "price", label: "price", sortable: true, className: "text-right" },
       { key: "location", label: "location", sortable: true },
@@ -282,6 +284,9 @@ const InventoryView = ({
                         {statusLabels[item.status] || item.status}
                       </span>
                     </td>
+                    <td className="px-3 py-4 font-semibold text-xs">
+                            {item.status === 'in-use' ? item.allocationDetails?.recipientName || '' : t('user_not_use')}
+                        </td>
                     <td className="px-3 py-4">{renderCondition(item)}</td>
                     <td className="px-3 py-4 text-right">
                       {formatCurrency(item.price)}
@@ -351,6 +356,19 @@ const InventoryView = ({
                 <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
                   {item.serialNumber || "N/A"}
                 </p>
+                {/* THÊM THÔNG TIN NGƯỜI DÙNG VÀO ĐÂY */}
+                        {item.status === 'in-use' && (
+                            <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400">
+                                <User className="w-3 h-3"/>
+                                <span>{item.allocationDetails?.recipientName || ''}</span>
+                            </div>
+                        )}
+                        {item.status !== 'in-use' && (
+                            <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-gray-500 dark:text-gray-400">
+                                <User className="w-3 h-3"/>
+                                <span>{t('user_not_use')}</span>
+                            </div>
+                        )}
                 <span
                   className={`mt-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                     statusColors[item.status] || "bg-gray-100"
@@ -413,3 +431,4 @@ const InventoryView = ({
 };
 
 export default InventoryView;
+
