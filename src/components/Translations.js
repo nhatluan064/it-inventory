@@ -2,6 +2,8 @@
 export const translations = {
   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   vi: {
+    liquidation_empty_title: "Kho thanh lý đang trống.",
+    liquidation_empty_text: "Các thiết bị không thể sửa chữa sẽ được chuyển đến đây để thanh lý.",
     loading_data: "Đang tải dữ liệu...",
     home: "Trang chủ",
     home_page_title: "Trang Chủ & Cập nhật",

@@ -23,6 +23,8 @@ const MaintenanceView = ({
     { key: "serialNumber", label: "serial_number_sn", sortable: true },
     { key: "maintenanceDate", label: "maintenance_date", sortable: true },
     { key: "condition", label: "failure_note", sortable: true },
+    // --- THAY ĐỔI 4: THÊM CỘT MỚI ---
+    { key: "recalledFrom", label: "recalled_from_user", sortable: true },
     {
       key: "actions",
       label: "actions",
@@ -45,8 +47,8 @@ const MaintenanceView = ({
       </div>
 
       {/* Card Danh sách */}
-      
-        <div className="overflow-x-auto hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <div className="overflow-x-auto hidden md:block">
           <table className="w-full text-xs">
             <SortableHeader
               columns={columns}
@@ -69,6 +71,10 @@ const MaintenanceView = ({
                       {formatDate(item.maintenanceDate)}
                     </td>
                     <td className="px-3 py-4">{item.condition}</td>
+                    {/* --- THAY ĐỔI 5: HIỂN THỊ DỮ LIỆU CỘT MỚI --- */}
+                    <td className="px-3 py-4 font-semibold">
+                      {item.recalledFrom || "---"}
+                    </td>
                     <td className="px-3 py-4 text-center">
                       <div className="flex items-center justify-center space-x-2">
                         <button
@@ -106,61 +112,33 @@ const MaintenanceView = ({
             </tbody>
           </table>
         </div>
-        <div className="md:hidden space-y-3">
+        <div className="md:hidden space-y-3 p-4">
           {sortedItems.length > 0 ? (
             sortedItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow p-2 flex items-stretch gap-1 h-32"
+                className="bg-gray-50 dark:bg-gray-700/50 rounded-lg shadow p-4 space-y-3"
               >
-                <div className="flex-grow pl-2 w-2/5 pr-2 border-r dark:border-gray-700 flex flex-col justify-center">
+                <div className="flex justify-between items-start">
                   <div>
-                    <p className="py-1 font-bold text-xs text-gray-900 dark:text-gray-200 truncate">
-                      - {item.name}
+                    <p className="font-bold text-sm text-gray-900 dark:text-gray-100">
+                      {item.name}
                     </p>
-                    <p className="py-1 col-span-2">
-                      <strong>- {t("serial_number_sn_mobile")}:</strong>
-                      <div className="inline ml-1 text-xs text-gray-500 dark:text-gray-400">
-                        {item.serialNumber || "N/A"}
-                      </div> 
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      SN: {item.serialNumber || "N/A"}
                     </p>
                   </div>
-                  <div className="py-1 mt-1">
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColors.maintenance}`}
-                    >
-                      {statusLabels.maintenance}
-                    </span>
+                  <div className="flex items-center space-x-1">
+                    <button onClick={() => onEditNote(item)} className="p-2" title={t("edit_failure_note")}><Edit className="w-4 h-4 text-blue-600" /></button>
+                    <button onClick={() => onRepairComplete(item)} className="p-2" title={t("repair_completed")}><CheckCircle className="w-4 h-4 text-green-600" /></button>
+                    <button onClick={() => onMarkUnrepairable(item)} className="p-2" title={t("mark_unrepairable")}><XCircle className="w-4 h-4 text-red-600" /></button>
                   </div>
                 </div>
-                <div className="flex-grow w-3/5 pl-2 text-xs flex flex-col justify-center gap-y-1">
-                  <p className="py-3 col-span-2">
-                    <strong>{t("maintenance_date")}:</strong>{" "}
-                    {formatDate(item.maintenanceDate)}
-                  </p>
-                  <p className="py-3 col-span-2">
-                    <strong>{t("failure_note")}:</strong> {item.condition}
-                  </p>
-                </div>
-                <div className="flex flex-col space-y-1 justify-center">
-                  <button
-                    onClick={() => onEditNote(item)}
-                    className="p-1.5 rounded-full text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => onRepairComplete(item)}
-                    className="p-1.5 rounded-full text-green-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <CheckCircle className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => onMarkUnrepairable(item)}
-                    className="p-1.5 rounded-full text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <XCircle className="w-4 h-4" />
-                  </button>
+                <div className="text-xs pt-2 border-t dark:border-gray-600 space-y-1">
+                  <p><strong>{t("maintenance_date")}:</strong> {formatDate(item.maintenanceDate)}</p>
+                  {/* --- THAY ĐỔI 6: HIỂN THỊ TRÊN GIAO DIỆN MOBILE --- */}
+                  <p className="font-semibold text-blue-600 dark:text-blue-400"><strong>{t("recalled_from_user")}:</strong> {item.recalledFrom || "---"}</p>
+                  <p><strong>{t("failure_note")}:</strong> {item.condition}</p>
                 </div>
               </div>
             ))
@@ -170,7 +148,7 @@ const MaintenanceView = ({
             </div>
           )}
         </div>
-      
+      </div>
     </div>
   );
 };
