@@ -74,28 +74,27 @@ export const SortableHeader = ({ columns, requestSort, sortConfig, t }) => {
     return <ArrowDown className="w-4 h-4 ml-1 inline-block" />;
   };
 
+  // Bỏ thẻ <thead> ở ngoài, chỉ giữ lại <tr>
   return (
-    <thead className="bg-gray-50 dark:bg-gray-700/50 sticky top-0 z-10">
-      <tr>
-        {columns.map((col) => (
-          <th
-            key={col.key}
-            scope="col"
-            // ---- DÒNG ĐÃ THAY ĐỔI: px-6 -> px-3 ----
-            className={`px-3 py-3 font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap ${
-              col.className || "text-left"
-            } ${
-              col.sortable
-                ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 select-none"
-                : ""
-            }`}
-            onClick={() => col.sortable && requestSort(col.key)}
-          >
-            {t(col.label)}
-            {col.sortable && getSortIcon(col.key)}
-          </th>
-        ))}
-      </tr>
-    </thead>
+    <tr>
+      {columns.map((col) => (
+        <th
+          key={col.key}
+          scope="col"
+          // ---- THAY ĐỔI TỪ px-3 THÀNH px-4 ----
+          className={`px-4 py-3.5 font-medium text-gray-500 dark:text-gray-300 uppercase whitespace-nowrap ${
+            col.className || "text-left"
+          } ${
+            col.sortable
+              ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 select-none"
+              : ""
+          }`}
+          onClick={() => col.sortable && requestSort(col.key)}
+        >
+          {t(col.label)}
+          {col.sortable && getSortIcon(col.key)}
+        </th>
+      ))}
+    </tr>
   );
 };

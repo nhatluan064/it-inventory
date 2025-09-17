@@ -76,7 +76,7 @@ const PendingPurchaseView = ({
           </div>
         </div>
         <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="relative flex-grow w-full">
+          {/* <div className="relative flex-grow w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
               type="text"
@@ -85,7 +85,7 @@ const PendingPurchaseView = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-          </div>
+          </div> */}
           <button
             onClick={onOpenAddFromMasterModal}
             className="w-full md:w-auto flex-shrink-0 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 items-center justify-center space-x-2 text-xs font-semibold hidden md:flex"

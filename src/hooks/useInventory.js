@@ -459,6 +459,7 @@ export const useInventory = (currentUser, t) => {
           price: item.price,
           serialNumber: serials[i],
           importDate: importDate,
+          purchaseQuantity: item.purchaseQuantity,
           quantity: 1,
         };
         const newDocRef = doc(
@@ -560,6 +561,7 @@ export const useInventory = (currentUser, t) => {
           ...data,
           serialNumber: sn,
           quantity: 1,
+          purchaseQuantity: data.quantity,
           importDate,
           status: "available",
           location: "location_in_stock",

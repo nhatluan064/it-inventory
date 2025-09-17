@@ -98,7 +98,7 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
             </tbody>
           </table>
         </div>
-        
+        <div className="md:hidden space-y-4 p-4">
           {items && items.length > 0 ? (
             items.map((item) => (
               <div
@@ -153,7 +153,7 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
               <p className="text-sm">{t("no_data_available")}</p>
             </div>
           )}
-        
+        </div>
       </div>
     </div>
   );
