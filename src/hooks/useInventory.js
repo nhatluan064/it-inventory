@@ -399,20 +399,20 @@ export const useInventory = (currentUser, t) => {
   );
 
   const cancelOrRevertPurchase = useCallback(
-  async (type, item) => {
-    // Logic hoàn tác (revert-purchasing) đã được xóa
-    // Giờ hàm này chỉ còn chức năng xóa yêu cầu mua
-    await deleteDoc(doc(db, "users", currentUser.uid, "equipment", item.id));
-    setEquipment(equipment.filter((e) => e.id !== item.id));
-    logTransaction({
-      type: "procurement",
-      reason: "deleted",
-      itemName: item.name,
-    });
-    toast.success(t("toast_purchase_request_deleted"));
-  },
-  [currentUser, equipment, logTransaction, t]
-);
+    async (type, item) => {
+      // Logic hoàn tác (revert-purchasing) đã được xóa
+      // Giờ hàm này chỉ còn chức năng xóa yêu cầu mua
+      await deleteDoc(doc(db, "users", currentUser.uid, "equipment", item.id));
+      setEquipment(equipment.filter((e) => e.id !== item.id));
+      logTransaction({
+        type: "procurement",
+        reason: "deleted",
+        itemName: item.name,
+      });
+      toast.success(t("toast_purchase_request_deleted"));
+    },
+    [currentUser, equipment, logTransaction, t]
+  );
 
   const cancelWithNote = useCallback(
     async (item, note) => {
@@ -508,6 +508,15 @@ export const useInventory = (currentUser, t) => {
         return false;
       }
 
+      // --- BƯỚC KIỂM TRA MỚI ---
+      // Kiểm tra xem có SN nào bị trùng lặp ngay trong ô nhập liệu không
+      const uniqueSerials = new Set(serials.map((s) => s.toLowerCase()));
+      if (uniqueSerials.size !== serials.length) {
+        toast.error(t("toast_duplicate_sn_error"));
+        return false;
+      }
+      // --- KẾT THÚC BƯỚC KIỂM TRA MỚI ---
+
       const existingSNs = equipment
         .map((e) => e.serialNumber?.toLowerCase())
         .filter(Boolean);
@@ -520,20 +529,19 @@ export const useInventory = (currentUser, t) => {
         return false;
       }
 
+      // ... (phần code lưu vào database giữ nguyên)
       const batch = writeBatch(db);
       const newItems = [];
       const importDate = new Date().toISOString();
 
-      // *** BẮT ĐẦU LOGIC MỚI: TỰ ĐỘNG TẠO MASTER ITEM NẾU CHƯA TỒN TẠI ***
       const masterExists = equipment.some(
         (item) =>
           item.name.toLowerCase() === data.name.toLowerCase() &&
-          item.category === data.category && // Thêm dòng này
+          item.category === data.category &&
           item.status === "master"
       );
 
       if (!masterExists) {
-        // Nếu mẫu chưa tồn tại, tạo một mẫu mới
         const newMasterItem = {
           name: data.name,
           category: data.category,
@@ -546,15 +554,13 @@ export const useInventory = (currentUser, t) => {
           collection(db, "users", currentUser.uid, "equipment")
         );
         batch.set(newMasterDocRef, newMasterItem);
-        // Ghi log cho hành động tạo mẫu tự động
         logTransaction({
           type: "master-list",
-          reason: "add-legacy", // Lý do mới để phân biệt
+          reason: "add-legacy",
           itemName: data.name,
           details: { category: data.category, autoCreated: true },
         });
       }
-      // *** KẾT THÚC LOGIC MỚI ***
 
       for (const sn of serials) {
         const newItemData = {
@@ -575,8 +581,6 @@ export const useInventory = (currentUser, t) => {
       }
 
       await batch.commit();
-      // Sau khi commit, ta cần fetch lại dữ liệu để state 'equipment' được cập nhật
-      // với cả mẫu mới và thiết bị mới, thay vì chỉ cập nhật thủ công.
       await fetchData();
 
       logTransaction({
@@ -589,7 +593,7 @@ export const useInventory = (currentUser, t) => {
       toast.success(t("toast_legacy_item_imported"));
       return true;
     },
-    [currentUser, equipment, logTransaction, t, fetchData] // Thêm fetchData vào dependency array
+    [currentUser, equipment, logTransaction, t, fetchData]
   );
 
   const updateItem = useCallback(

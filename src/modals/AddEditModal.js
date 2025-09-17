@@ -45,14 +45,23 @@ const AddEditModal = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setIsSubmitting(true); // Nút chuyển sang trạng thái "..."
 
-    const success = await onSubmit(formData);
+    try {
+      // Thử thực hiện hành động onSubmit (tức là hàm addLegacyItem)
+      const success = await onSubmit(formData);
 
-    setIsSubmitting(false);
-
-    if (success) {
-      onClose();
+      // Nếu thành công (hàm trả về true), đóng modal
+      if (success) {
+        onClose();
+      }
+    } catch (error) {
+      // Nếu có lỗi xảy ra, thông báo cho người dùng
+      console.error("Failed to add legacy item:", error);
+      alert(t("error_occurred"));
+    } finally {
+      // Dù thành công hay thất bại, khối này LUÔN LUÔN được chạy
+      setIsSubmitting(false); // Kích hoạt lại nút bấm
     }
   };
 
