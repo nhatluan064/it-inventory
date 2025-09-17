@@ -16,6 +16,7 @@ import {
   Hash,
   MapPin,
   Layers,
+  CirclePlusIcon,
 } from "lucide-react";
 import { useSort, SortableHeader } from "../hooks/useSort";
 
@@ -65,7 +66,7 @@ const animationStyles = `
     content: '';
     position: absolute;
     /* Bỏ top, left, transform để tránh lỗi tính toán tọa độ */
-    width: 110%;
+    width: 105%;
     height: 120%;
     border-radius: 9999px;
     opacity: 0;
@@ -79,6 +80,7 @@ const animationStyles = `
   .status-glow.in-use::before { background: #3b82f6; }
   .status-glow.maintenance::before { background: #f59e0b; }
   .status-glow.damaged::before { background: #ef4444; }
+  .status-glow.liquidation::before { background: #9ca3af; }
 `;
 
 const InventoryView = ({
@@ -159,17 +161,72 @@ const InventoryView = ({
 
   const columns = useMemo(
     () => [
-      { key: "importDate", label: "import_date", sortable: true, className: "min-w-[120px]" },
-      { key: "name", label: "device_name", sortable: true, className: "min-w-[200px] w-1/6" },
-      { key: "serialNumber", label: "serial_number_sn", sortable: true, className: "min-w-[150px]" },
-      { key: "category", label: "category", sortable: true, className: "min-w-[130px]" },
-      { key: "status", label: "status", sortable: true, className: "text-center min-w-[150px]" },
-      { key: "allocationDetails.recipientName", label: "user_in_use", sortable: true, className: "min-w-[200px]" },
-      { key: "conditionText", label: "condition", sortable: true, className: "min-w-[150px]" },
-      { key: "price", label: "price", sortable: true, className: "text-right min-w-[50px]" },
-      { key: "purchaseQuantity", label: "purchase_quantity", sortable: true, className: "text-center min-w-[50px]" },
-      { key: "location", label: "location", sortable: true, className: "min-w-[120px]" },
-      { key: "actions", label: "actions", sortable: false, className: "text-center min-w-[100px]" },
+      {
+        key: "importDate",
+        label: "import_date",
+        sortable: true,
+        className: "min-w-[100px] w-1/8",
+      },
+      {
+        key: "name",
+        label: "device_name",
+        sortable: true,
+        className: "min-w-[150px] w-1/8",
+      },
+      {
+        key: "serialNumber",
+        label: "serial_number_sn",
+        sortable: true,
+        className: "min-w-[150px] w-1/8",
+      },
+      {
+        key: "category",
+        label: "category",
+        sortable: true,
+        className: "min-w-[180px] w-1/8",
+      },
+      {
+        key: "status",
+        label: "status",
+        sortable: true,
+        className: "text-center min-w-[150px] w-1/8",
+      },
+      {
+        key: "allocationDetails.recipientName",
+        label: "user_in_use",
+        sortable: true,
+        className: "min-w-[200px]",
+      },
+      {
+        key: "conditionText",
+        label: "condition",
+        sortable: true,
+        className: "min-w-[150px]",
+      },
+      {
+        key: "price",
+        label: "price",
+        sortable: true,
+        className: "text-right min-w-[50px]",
+      },
+      {
+        key: "purchaseQuantity",
+        label: "purchase_quantity",
+        sortable: true,
+        className: "text-center min-w-[50px]",
+      },
+      {
+        key: "location",
+        label: "location",
+        sortable: true,
+        className: "min-w-[120px]",
+      },
+      {
+        key: "actions",
+        label: "actions",
+        sortable: false,
+        className: "text-center min-w-[100px]",
+      },
     ],
     [t]
   );
@@ -199,44 +256,50 @@ const InventoryView = ({
   // Enhanced status colors with gradients (FIXED: Removed glow classes)
   const getStatusStyle = (status) => {
     const styles = {
-      'available': 'bg-gradient-to-r from-green-400 to-green-500 text-white shadow-green-500/25',
-      'in-use': 'bg-gradient-to-r from-blue-400 to-blue-500 text-white shadow-blue-500/25',
-      'maintenance': 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-yellow-500/25',
-      'damaged': 'bg-gradient-to-r from-red-400 to-red-500 text-white shadow-red-500/25',
+      available:
+        "bg-gradient-to-r from-green-400 to-green-500 text-white shadow-green-500/25",
+      "in-use":
+        "bg-gradient-to-r from-blue-400 to-blue-500 text-white shadow-blue-500/25",
+      maintenance:
+        "bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-yellow-500/25",
+      damaged:
+        "bg-gradient-to-r from-red-400 to-red-500 text-white shadow-red-500/25",
     };
-    return styles[status] || 'bg-gradient-to-r from-gray-400 to-gray-500 text-white';
+    return (
+      styles[status] || "bg-gradient-to-r from-gray-400 to-gray-500 text-white"
+    );
   };
 
   // Handle button clicks with loading state
   const handleAction = async (action, item) => {
     const actionKey = `${action}-${item.id}`;
-    setLoadingStates(prev => ({ ...prev, [actionKey]: true }));
+    setLoadingStates((prev) => ({ ...prev, [actionKey]: true }));
     try {
-      if (action === 'allocate') await onAllocateItem(item);
-      else if (action === 'view') await onViewItem(item);
-      else if (action === 'edit') await onEditItem(item);
-      else if (action === 'delete') await onDeleteItem(item);
+      if (action === "allocate") await onAllocateItem(item);
+      else if (action === "view") await onViewItem(item);
+      else if (action === "edit") await onEditItem(item);
+      else if (action === "delete") await onDeleteItem(item);
     } finally {
       setTimeout(() => {
-        setLoadingStates(prev => ({ ...prev, [actionKey]: false }));
+        setLoadingStates((prev) => ({ ...prev, [actionKey]: false }));
       }, 300);
     }
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="animate-fadeIn">
       <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
       {/* --- FILTER SECTION WITH MODERN DESIGN --- */}
       <div className="glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-2xl border border-gray-100/50 dark:border-gray-700/50 p-6 backdrop-blur-xl">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-pulse-slow">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
               {t("inventory_list")}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {t("inventory_desc")}
             </p>
-            <div className="h-0.5 w-16 bg-gradient-to-r from-blue-500 to-purple-500 mt-2 rounded-full" />
+            <div className="h-0.5 w-16 bg-gradient-to-r from-blue-500 to-blue-600 mt-2 rounded-full" />
           </div>
           <div className="flex items-center gap-3 md:hidden">
             <button
@@ -337,9 +400,9 @@ const InventoryView = ({
             </label>
             <button
               onClick={onAddLegacyItem}
-              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2.5 rounded-xl hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center space-x-2 text-sm font-semibold"
+              className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-xl hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center space-x-2 text-xs font-semibold"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-6 h-6" />
               <span>{t("import_unlisted_device")}</span>
             </button>
           </div>
@@ -347,7 +410,7 @@ const InventoryView = ({
       </div>
 
       {/* --- DESKTOP TABLE WITH ENHANCED DESIGN --- */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden hidden md:block border border-gray-100 dark:border-gray-700">
+      <div className="mt-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden hidden md:block border border-gray-100 dark:border-gray-700">
         <div className="overflow-x-auto">
           <table className="text-left w-full text-xs">
             <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border-b-2 border-gray-200 dark:border-gray-700">
@@ -364,7 +427,7 @@ const InventoryView = ({
                   <tr
                     key={item.id}
                     className={`text-left transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-purple-50/50 dark:hover:from-gray-700/30 dark:hover:to-gray-700/50 ${
-                      index % 2 === 0 ? 'bg-gray-50/30 dark:bg-gray-900/20' : ''
+                      index % 2 === 0 ? "bg-gray-50/30 dark:bg-gray-900/20" : ""
                     }`}
                     onMouseEnter={() => setHoveredRow(item.id)}
                     onMouseLeave={() => setHoveredRow(null)}
@@ -372,7 +435,9 @@ const InventoryView = ({
                     <td className="px-4 py-3.5">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                        <span className="text-gray-700 dark:text-gray-300">{formatDate(item.importDate)}</span>
+                        <span className="text-gray-700 dark:text-gray-300">
+                          {formatDate(item.importDate)}
+                        </span>
                       </div>
                     </td>
                     <td className="px-4 py-3.5">
@@ -383,40 +448,56 @@ const InventoryView = ({
                     <td className="px-4 py-3.5">
                       <div className="flex items-center gap-2">
                         <Hash className="w-3.5 h-3.5 text-gray-400" />
-                        <span className="font-mono text-gray-600 dark:text-gray-400">{item.serialNumber || "N/A"}</span>
+                        <span className="font-mono text-gray-600 dark:text-gray-400">
+                          {item.serialNumber || "N/A"}
+                        </span>
                       </div>
                     </td>
                     <td className="px-4 py-3.5">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 dark:bg-gray-700 rounded-lg">
                         <Layers className="w-3.5 h-3.5 text-gray-500" />
                         <span className="capitalize text-gray-700 dark:text-gray-300">
-                          {(categories.find((c) => c.id === item.category) || {}).name || item.category}
+                          {(
+                            categories.find((c) => c.id === item.category) || {}
+                          ).name || item.category}
                         </span>
                       </span>
                     </td>
                     <td className="px-4 py-3.5 text-center">
-                      <div className={`relative inline-block status-glow ${item.status}`}>
-                        <span className={`relative z-10 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold shadow-lg ${getStatusStyle(item.status)}`}>
+                      <div
+                        className={`relative inline-block status-glow ${item.status}`}
+                      >
+                        <span
+                          className={`relative z-10 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold shadow-lg ${getStatusStyle(
+                            item.status
+                          )}`}
+                        >
                           {statusLabels[item.status] || item.status}
                         </span>
                       </div>
                     </td>
                     <td className="px-4 py-3.5">
-                      {item.status === 'in-use' ? (
+                      {item.status === "in-use" ? (
                         <div className="flex items-center gap-2">
                           <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold shadow-md">
-                            {(item.allocationDetails?.recipientName || '').charAt(0).toUpperCase()}
+                            {(item.allocationDetails?.recipientName || "")
+                              .charAt(0)
+                              .toUpperCase()}
                           </div>
                           <span className="font-semibold text-gray-700 dark:text-gray-300">
-                            {item.allocationDetails?.recipientName || ''}
+                            {item.allocationDetails?.recipientName || ""}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-gray-400 italic">{t('user_not_use')}</span>
+                        <span className="text-gray-400 italic">
+                          {t("user_not_use")}
+                        </span>
                       )}
                     </td>
                     <td className="px-4 py-3.5">
-                      <span className="text-gray-600 dark:text-gray-400">{renderCondition(item)}</span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {renderCondition(item)}
+                      </span>
                     </td>
                     <td className="px-4 py-3.5 text-right">
                       <div className="flex items-center justify-end gap-1">
@@ -426,7 +507,7 @@ const InventoryView = ({
                       </div>
                     </td>
                     <td className="px-4 py-3.5 text-center">
-                      <span className="font-bold text-lg text-gray-700 dark:text-gray-300">
+                      <span className="font-bold text-sm text-gray-700 dark:text-gray-300">
                         {item.purchaseQuantity || 1}
                       </span>
                     </td>
@@ -438,26 +519,37 @@ const InventoryView = ({
                         </span>
                       </div>
                     </td>
-                    
+
                     <td className="px-4 py-3.5">
-                      <div className={`flex items-center justify-center gap-1 transition-all duration-300 ${
-                        hoveredRow === item.id ? 'opacity-100 scale-100' : 'opacity-70 scale-95'
-                      }`}>
-                        <button 
-                          onClick={() => handleAction('allocate', item)} 
+                      <div
+                        className={`flex items-center justify-center gap-1 transition-all duration-300 ${
+                          hoveredRow === item.id
+                            ? "opacity-100 scale-100"
+                            : "opacity-70 scale-95"
+                        }`}
+                      >
+                        <button
+                          onClick={() => handleAction("allocate", item)}
                           className={`group relative p-1.5 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 hover:scale-110 ${
-                            loadingStates[`allocate-${item.id}`] ? 'animate-pulse' : ''
+                            loadingStates[`allocate-${item.id}`]
+                              ? "animate-pulse"
+                              : ""
                           }`}
-                          title={t("allocate_device")} 
-                          disabled={item.status !== "available" || loadingStates[`allocate-${item.id}`]}
+                          title={t("allocate_device")}
+                          disabled={
+                            item.status !== "available" ||
+                            loadingStates[`allocate-${item.id}`]
+                          }
                         >
                           <LogOut className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                           <span className="absolute inset-0 rounded-lg bg-blue-400 opacity-0 group-hover:opacity-20 transition-opacity"></span>
                         </button>
-                        <button 
-                          onClick={() => handleAction('view', item)} 
+                        <button
+                          onClick={() => handleAction("view", item)}
                           className={`group relative p-1.5 text-emerald-500 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-lg transition-all duration-200 hover:scale-110 ${
-                            loadingStates[`view-${item.id}`] ? 'animate-pulse' : ''
+                            loadingStates[`view-${item.id}`]
+                              ? "animate-pulse"
+                              : ""
                           }`}
                           title={t("view")}
                           disabled={loadingStates[`view-${item.id}`]}
@@ -465,10 +557,12 @@ const InventoryView = ({
                           <Eye className="w-4 h-4 group-hover:scale-110 transition-transform" />
                           <span className="absolute inset-0 rounded-lg bg-emerald-400 opacity-0 group-hover:opacity-20 transition-opacity"></span>
                         </button>
-                        <button 
-                          onClick={() => handleAction('edit', item)} 
+                        <button
+                          onClick={() => handleAction("edit", item)}
                           className={`group relative p-1.5 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-lg transition-all duration-200 hover:scale-110 ${
-                            loadingStates[`edit-${item.id}`] ? 'animate-pulse' : ''
+                            loadingStates[`edit-${item.id}`]
+                              ? "animate-pulse"
+                              : ""
                           }`}
                           title={t("edit")}
                           disabled={loadingStates[`edit-${item.id}`]}
@@ -476,10 +570,12 @@ const InventoryView = ({
                           <Edit className="w-4 h-4 group-hover:rotate-6 transition-transform" />
                           <span className="absolute inset-0 rounded-lg bg-amber-400 opacity-0 group-hover:opacity-20 transition-opacity"></span>
                         </button>
-                        <button 
-                          onClick={() => handleAction('delete', item)} 
+                        <button
+                          onClick={() => handleAction("delete", item)}
                           className={`group relative p-1.5 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all duration-200 hover:scale-110 ${
-                            loadingStates[`delete-${item.id}`] ? 'animate-pulse' : ''
+                            loadingStates[`delete-${item.id}`]
+                              ? "animate-pulse"
+                              : ""
                           }`}
                           title={t("delete")}
                           disabled={loadingStates[`delete-${item.id}`]}
@@ -496,7 +592,9 @@ const InventoryView = ({
                   <td colSpan={columns.length} className="text-center py-16">
                     <div className="flex flex-col items-center gap-3">
                       <Package className="w-12 h-12 text-gray-300" />
-                      <p className="text-gray-500 text-sm">{t("no_devices_match_search")}</p>
+                      <p className="text-gray-500 text-sm">
+                        {t("no_devices_match_search")}
+                      </p>
                     </div>
                   </td>
                 </tr>
@@ -523,11 +621,19 @@ const InventoryView = ({
                       </h3>
                       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                         <Hash className="w-3 h-3" />
-                        <span className="font-mono">{item.serialNumber || "N/A"}</span>
+                        <span className="font-mono">
+                          {item.serialNumber || "N/A"}
+                        </span>
                       </div>
                     </div>
-                    <div className={`relative inline-block status-glow ${item.status}`}>
-                      <span className={`relative z-10 px-2.5 py-1 rounded-full text-xs font-semibold shadow ${getStatusStyle(item.status)}`}>
+                    <div
+                      className={`relative inline-block status-glow ${item.status}`}
+                    >
+                      <span
+                        className={`relative z-10 px-2.5 py-1 rounded-full text-xs font-semibold shadow ${getStatusStyle(
+                          item.status
+                        )}`}
+                      >
                         {statusLabels[item.status] || item.status}
                       </span>
                     </div>
@@ -537,14 +643,20 @@ const InventoryView = ({
                     <div className="space-y-2">
                       <div className="flex items-center gap-1.5">
                         <Layers className="w-3.5 h-3.5 text-gray-400" />
-                        <span className="text-gray-600 dark:text-gray-400">{t("category")}:</span>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {t("category")}:
+                        </span>
                         <span className="font-medium text-gray-800 dark:text-gray-200">
-                          {(categories.find((c) => c.id === item.category) || {}).name || item.category}
+                          {(
+                            categories.find((c) => c.id === item.category) || {}
+                          ).name || item.category}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                        <span className="text-gray-600 dark:text-gray-400">{t("location")}:</span>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {t("location")}:
+                        </span>
                         <span className="font-medium text-gray-800 dark:text-gray-200">
                           {t(item.location) || t("in_stock")}
                         </span>
@@ -553,13 +665,17 @@ const InventoryView = ({
                     <div className="space-y-2">
                       <div className="flex items-center gap-1.5">
                         <Package className="w-3.5 h-3.5 text-gray-400" />
-                        <span className="text-gray-600 dark:text-gray-400">{t("purchase_quantity")}:</span>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {t("purchase_quantity")}:
+                        </span>
                         <span className="font-bold text-gray-800 dark:text-gray-200">
                           {item.purchaseQuantity || 1}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-gray-600 dark:text-gray-400">{t("condition")}:</span>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {t("condition")}:
+                        </span>
                         <span className="font-medium text-gray-800 dark:text-gray-200">
                           {renderCondition(item)}
                         </span>
@@ -567,19 +683,23 @@ const InventoryView = ({
                     </div>
                   </div>
 
-                  {item.status === 'in-use' ? (
+                  {item.status === "in-use" ? (
                     <div className="flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                       <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold">
-                        {(item.allocationDetails?.recipientName || '').charAt(0).toUpperCase()}
+                        {(item.allocationDetails?.recipientName || "")
+                          .charAt(0)
+                          .toUpperCase()}
                       </div>
                       <span className="text-xs font-semibold text-blue-700 dark:text-blue-300">
-                        {item.allocationDetails?.recipientName || ''}
+                        {item.allocationDetails?.recipientName || ""}
                       </span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
-                      <User className="w-4 h-4 text-gray-400"/>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">{t('user_not_use')}</span>
+                      <User className="w-4 h-4 text-gray-400" />
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {t("user_not_use")}
+                      </span>
                     </div>
                   )}
                 </div>
