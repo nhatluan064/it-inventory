@@ -23,9 +23,8 @@ const SettingsView = ({ onBackupData, onResetData, onImportData, t }) => {
   };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
+    <div className="space-y-8 max-w-4xl mx-auto animate-scaleIn">
       <ViewHeader title={t("system_settings")} />
-
       {/* Interface Settings */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         {/* ĐÃ SỬA: text-lg -> text-base, w-5 h-5 -> w-4 h-4 */}

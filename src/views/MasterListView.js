@@ -36,7 +36,7 @@ const MasterListView = ({
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-scaleIn">
       {/* --- FILTER SECTION WITH MODERN DESIGN --- */}
       <div className="glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-2xl border border-gray-100/50 dark:border-gray-700/50 p-6 backdrop-blur-xl">
         <div className="flex justify-between items-center mb-6">

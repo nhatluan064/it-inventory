@@ -316,8 +316,10 @@ const App = () => {
   // --- RENDER LOGIC ---
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-        ...
+      <div className="flex space-x-2">
+        <div class="w-3 h-3 bg-gray-500 rounded-full animate-dot1"></div>
+        <div class="w-3 h-3 bg-gray-500 rounded-full animate-dot2"></div>
+        <div class="w-3 h-3 bg-gray-500 rounded-full animate-dot3"></div>
       </div>
     );
   }
@@ -361,8 +363,10 @@ const App = () => {
 
   if (inventory.dataLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-        Đang tải dữ liệu...
+      <div class="flex space-x-2">
+        <div class="w-3 h-3 bg-gray-500 rounded-full animate-dot1"></div>
+        <div class="w-3 h-3 bg-gray-500 rounded-full animate-dot2"></div>
+        <div class="w-3 h-3 bg-gray-500 rounded-full animate-dot3"></div>
       </div>
     );
   }
@@ -384,7 +388,18 @@ const App = () => {
 
     switch (currentTab) {
       case "home":
-        return <HomeView {...viewProps} />;
+        return (
+          <HomeView
+            {...viewProps}
+            equipment={inventory.equipment}
+            pendingPurchaseCount={pendingPurchaseItems.length}
+            purchasingCount={purchasingItems.length}
+            purchasedCount={purchasedItems.length}
+            masterListCount={uniqueMasterItemsCount}
+            reportsCount={inventory.transactions.length}
+            setActiveTab={handleTabClick}
+          />
+        );
       case "masterList":
         return (
           <MasterListView

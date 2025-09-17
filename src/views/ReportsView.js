@@ -193,7 +193,7 @@ const ReportsView = ({ transactions, t }) => {
   }, [sortedTransactions, logDetails, t]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-scaleIn">
       {/* Card Tiêu đề & Lọc */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
         <div className="flex justify-between items-center mb-4">

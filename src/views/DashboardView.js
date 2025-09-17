@@ -7,12 +7,12 @@ import {
   CheckCircle,
   Package,
   UserCheck,
+  Home,
   Wrench,
   Trash2,
   FileText,
   LogOut,
 } from "lucide-react";
-
 
 const DashboardView = ({
   equipment,
@@ -40,7 +40,6 @@ const DashboardView = ({
     }
   });
 
-
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) return;
@@ -60,21 +59,38 @@ const DashboardView = ({
   }, []);
 
   const totalInventory = equipment.filter((e) =>
-    ["available", "in-use", "maintenance", "liquidation", "broken"].includes(e.status)
+    ["available", "in-use", "maintenance", "liquidation", "broken"].includes(
+      e.status
+    )
   ).length;
-  const availableDevices = equipment.filter((e) => e.status === "available").length;
+  const availableDevices = equipment.filter(
+    (e) => e.status === "available"
+  ).length;
   const inUseDevices = equipment.filter((e) => e.status === "in-use").length;
-  const maintenanceCount = equipment.filter((e) => e.status === "maintenance").length;
-  const liquidationCount = equipment.filter((e) => e.status === "liquidation").length;
+  const maintenanceCount = equipment.filter(
+    (e) => e.status === "maintenance"
+  ).length;
+  const liquidationCount = equipment.filter(
+    (e) => e.status === "liquidation"
+  ).length;
 
-  const StatCard = ({ IconComponent, title, value, gradient, tabId, wide = false }) => (
+  const StatCard = ({
+    IconComponent,
+    title,
+    value,
+    gradient,
+    tabId,
+    wide = false,
+  }) => (
     <button
       onClick={() => handleCardClick(tabId)}
       className={`rounded-lg p-4 text-white shadow-md ${gradient} ${
         wide ? "w-64" : "w-48"
       } flex-shrink-0 text-left transition-transform transform hover:-translate-y-1 cursor-pointer flex items-center space-x-4`}
     >
-      {IconComponent && <IconComponent className="w-8 h-8 opacity-75 flex-shrink-0" />}
+      {IconComponent && (
+        <IconComponent className="w-8 h-8 opacity-75 flex-shrink-0" />
+      )}
       <div>
         <p className="text-xs opacity-90 truncate">{title}</p>
         <p className="text-xl font-bold">{value}</p>
@@ -82,40 +98,57 @@ const DashboardView = ({
     </button>
   );
 
-  const CombinedStatCard = ({ IconComponent, title1, value1, title2, value2, gradient, tabId }) => (
-     <button
+  const CombinedStatCard = ({
+    IconComponent,
+    title1,
+    value1,
+    title2,
+    value2,
+    gradient,
+    tabId,
+  }) => (
+    <button
       onClick={() => handleCardClick(tabId)}
       className={`rounded-lg shadow-md ${gradient} w-64 flex-shrink-0 transition-transform transform hover:-translate-y-1 cursor-pointer overflow-hidden flex items-center p-4 space-x-4`}
     >
-        {IconComponent && <IconComponent className="w-8 h-8 opacity-75 flex-shrink-0" />}
-        <div className="flex-grow flex items-center">
-            <div className="w-1/2 text-white text-left">
-                <p className="text-xs opacity-90 truncate">{title1}</p>
-                <p className="text-xl font-bold">{value1}</p>
-            </div>
-            <div className="border-l-2 border-white/50 h-10 self-center mx-2"></div>
-            <div className="w-1/2 text-white text-left">
-                 <p className="text-xs opacity-90 truncate">{title2}</p>
-                 <p className="text-xl font-bold">{value2}</p>
-            </div>
+      {IconComponent && (
+        <IconComponent className="w-8 h-8 opacity-75 flex-shrink-0" />
+      )}
+      <div className="flex-grow flex items-center">
+        <div className="w-1/2 text-white text-left">
+          <p className="text-xs opacity-90 truncate">{title1}</p>
+          <p className="text-xl font-bold">{value1}</p>
         </div>
+        <div className="border-l-2 border-white/50 h-10 self-center mx-2"></div>
+        <div className="w-1/2 text-white text-left">
+          <p className="text-xs opacity-90 truncate">{title2}</p>
+          <p className="text-xl font-bold">{value2}</p>
+        </div>
+      </div>
     </button>
   );
 
-
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-hidden space-y-6 animate-scaleIn">
       {/* ---- DÒNG ĐÃ SỬA LỖI ---- */}
       <div
         ref={scrollContainerRef}
         className="overflow-x-auto py-3 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 flex space-x-4 cursor-grab active:cursor-grabbing hide-scrollbar"
       >
+        {/* V-- THÊM THẺ MỚI TẠI ĐÂY --V */}
         <StatCard
-            IconComponent={ClipboardList}
-            title={t("master_list")}
-            value={masterListCount}
-            gradient="bg-gradient-to-r from-cyan-500 to-cyan-600"
-            tabId="masterList"
+          IconComponent={Home}
+          title={t("nav_title_main")}
+          value={t("home")}
+          gradient="bg-gradient-to-r from-gray-500 to-gray-600"
+          tabId="home"
+        />
+        <StatCard
+          IconComponent={ClipboardList}
+          title={t("master_list")}
+          value={masterListCount}
+          gradient="bg-gradient-to-r from-cyan-500 to-cyan-600"
+          tabId="masterList"
         />
         <StatCard
           IconComponent={FilePlus}
@@ -139,13 +172,13 @@ const DashboardView = ({
           tabId="purchased"
         />
         <CombinedStatCard
-            IconComponent={Package}
-            title1={t("total_inventory")}
-            value1={totalInventory}
-            title2={t("available")}
-            value2={availableDevices}
-            gradient="bg-gradient-to-r from-blue-500 to-blue-600"
-            tabId="inventory"
+          IconComponent={Package}
+          title1={t("total_inventory")}
+          value1={totalInventory}
+          title2={t("available")}
+          value2={availableDevices}
+          gradient="bg-gradient-to-r from-blue-500 to-blue-600"
+          tabId="inventory"
         />
         <StatCard
           IconComponent={LogOut}
@@ -169,11 +202,11 @@ const DashboardView = ({
           tabId="liquidation"
         />
         <StatCard
-            IconComponent={FileText}
-            title={t("reports")}
-            value={reportsCount}
-            gradient="bg-gradient-to-r from-pink-500 to-pink-600"
-            tabId="reports"
+          IconComponent={FileText}
+          title={t("reports")}
+          value={reportsCount}
+          gradient="bg-gradient-to-r from-pink-500 to-pink-600"
+          tabId="reports"
         />
       </div>
     </div>
