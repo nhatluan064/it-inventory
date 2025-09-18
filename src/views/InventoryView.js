@@ -636,19 +636,24 @@ const InventoryView = ({
                             <Eye className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleAction("edit", item)}
-                            className={`group relative p-1.5 text-amber-500 ... ${
-                              loadingStates[`edit-${item.id}`]
+                            // Gọi hàm onEditItem và truyền vào cả "group"
+                            onClick={() => onEditItem(group)}
+                            // Tooltip sẽ tự thay đổi để giải thích cho người dùng
+                            title={
+                              group.groupedQuantity > 1
+                                ? "Sửa hàng loạt cho nhóm"
+                                : t("edit")
+                            }
+                            // Gỡ bỏ điều kiện disabled cũ, chỉ giữ lại loading state
+                            disabled={loadingStates[`edit-${group.groupKey}`]}
+                            className={`group relative p-1.5 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-lg transition-all duration-200 hover:scale-110 ${
+                              loadingStates[`edit-${group.groupKey}`]
                                 ? "animate-pulse"
                                 : ""
                             }`}
-                            title={t("edit")}
-                            disabled={
-                              loadingStates[`edit-${item.id}`] ||
-                              group.groupedQuantity > 1
-                            }
                           >
-                            <Edit className="w-4 h-4" />
+                            <Edit className="w-4 h-4 group-hover:rotate-6 transition-transform" />
+                            <span className="absolute inset-0 rounded-lg bg-amber-400 opacity-0 group-hover:opacity-20 transition-opacity"></span>
                           </button>
                           <button
                             onClick={() => handleAction("delete", item)}

@@ -43,6 +43,7 @@ import EquipmentDetailModal from "./modals/EquipmentDetailModal";
 import EquipmentTypeModal from "./modals/EquipmentTypeModal";
 import AllocationModal from "./modals/AllocationModal";
 import CancelNoteModal from "./modals/CancelNoteModal";
+import BulkEditModal from "./modals/BulkEditModal";
 // import EditNameModal from "./modals/EditNameModal";
 import RecallModal from "./modals/RecallModal";
 import InfoModal from "./modals/InfoModal";
@@ -222,6 +223,16 @@ const App = () => {
       return searchMatch && categoryMatch && departmentMatch && dateMatch;
     });
   }, [inventory.equipment, allocatedFilters]);
+
+  const handleEditItem = (itemOrGroup) => {
+    // Nếu là nhóm (có groupedQuantity > 1), mở modal sửa hàng loạt
+    if (itemOrGroup.groupedQuantity > 1) {
+      modals.openModal("bulkEdit", itemOrGroup);
+    } else {
+      // Nếu là item đơn lẻ, mở modal sửa thông thường
+      modals.openModal("addEdit", itemOrGroup.originalItems[0]);
+    }
+  };
 
   const masterItems = useMemo(() => {
     return inventory.equipment.filter((item) => item.status === "master");
@@ -456,7 +467,7 @@ const App = () => {
             unfilteredEquipment={inventoryItems}
             filters={inventoryFilters}
             setFilters={setInventoryFilters}
-            onEditItem={(item) => modals.openModal("addEdit", item)}
+            onEditItem={handleEditItem} // <-- Sửa lại prop này
             onDeleteItem={(item) =>
               modals.openModal("delete", item, { deleteType: "inventory" })
             }
@@ -613,6 +624,15 @@ const App = () => {
         </div>
 
         {/* Modals */}
+        <BulkEditModal
+          show={modals.modalState.bulkEdit}
+          onClose={() => modals.closeModal("bulkEdit")}
+          onSubmit={inventory.batchUpdateItems}
+          group={modals.currentItem}
+          categories={categories}
+          t={t}
+        />
+
         <EquipmentTypeModal
           show={modals.modalState.type}
           onClose={() => modals.closeModal("type")}

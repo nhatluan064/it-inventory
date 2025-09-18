@@ -598,18 +598,70 @@ export const useInventory = (currentUser, t) => {
 
   const updateItem = useCallback(
     async (data) => {
+      // Tìm item gốc trong state hiện tại để so sánh sự thay đổi
+      const originalItem = equipment.find((e) => e.id === data.id);
+      if (!originalItem) {
+        toast.error("Không tìm thấy thiết bị để cập nhật.");
+        return false;
+      }
+
+      // --- LOGIC MỚI: TỰ ĐỘNG TẠO MẪU KHI SỬA DANH MỤC ---
+      // KIỂM TRA NẾU DANH MỤC BỊ THAY ĐỔI
+      if (originalItem.category !== data.category) {
+        // Kiểm tra xem Mẫu mới (Tên + Danh mục mới) đã tồn tại trong Danh sách Mẫu chưa
+        const masterExists = equipment.some(
+          (e) =>
+            e.status === "master" &&
+            e.name.toLowerCase() === data.name.toLowerCase() &&
+            e.category === data.category
+        );
+
+        // Nếu Mẫu mới CHƯA tồn tại, tự động tạo Mẫu mới
+        if (!masterExists) {
+          const newMasterItem = {
+            name: data.name,
+            category: data.category,
+            status: "master",
+            location: "master-list",
+            quantity: 0,
+            price: 0,
+          };
+          // Thêm Mẫu mới vào Firestore
+          await addDoc(
+            collection(db, "users", currentUser.uid, "equipment"),
+            newMasterItem
+          );
+
+          logTransaction({
+            type: "master-list",
+            reason: "add-auto", // Lý do mới để phân biệt
+            itemName: data.name,
+            details: { category: data.category, autoCreated: true },
+          });
+          toast.success(
+            `Đã tự động tạo Mẫu mới: ${data.name} - ${t(data.category)}`
+          );
+        }
+      }
+      // --- KẾT THÚC LOGIC MỚI ---
+
+      // Tiến hành cập nhật thông tin cho item trong kho như bình thường
       const docRef = doc(db, "users", currentUser.uid, "equipment", data.id);
       await updateDoc(docRef, data);
-      setEquipment(equipment.map((e) => (e.id === data.id ? data : e)));
+
+      // Tải lại toàn bộ dữ liệu để đồng bộ state (bao gồm cả Mẫu mới nếu có)
+      await fetchData();
+
       logTransaction({
         type: "inventory",
         reason: "update",
         itemName: data.name,
       });
+
       toast.success(t("toast_info_updated_successfully"));
       return true;
     },
-    [currentUser, equipment, logTransaction, t]
+    [currentUser, equipment, logTransaction, t, fetchData] // Thêm fetchData vào dependency
   );
 
   const deleteItem = useCallback(
@@ -966,7 +1018,53 @@ export const useInventory = (currentUser, t) => {
     }
   }, [currentUser, t]);
 
+  const batchUpdateItems = useCallback(
+    async (group, formData) => {
+      const batch = writeBatch(db);
+
+      group.originalItems.forEach((item, index) => {
+        const updatedData = {};
+
+        // Kiểm tra xem danh mục có thay đổi không
+        if (item.category !== formData.category) {
+          updatedData.category = formData.category;
+        }
+
+        // Kiểm tra xem SN có thay đổi không
+        const newSn = formData.serialNumbers[index];
+        if (item.serialNumber !== newSn) {
+          updatedData.serialNumber = newSn;
+        }
+
+        // Nếu có bất kỳ thay đổi nào, thêm vào batch
+        if (Object.keys(updatedData).length > 0) {
+          const docRef = doc(
+            db,
+            "users",
+            currentUser.uid,
+            "equipment",
+            item.id
+          );
+          batch.update(docRef, updatedData);
+        }
+      });
+
+      try {
+        await batch.commit();
+        await fetchData(); // Tải lại dữ liệu mới
+        toast.success(t("toast_info_updated_successfully"));
+        return true;
+      } catch (error) {
+        console.error("Batch update failed: ", error);
+        toast.error("Cập nhật hàng loạt thất bại.");
+        return false;
+      }
+    },
+    [currentUser, fetchData, t]
+  );
+
   return {
+    batchUpdateItems,
     equipment,
     transactions,
     dataLoading,

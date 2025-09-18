@@ -102,7 +102,7 @@ const AddEditModal = ({
                 value={formData.category}
                 onChange={handleChange}
                 className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 disabled:bg-gray-100 dark:disabled:bg-gray-700/50 disabled:cursor-not-allowed"
-                disabled={isEditing}
+                required
               >
                 {categoryOptions.map((cat) => (
                   <option key={cat.id} value={cat.id}>
