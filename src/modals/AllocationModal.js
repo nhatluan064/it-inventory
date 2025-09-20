@@ -1,5 +1,5 @@
 // src/modals/AllocationModal.js
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import {
   User,
   Building,
@@ -11,25 +11,7 @@ import {
 } from "lucide-react";
 import { positions, departments } from "../constants";
 
-const AllocationModal = ({ show, onClose, onSubmit, item: rawData, t }) => {
-  // --- BỘ CHUYỂN ĐỔI DỮ LIỆU ---
-  // Giúp modal hoạt động với cả item đơn lẻ và group
-  const data = useMemo(() => {
-    if (!rawData) return null;
-    // Nếu đã là group object, dùng luôn
-    if (rawData.originalItems) {
-      return rawData;
-    }
-    // Nếu là item đơn lẻ, tự động gói lại thành cấu trúc group
-    return {
-      ...rawData,
-      groupKey: rawData.id,
-      groupedQuantity: 1,
-      serialNumbers: [rawData.serialNumber],
-      originalItems: [rawData],
-    };
-  }, [rawData]);
-
+const AllocationModal = ({ show, onClose, onSubmit, item, t }) => {
   const [formData, setFormData] = useState({
     recipientName: "",
     employeeId: "",
@@ -40,54 +22,43 @@ const AllocationModal = ({ show, onClose, onSubmit, item: rawData, t }) => {
     handoverDate: new Date().toISOString(),
   });
 
-  const [selectedSN, setSelectedSN] = useState("");
-  const isGroup = data?.groupedQuantity > 1;
-
   const toInputDateTime = (isoString) => {
     if (!isoString) return "";
     const date = new Date(isoString);
+    // Adjust for local timezone to display correctly in the input
     const timezoneOffset = date.getTimezoneOffset() * 60000;
     const localDate = new Date(date.getTime() - timezoneOffset);
     return localDate.toISOString().slice(0, 16);
   };
 
   useEffect(() => {
-    if (show && data) {
-      const firstItem = data.originalItems[0];
+    if (show && item) {
       let displayCondition = "---";
-      if (firstItem.condition) {
-        if (
-          typeof firstItem.condition === "object" &&
-          firstItem.condition.key
-        ) {
-          displayCondition = t(
-            firstItem.condition.key,
-            firstItem.condition.params
-          );
+      if (item.condition) {
+        if (typeof item.condition === "object" && item.condition.key) {
+          displayCondition = t(item.condition.key, item.condition.params);
         } else {
-          const conditionText = t(String(firstItem.condition));
-          displayCondition = firstItem.isRecalled
+          const conditionText = t(String(item.condition));
+          displayCondition = item.isRecalled
             ? t("recalled_prefix", { conditionText: conditionText })
             : conditionText;
         }
       }
 
-      setFormData((prev) => ({
-        ...prev,
-        recipientName: "", // Reset form fields
+      // Reset form when modal opens
+      setFormData({
+        recipientName: "",
         employeeId: "",
         position: positions[0]?.id || "",
         positionDescription: "",
         department: departments[0]?.id || "",
         condition: displayCondition,
         handoverDate: new Date().toISOString(),
-      }));
-
-      setSelectedSN(firstItem.serialNumber || "");
+      });
     }
-  }, [show, data, t]);
+  }, [show, item, t]);
 
-  if (!show || !data) return null;
+  if (!show || !item) return null;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -101,32 +72,20 @@ const AllocationModal = ({ show, onClose, onSubmit, item: rawData, t }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const itemToSubmit = data.originalItems.find(
-      (item) => item.serialNumber === selectedSN
-    );
-
-    if (!itemToSubmit) {
-      console.error("Selected item not found in group.");
-      onClose();
-      return;
-    }
-
-    const originalConditionKey = itemToSubmit.condition
-      ? typeof itemToSubmit.condition === "object"
-        ? itemToSubmit.condition.key
-        : String(itemToSubmit.condition)
+    const originalConditionKey = item.condition
+      ? typeof item.condition === "object"
+        ? item.condition.key
+        : String(item.condition)
       : "condition_new";
 
     onSubmit({
       ...formData,
       condition: originalConditionKey,
-      serialNumber: selectedSN,
-      equipmentId: itemToSubmit.id,
+      serialNumber: item.serialNumber, // SN is now fixed from the item
+      equipmentId: item.id,
     });
     onClose();
   };
-
-  const firstItem = data.originalItems[0];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
@@ -135,8 +94,7 @@ const AllocationModal = ({ show, onClose, onSubmit, item: rawData, t }) => {
           {t("allocate_device")}
         </h2>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-          {t("allocating")}:{" "}
-          <span className="font-semibold">{firstItem.name}</span>
+          {t("allocating")}: <span className="font-semibold">{item.name}</span>
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -238,27 +196,13 @@ const AllocationModal = ({ show, onClose, onSubmit, item: rawData, t }) => {
               </label>
               <div className="relative mt-1">
                 <Hash className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                {isGroup ? (
-                  <select
-                    value={selectedSN}
-                    onChange={(e) => setSelectedSN(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
-                    required
-                  >
-                    {data.serialNumbers.map((sn) => (
-                      <option key={sn} value={sn}>
-                        {sn}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    type="text"
-                    value={selectedSN}
-                    className="w-full pl-10 pr-4 py-2 border rounded-md bg-gray-100 dark:bg-gray-700/50 dark:border-gray-600 cursor-not-allowed"
-                    disabled
-                  />
-                )}
+                {/* --- TRƯỜNG SN ĐÃ ĐƯỢC ĐƠN GIẢN HÓA --- */}
+                <input
+                  type="text"
+                  value={item.serialNumber || ""}
+                  className="w-full pl-10 pr-4 py-2 border rounded-md bg-gray-100 dark:bg-gray-700/50 dark:border-gray-600 cursor-not-allowed"
+                  disabled
+                />
               </div>
             </div>
             <div>

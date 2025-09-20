@@ -29,9 +29,10 @@ const RecallModal = ({ show, onClose, onSubmit, item, t }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Gửi đi một object chứa item gốc và lý do thu hồi
     onSubmit({
-      ...item,
-      recallReason: reasonKey, // Đổi tên thuộc tính để rõ nghĩa hơn
+      itemToRecall: item, // Gửi item gốc
+      recallReason: reasonKey,
       maintenanceNote: maintenanceNote,
     });
     onClose();
@@ -57,14 +58,14 @@ const RecallModal = ({ show, onClose, onSubmit, item, t }) => {
               onChange={(e) => setReasonKey(e.target.value)}
               className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200"
             >
-              {recallOptions.map(opt => (
+              {recallOptions.map((opt) => (
                 <option key={opt.key} value={opt.key}>
                   {t(opt.key)}
                 </option>
               ))}
             </select>
           </div>
-          
+
           {isMaintenance && (
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">

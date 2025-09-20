@@ -78,4 +78,6 @@ export const departments = [
     { id: "dept_security", tKey: "dept_security" },
     { id: "dept_accounting", tKey: "dept_accounting" },
     { id: "dept_sales", tKey: "dept_sales" },
+    { id: "dept_qc", tKey: "dept_qc" },
+    { id: "dept_warehouse", tKey: "dept_warehouse" },
 ];

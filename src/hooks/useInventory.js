@@ -399,7 +399,7 @@ export const useInventory = (currentUser, t) => {
   );
 
   const cancelOrRevertPurchase = useCallback(
-    async (type, item) => {
+    async (item) => { // <<< SỬA Ở ĐÂY: CHỈ CÒN LẠI "item"
       // Logic hoàn tác (revert-purchasing) đã được xóa
       // Giờ hàm này chỉ còn chức năng xóa yêu cầu mua
       await deleteDoc(doc(db, "users", currentUser.uid, "equipment", item.id));
@@ -683,34 +683,41 @@ export const useInventory = (currentUser, t) => {
     async (allocationData) => {
       const { equipmentId, ...details } = allocationData;
       const targetItem = equipment.find((item) => item.id === equipmentId);
+
       if (!targetItem) {
         toast.error("Không tìm thấy thiết bị để bàn giao.");
         return;
       }
+
+      // Dữ liệu để cập nhật TRỰC TIẾP trên item gốc
       const dataToUpdate = {
         status: "in-use",
         location: details.department,
-        allocationDetails: { ...details },
-        serialNumber: details.serialNumber,
-        // *** XÓA DÒNG NÀY ĐI: name: `${targetItem.name.split(" (User:")[0]} (User: ${details.recipientName})`, ***
+        allocationDetails: { ...details }, // Lưu thông tin người nhận
       };
+
+      // Update item trong Firestore
       await updateDoc(
         doc(db, "users", currentUser.uid, "equipment", targetItem.id),
         dataToUpdate
       );
+
+      // Cập nhật state ở local
       setEquipment((prev) =>
         prev.map((item) =>
           item.id === targetItem.id ? { ...item, ...dataToUpdate } : item
         )
       );
+
+      // Ghi lại Lịch sử (Log)
       logTransaction({
         type: "export",
         reason: "allocate",
-        itemName: targetItem.name, // Giờ đây chỉ cần lấy tên gốc
-        quantity: 1,
-        details: { ...details },
+        itemName: targetItem.name,
+        details: { ...details, serialNumber: targetItem.serialNumber },
         timestamp: details.handoverDate,
       });
+
       toast.success(
         t("toast_item_allocated_successfully", {
           itemName: targetItem.name,
@@ -722,58 +729,64 @@ export const useInventory = (currentUser, t) => {
   );
 
   const recallItem = useCallback(
-    async (recalledItem) => {
-      const { recallReason, maintenanceNote } = recalledItem;
+    async (recalledItemData) => {
+      const { itemToRecall, recallReason, maintenanceNote } = recalledItemData;
       let dataToUpdate;
-      const originalName = recalledItem.name.split(" (User:")[0]; // Vẫn giữ logic này để dọn dẹp dữ liệu cũ
 
+      // Nếu thu hồi do hư hỏng -> chuyển sang Bảo trì
       if (recallReason === "condition_damaged_needs_maintenance") {
         dataToUpdate = {
           status: "maintenance",
           location: "location_maintenance_room",
-          condition: maintenanceNote || "N/A",
-          name: originalName, // Đảm bảo tên được trả về trạng thái gốc
-          maintenanceDate: new Date().toISOString(),
-          isRecalled: false,
-          allocationDetails: null, // Xóa thông tin cấp phát
+          condition: maintenanceNote || "N/A", // Ghi chú hỏng hóc mới
+          allocationDetails: null, // Xóa thông tin người dùng cũ
         };
         toast.success(
           t("toast_moved_to_maintenance", {
+            itemName: itemToRecall.name,
             quantity: 1,
-            itemName: dataToUpdate.name,
-          })
-        );
-      } else {
-        dataToUpdate = {
-          status: "available",
-          location: "location_in_stock",
-          condition: recallReason,
-          name: originalName, // Đảm bảo tên được trả về trạng thái gốc
-          allocationDetails: null, // Xóa thông tin cấp phát
-          isRecalled: true,
-        };
-        toast.success(
-          t("toast_recalled_to_stock", {
-            quantity: 1,
-            itemName: dataToUpdate.name,
           })
         );
       }
+      // Nếu thu hồi vì lý do khác -> trả về kho
+      else {
+        dataToUpdate = {
+          status: "available",
+          location: "location_in_stock",
+          condition: recallReason, // Ghi lại tình trạng khi thu hồi
+          allocationDetails: null, // Xóa thông tin người dùng cũ
+        };
+        toast.success(
+          t("toast_recalled_to_stock", {
+            itemName: itemToRecall.name,
+            quantity: 1,
+          })
+        );
+      }
+
+      // Update item trong Firestore
       await updateDoc(
-        doc(db, "users", currentUser.uid, "equipment", recalledItem.id),
+        doc(db, "users", currentUser.uid, "equipment", itemToRecall.id),
         dataToUpdate
       );
+
+      // Cập nhật state ở local
       setEquipment((prev) =>
         prev.map((item) =>
-          item.id === recalledItem.id ? { ...item, ...dataToUpdate } : item
+          item.id === itemToRecall.id ? { ...item, ...dataToUpdate } : item
         )
       );
+
+      // Ghi lại Lịch sử (Log)
       logTransaction({
         type: "import",
         reason: "recall",
-        itemName: dataToUpdate.name,
-        quantity: 1,
-        details: { returnCondition: recallReason, maintenanceNote },
+        itemName: itemToRecall.name,
+        details: {
+          serialNumber: itemToRecall.serialNumber,
+          returnCondition: recallReason,
+          maintenanceNote,
+        },
       });
     },
     [currentUser, logTransaction, t]
@@ -1081,8 +1094,8 @@ export const useInventory = (currentUser, t) => {
     addLegacyItem,
     updateItem,
     deleteItem,
-    allocateItem,
-    recallItem,
+    allocateItem, // Đảm bảo export hàm mới
+    recallItem, // Đảm bảo export hàm mới
     markAsDamaged,
     updateMaintenanceNote,
     completeRepair,

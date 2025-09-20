@@ -36,11 +36,13 @@
     Class tiện ích để ẩn thanh cuộn.
     Giữ lại từ code gốc của bạn.
   */
-  .hide-scrollbar::-webkit-scrollbar {
+  /* Ẩn thanh cuộn nhưng vẫn cuộn được */
+  .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
-  .hide-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
+
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE & Edge */
     scrollbar-width: none; /* Firefox */
   }
 

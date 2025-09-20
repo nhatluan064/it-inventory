@@ -53,6 +53,7 @@ import RepairNoteModal from "./modals/RepairNoteModal";
 import UserInfoModal from "./modals/UserInfoModal";
 
 const App = () => {
+  const [dashboardScrollPosition, setDashboardScrollPosition] = useState(0);
   // --- UI and Translation States ---
   const [theme, setTheme] = useState(
     () => localStorage.getItem("theme") || "system"
@@ -223,16 +224,6 @@ const App = () => {
       return searchMatch && categoryMatch && departmentMatch && dateMatch;
     });
   }, [inventory.equipment, allocatedFilters]);
-
-  const handleEditItem = (itemOrGroup) => {
-    // Nếu là nhóm (có groupedQuantity > 1), mở modal sửa hàng loạt
-    if (itemOrGroup.groupedQuantity > 1) {
-      modals.openModal("bulkEdit", itemOrGroup);
-    } else {
-      // Nếu là item đơn lẻ, mở modal sửa thông thường
-      modals.openModal("addEdit", itemOrGroup.originalItems[0]);
-    }
-  };
 
   const masterItems = useMemo(() => {
     return inventory.equipment.filter((item) => item.status === "master");
@@ -409,6 +400,8 @@ const App = () => {
             masterListCount={uniqueMasterItemsCount}
             reportsCount={inventory.transactions.length}
             setActiveTab={handleTabClick}
+            scrollPosition={dashboardScrollPosition}
+            setScrollPosition={setDashboardScrollPosition}
           />
         );
       case "masterList":
@@ -467,7 +460,8 @@ const App = () => {
             unfilteredEquipment={inventoryItems}
             filters={inventoryFilters}
             setFilters={setInventoryFilters}
-            onEditItem={handleEditItem} // <-- Sửa lại prop này
+            // --- SỬA LẠI DÒNG NÀY ---
+            onEditItem={(item) => modals.openModal("addEdit", item)}
             onDeleteItem={(item) =>
               modals.openModal("delete", item, { deleteType: "inventory" })
             }
@@ -603,8 +597,9 @@ const App = () => {
             </div>
           </header>
 
-          <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8">
-            <div className="lg:hidden mb-6 -mx-4 -mt-4 sm:-mx-6 sm:-mt-6">
+          <main className="flex-1 flex flex-col gap-6 overflow-hidden p-4 sm:p-6 lg:p-8">
+            {/* Mobile Dashboard View */}
+            <div className="lg:hidden flex-shrink-0 -mx-4 -mt-4 sm:-mx-6 sm:-mt-6">
               <div className="p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                 <DashboardView
                   t={t}
@@ -615,11 +610,14 @@ const App = () => {
                   masterListCount={uniqueMasterItemsCount}
                   reportsCount={inventory.transactions.length}
                   setActiveTab={handleTabClick}
+                  scrollPosition={dashboardScrollPosition}
+                  setScrollPosition={setDashboardScrollPosition}
                 />
               </div>
             </div>
 
-            {renderCurrentView()}
+            {/* Wrapper mới cho View, cho phép nó co giãn và có chiều cao xác định */}
+            <div className="flex-1 overflow-hidden">{renderCurrentView()}</div>
           </main>
         </div>
 

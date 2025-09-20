@@ -120,7 +120,8 @@ export const translations = {
     dept_sales: "Kinh doanh",
     dept_production_management: "Điều hành sản xuất",
     dept_general_affairs: "Tổng vụ",
-
+    dept_qc:"Bộ phận QC",
+    dept_warehouse:"Bộ phận Kho",
     // --- TOAST MESSAGES ---
     toast_price_is_required:
       "Vui lòng nhập giá thành cho tất cả các thiết bị được chọn.",
@@ -314,7 +315,7 @@ export const translations = {
     user_not_use: "Chưa có người dùng",
     no_devices_match_search:
       "Không tìm thấy thiết bị nào khớp với tìm kiếm của bạn.",
-    pending_purchase_list: "Danh sách Yêu cầu Mua",
+    pending_purchase_list: "Danh sách Mua",
     pending_purchase_desc: "Chọn thiết bị, nhập số lượng để mua.",
     add_from_master_list: "Thêm từ danh sách mẫu",
     proceed_to_purchase_count: "Tiến hành Mua ({count})",
@@ -560,7 +561,8 @@ export const translations = {
     dept_sales: "Sales",
     dept_production_management: "Production Management",
     dept_general_affairs: "General Affairs",
-
+    dept_qc:"QC",
+    dept_warehouse:"Warehouse",
     // --- TOAST MESSAGES ---
     toast_price_is_required: "Please enter a price for all selected items.",
     toast_sn_already_exists_in_inventory:
@@ -978,7 +980,8 @@ export const translations = {
     dept_sales: "销售部",
     dept_production_management: "生产管理",
     dept_general_affairs: "总务部",
-
+    dept_warehouse: "仓库部",
+    dept_qc: "质检部",
     // --- TOAST MESSAGES ---
     toast_price_is_required: "请输入所有选定项目的价格。",
     toast_sn_already_exists_in_inventory:
