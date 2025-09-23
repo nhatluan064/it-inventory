@@ -8,7 +8,8 @@ import {
   GoogleAuthProvider,
   signOut,
   sendPasswordResetEmail,
-  updateProfile, // Import updateProfile
+  updateProfile,
+  sendEmailVerification,
 } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 
@@ -16,32 +17,49 @@ export const useAuth = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [authSuccessType, setAuthSuccessType] = useState(null);
+  // CỜ HIỆU MỚI: Báo cho App.js biết đang trong luồng đăng ký
   const [isRegisteringFlow, setIsRegisteringFlow] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
+      // Chỉ cập nhật user nếu không phải đang trong quá trình đăng ký
+      if (!isRegisteringFlow) {
+        setCurrentUser(user);
+      }
       setAuthLoading(false);
     });
     return () => unsubscribe();
-  }, []);
+  }, [isRegisteringFlow]); // Thêm dependency
 
   const login = async (email, password) => {
-    await signInWithEmailAndPassword(auth, email, password);
-    // Let App.js handle state change based on currentUser
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    if (!userCredential.user.emailVerified) {
+      await signOut(auth);
+      throw new Error("EMAIL_NOT_VERIFIED");
+    }
   };
 
   const googleSignIn = async () => {
     await signInWithPopup(auth, new GoogleAuthProvider());
-     // Let App.js handle state change based on currentUser
   };
 
   const signUp = async (email, password) => {
+    // BƯỚC 1: Bật cờ hiệu lên
     setIsRegisteringFlow(true);
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    if (userCredential.user) {
-      setAuthSuccessType('register');
-    }
+
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    await sendEmailVerification(userCredential.user);
+    await signOut(auth);
+
+    setAuthSuccessType("register");
   };
 
   const logout = async () => {
@@ -52,21 +70,18 @@ export const useAuth = () => {
   const passwordReset = (email) => {
     return sendPasswordResetEmail(auth, email);
   };
-  
-  const finishAuthSuccess = async () => {
-      if (authSuccessType === "register") {
-        await signOut(auth); 
-      }
-      setAuthSuccessType(null);
-      setIsRegisteringFlow(false);
+
+  const finishAuthSuccess = () => {
+    setAuthSuccessType(null);
+    // BƯỚC 2: Tắt cờ hiệu khi luồng đăng ký kết thúc
+    setIsRegisteringFlow(false);
+    // Cập nhật lại currentUser thành null để chắc chắn quay về trang login
+    setCurrentUser(null);
   };
 
-  // New function to update user profile
   const setupProfile = async (displayName) => {
     if (auth.currentUser) {
       await updateProfile(auth.currentUser, { displayName });
-      // To get the updated user info immediately, we need to re-fetch it.
-      // Easiest way is to update our state directly.
       setCurrentUser({ ...auth.currentUser, displayName });
     }
   };
@@ -75,12 +90,13 @@ export const useAuth = () => {
     currentUser,
     authLoading,
     authSuccessType,
+    isRegisteringFlow, // Export cờ hiệu ra ngoài
     login,
     googleSignIn,
     signUp,
     logout,
     passwordReset,
     finishAuthSuccess,
-    setupProfile, // Export the new function
+    setupProfile,
   };
 };

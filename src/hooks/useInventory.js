@@ -12,7 +12,8 @@ import {
 } from "firebase/firestore";
 import toast from "react-hot-toast";
 
-export const useInventory = (currentUser, t) => {
+// THAY ĐỔI #1: Thêm `setActiveTab` vào danh sách tham số
+export const useInventory = (currentUser, t, setActiveTab) => {
   const [equipment, setEquipment] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
@@ -22,7 +23,6 @@ export const useInventory = (currentUser, t) => {
       if (!currentUser) return;
       const newTransaction = {
         user: currentUser?.displayName || currentUser?.email || "System",
-        // Luôn sử dụng thời gian thực tại thời điểm log
         timestamp: new Date().toISOString(),
         ...data,
       };
@@ -57,11 +57,11 @@ export const useInventory = (currentUser, t) => {
           "equipment"
         );
         const equipSnapshot = await getDocs(equipColRef);
-        const equipList = equipSnapshot.docs.map((doc) => ({
-          ...doc.data(),
+        const equipData = equipSnapshot.docs.map((doc) => ({
           id: doc.id,
+          ...doc.data(),
         }));
-        setEquipment(equipList);
+        setEquipment(equipData);
 
         const transColRef = collection(
           db,
@@ -70,12 +70,12 @@ export const useInventory = (currentUser, t) => {
           "transactions"
         );
         const transSnapshot = await getDocs(transColRef);
-        const transList = transSnapshot.docs.map((doc) => ({
-          ...doc.data(),
+        const transData = transSnapshot.docs.map((doc) => ({
           id: doc.id,
+          ...doc.data(),
         }));
         setTransactions(
-          transList.sort(
+          transData.sort(
             (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
           )
         );
@@ -87,7 +87,10 @@ export const useInventory = (currentUser, t) => {
           toast.success(t("loading_database_success"));
         }
       } catch (error) {
-        toast.error(t("loading_database_false"));
+        if (currentUser.displayName) {
+          toast.error(t("loading_database_false"));
+        }
+        console.error("Failed to fetch data:", error);
       } finally {
         setDataLoading(false);
       }
@@ -667,13 +670,11 @@ export const useInventory = (currentUser, t) => {
         )
       );
 
-      // SỬA LỖI TIMESTAMP Ở ĐÂY
       await logTransaction({
         type: "export",
         reason: "allocate",
         itemName: targetItem.name,
         details: { ...details, serialNumber: targetItem.serialNumber },
-        // Không dùng handoverDate, logTransaction sẽ tự lấy giờ hiện tại
       });
 
       toast.success(
@@ -736,8 +737,8 @@ export const useInventory = (currentUser, t) => {
         location: "location_maintenance_room",
         condition: note || t("recalled_from_user"),
         maintenanceDate: new Date().toISOString(),
-        allocationDetails: null, // Clear allocation details
-        recalledFrom: item.allocationDetails?.recipientName || "N/A", // Keep track of user
+        allocationDetails: null,
+        recalledFrom: item.allocationDetails?.recipientName || "N/A",
       };
       await updateDoc(
         doc(db, "users", currentUser.uid, "equipment", item.id),
@@ -797,7 +798,7 @@ export const useInventory = (currentUser, t) => {
         status: "available",
         location: "location_in_stock",
         condition,
-        recalledFrom: null, // Clear the recalledFrom field
+        recalledFrom: null,
       };
       await updateDoc(
         doc(db, "users", currentUser.uid, "equipment", item.id),
@@ -929,6 +930,8 @@ export const useInventory = (currentUser, t) => {
           await batch.commit();
           await fetchData();
           toast.success(t("toast_data_restored_successfully"));
+          // THAY ĐỔI #2: Gọi setActiveTab sau khi import thành công
+          if (setActiveTab) setActiveTab("home");
         } catch (error) {
           console.error("Error reading or importing backup file: ", error);
           toast.error(t("toast_error_reading_backup_file"));
@@ -936,7 +939,8 @@ export const useInventory = (currentUser, t) => {
       };
       reader.readAsText(file);
     },
-    [currentUser, fetchData, t]
+    // THAY ĐỔI #3: Thêm setActiveTab vào dependency array
+    [currentUser, fetchData, t, setActiveTab]
   );
 
   const resetData = useCallback(async () => {
@@ -1035,6 +1039,6 @@ export const useInventory = (currentUser, t) => {
     importData,
     resetData,
     batchUpdateItems,
-    deleteLogs, // Thêm hàm vào return
+    deleteLogs,
   };
 };

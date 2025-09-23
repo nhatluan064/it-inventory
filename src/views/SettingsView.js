@@ -107,9 +107,9 @@ const SettingsView = ({
         <div className="space-y-4">
           {/* Import Data */}
           <div>
-            <p className="font-medium text-gray-800 dark:text-gray-200">
+            {/* <p className="font-medium text-gray-800 dark:text-gray-200">
               {t("import_data")}
-            </p>
+            </p> */}
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
               {t("confirm_override_data")}
             </p>

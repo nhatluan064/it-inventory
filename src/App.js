@@ -109,6 +109,7 @@ const App = () => {
     currentUser,
     authLoading,
     authSuccessType,
+    isRegisteringFlow, // <<< LẤY STATE MỚI
     login,
     googleSignIn,
     signUp,
@@ -117,7 +118,7 @@ const App = () => {
     finishAuthSuccess,
     setupProfile,
   } = useAuth();
-  const inventory = useInventory(currentUser, t);
+  const inventory = useInventory(currentUser, t, setActiveTab);
   const modals = useModals();
 
   const categories = useMemo(
@@ -325,15 +326,39 @@ const App = () => {
     [theme, language, t]
   );
 
-  if (authLoading) {
-    return (
+  const renderLoadingScreen = () => (
+    <div className="flex h-screen w-screen items-center justify-center">
       <div className="flex space-x-2">
         <div className="w-3 h-3 bg-gray-500 rounded-full animate-dot1"></div>
         <div className="w-3 h-3 bg-gray-500 rounded-full animate-dot2"></div>
         <div className="w-3 h-3 bg-gray-500 rounded-full animate-dot3"></div>
       </div>
+    </div>
+  );
+
+  // =================================================================
+  //                       LOGIC RENDER MỚI (ĐÃ SỬA LỖI)
+  // =================================================================
+
+  // Ưu tiên 1: Hiển thị trang thông báo nếu đăng ký thành công
+  if (authSuccessType) {
+    return (
+      <AppContext.Provider value={appContextValue}>
+        <AuthSuccessPopup
+          type={authSuccessType}
+          t={t}
+          onFinished={finishAuthSuccess}
+        />
+      </AppContext.Provider>
     );
   }
+
+  // Ưu tiên 2: Hiển thị màn hình chờ nếu đang loading auth hoặc trong luồng đăng ký
+  if (authLoading || isRegisteringFlow) {
+    return renderLoadingScreen();
+  }
+
+  // Ưu tiên 3: Nếu không có user, hiển thị trang đăng nhập
   if (!currentUser) {
     return (
       <AppContext.Provider value={appContextValue}>
@@ -348,17 +373,8 @@ const App = () => {
       </AppContext.Provider>
     );
   }
-  if (authSuccessType) {
-    return (
-      <AppContext.Provider value={appContextValue}>
-        <AuthSuccessPopup
-          type={authSuccessType}
-          t={t}
-          onFinished={finishAuthSuccess}
-        />
-      </AppContext.Provider>
-    );
-  }
+
+  // Ưu tiên 4: Nếu có user nhưng chưa có tên, hiển thị trang nhập thông tin
   if (currentUser && !currentUser.displayName) {
     return (
       <AppContext.Provider value={appContextValue}>
@@ -372,15 +388,14 @@ const App = () => {
     );
   }
 
+  // Ưu tiên 5: Nếu đang tải dữ liệu kho, hiển thị màn hình chờ
   if (inventory.dataLoading) {
-    return (
-      <div className="flex space-x-2">
-        <div className="w-3 h-3 bg-gray-500 rounded-full animate-dot1"></div>
-        <div className="w-3 h-3 bg-gray-500 rounded-full animate-dot2"></div>
-        <div className="w-3 h-3 bg-gray-500 rounded-full animate-dot3"></div>
-      </div>
-    );
+    return renderLoadingScreen();
   }
+
+  // =================================================================
+  //                       PHẦN RENDER GIAO DIỆN CHÍNH
+  // =================================================================
 
   const handleConfirmDelete = () => {
     const { deleteType, currentItem, closeModal } = modals;
