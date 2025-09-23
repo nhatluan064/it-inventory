@@ -1,7 +1,6 @@
-// src/modals/AddEditModal.js
 import React, { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
-// Định nghĩa một state mặc định để tránh lỗi null
 const defaultFormState = {
   name: "",
   category: "pc",
@@ -11,6 +10,17 @@ const defaultFormState = {
   quantity: 1,
   price: 0,
   serialNumber: "",
+  importDate: new Date().toISOString(),
+  handoverDate: null,
+};
+
+const toInputDate = (isoString) => {
+  if (!isoString) return "";
+  try {
+    return new Date(isoString).toISOString().slice(0, 10);
+  } catch (e) {
+    return "";
+  }
 };
 
 const AddEditModal = ({
@@ -25,10 +35,25 @@ const AddEditModal = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isEditing = initialData != null;
+  const isInUse = isEditing && initialData.status === "in-use";
 
   useEffect(() => {
     if (show) {
-      setFormData(isEditing ? initialData : defaultFormState);
+      if (isEditing) {
+        const formattedData = {
+          ...initialData,
+          importDate: toInputDate(initialData.importDate),
+          handoverDate: toInputDate(
+            initialData.allocationDetails?.handoverDate
+          ),
+        };
+        setFormData(formattedData);
+      } else {
+        setFormData({
+          ...defaultFormState,
+          importDate: toInputDate(new Date().toISOString()),
+        });
+      }
     }
   }, [initialData, show, isEditing]);
 
@@ -45,23 +70,28 @@ const AddEditModal = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true); // Nút chuyển sang trạng thái "..."
-
+    setIsSubmitting(true);
     try {
-      // Thử thực hiện hành động onSubmit (tức là hàm addLegacyItem)
-      const success = await onSubmit(formData);
+      let dataToSubmit = { ...formData };
+      dataToSubmit.importDate = new Date(dataToSubmit.importDate).toISOString();
 
-      // Nếu thành công (hàm trả về true), đóng modal
+      if (isInUse && dataToSubmit.handoverDate) {
+        dataToSubmit.allocationDetails = {
+          ...initialData.allocationDetails,
+          handoverDate: new Date(dataToSubmit.handoverDate).toISOString(),
+        };
+      }
+      delete dataToSubmit.handoverDate;
+
+      const success = await onSubmit(dataToSubmit);
       if (success) {
         onClose();
       }
     } catch (error) {
-      // Nếu có lỗi xảy ra, thông báo cho người dùng
-      console.error("Failed to add legacy item:", error);
-      alert(t("error_occurred"));
+      console.error("Failed to submit item:", error);
+      toast.error(t("error_occurred"));
     } finally {
-      // Dù thành công hay thất bại, khối này LUÔN LUÔN được chạy
-      setIsSubmitting(false); // Kích hoạt lại nút bấm
+      setIsSubmitting(false);
     }
   };
 
@@ -76,32 +106,48 @@ const AddEditModal = ({
             : t("import_unlisted_device")}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t("device_name")}
-            </label>
-            {/* *** THAY ĐỔI CHÍNH Ở ĐÂY *** */}
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-700/50 disabled:cursor-not-allowed"
-              required
-              disabled={isEditing}
-            />
+          {/* Tên Thiết bị và Ngày Nhập kho */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t("device_name")}
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="mt-1 block w-full border rounded-md shadow-sm p-2 dark:bg-gray-700 dark:border-gray-600"
+                required
+                disabled={isEditing}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t("import_date")}
+              </label>
+              <input
+                type="date"
+                name="importDate"
+                value={formData.importDate}
+                onChange={handleChange}
+                className="mt-1 block w-full border rounded-md shadow-sm p-2 dark:bg-gray-700 dark:border-gray-600"
+                required
+              />
+            </div>
           </div>
+
+          {/* Danh mục và Trạng thái */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t("category")}
               </label>
-              {/* *** THAY ĐỔI CHÍNH Ở ĐÂY *** */}
               <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 disabled:bg-gray-100 dark:disabled:bg-gray-700/50 disabled:cursor-not-allowed"
+                className="mt-1 block w-full border rounded-md shadow-sm p-2 dark:bg-gray-700 dark:border-gray-600"
                 required
               >
                 {categoryOptions.map((cat) => (
@@ -119,27 +165,33 @@ const AddEditModal = ({
                 name="status"
                 value={formData.status}
                 disabled
-                className={`mt-1 block w-full border rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-200 bg-gray-100 dark:bg-gray-700/50`}
+                className="mt-1 block w-full border rounded-md shadow-sm p-2 bg-gray-100 dark:bg-gray-700/50 dark:border-gray-600"
               >
                 <option value="available">{t("available")}</option>
+                <option value="in-use">{t("in_use")}</option>
               </select>
             </div>
           </div>
 
-          {!isEditing && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t("condition")}
-              </label>
-              <input
-                type="text"
-                value={t(formData.condition)}
-                className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-gray-100 dark:bg-gray-700/50 text-gray-900 dark:text-gray-200"
-                disabled
-              />
+          {/* Ngày bàn giao */}
+          {isInUse && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t("handover_date")}
+                </label>
+                <input
+                  type="date"
+                  name="handoverDate"
+                  value={formData.handoverDate || ""}
+                  onChange={handleChange}
+                  className="mt-1 block w-full border rounded-md shadow-sm p-2 dark:bg-gray-700 dark:border-gray-600"
+                />
+              </div>
             </div>
           )}
 
+          {/* Số lượng và Giá thành */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -151,11 +203,7 @@ const AddEditModal = ({
                 value={formData.quantity}
                 onChange={handleChange}
                 min="0"
-                className={`mt-1 block w-full border rounded-md shadow-sm py-2 px-3 text-gray-900 dark:text-gray-200 focus:ring-blue-500 ${
-                  isEditing
-                    ? "bg-gray-100 dark:bg-gray-700/50"
-                    : "bg-white dark:bg-gray-700"
-                }`}
+                className="mt-1 block w-full border rounded-md shadow-sm p-2 bg-gray-100 dark:bg-gray-700/50 dark:border-gray-600"
                 required
                 disabled={isEditing}
               />
@@ -170,34 +218,24 @@ const AddEditModal = ({
                 value={formData.price}
                 onChange={handleChange}
                 min="0"
-                className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200"
+                className="mt-1 block w-full border rounded-md shadow-sm p-2 dark:bg-gray-700 dark:border-gray-600"
               />
             </div>
           </div>
 
+          {/* Số Serial */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {t("serial_number_sn")}
             </label>
-            {isEditing ? (
-              <input
-                type="text"
-                name="serialNumber"
-                value={formData.serialNumber}
-                onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-blue-500"
-                required
-              />
-            ) : (
-              <textarea
-                name="serialNumber"
-                value={formData.serialNumber}
-                onChange={handleChange}
-                placeholder={t("add_multiple_sn_placeholder")}
-                className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-blue-500"
-                rows="3"
-              />
-            )}
+            <input
+              type="text"
+              name="serialNumber"
+              value={formData.serialNumber}
+              onChange={handleChange}
+              className="mt-1 block w-full border rounded-md shadow-sm p-2 dark:bg-gray-700 dark:border-gray-600"
+              required
+            />
           </div>
 
           <div className="flex justify-end space-x-3 pt-6">

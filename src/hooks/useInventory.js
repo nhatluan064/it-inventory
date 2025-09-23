@@ -22,6 +22,7 @@ export const useInventory = (currentUser, t) => {
       if (!currentUser) return;
       const newTransaction = {
         user: currentUser?.displayName || currentUser?.email || "System",
+        // Luôn sử dụng thời gian thực tại thời điểm log
         timestamp: new Date().toISOString(),
         ...data,
       };
@@ -101,11 +102,31 @@ export const useInventory = (currentUser, t) => {
     fetchData();
   }, [fetchData]);
 
+  const deleteLogs = useCallback(async () => {
+    if (!currentUser) return;
+    try {
+      const batch = writeBatch(db);
+      const transColRef = collection(
+        db,
+        "users",
+        currentUser.uid,
+        "transactions"
+      );
+      const transSnapshot = await getDocs(transColRef);
+      transSnapshot.forEach((doc) => batch.delete(doc.ref));
+      await batch.commit();
+      setTransactions([]);
+      toast.success(t("toast_logs_deleted_successfully"));
+    } catch (error) {
+      console.error("Error deleting logs: ", error);
+      toast.error(t("toast_error_deleting_logs"));
+    }
+  }, [currentUser, t]);
+
   // --- Master List Functions ---
   const addEquipmentType = useCallback(
     async (typeData) => {
       if (!currentUser) return;
-      // Sửa logic kiểm tra trùng lặp: check cả name và category
       const existing = equipment.some(
         (item) =>
           item.name.toLowerCase() === typeData.name.toLowerCase() &&
@@ -130,7 +151,7 @@ export const useInventory = (currentUser, t) => {
         newItem
       );
       setEquipment((prev) => [...prev, { ...newItem, id: docRef.id }]);
-      logTransaction({
+      await logTransaction({
         type: "master-list",
         reason: "add",
         itemName: newItem.name,
@@ -142,50 +163,8 @@ export const useInventory = (currentUser, t) => {
     [currentUser, equipment, t, logTransaction]
   );
 
-  const updateMasterName = useCallback(
-    async (itemToUpdate) => {
-      if (!itemToUpdate || !itemToUpdate.originalName) {
-        console.error(
-          "updateMasterName called with invalid data",
-          itemToUpdate
-        );
-        return;
-      }
-      const batch = writeBatch(db);
-      const updatedItemsState = equipment.map((item) => {
-        if (item.name.startsWith(itemToUpdate.originalName)) {
-          const newName = item.name.replace(
-            itemToUpdate.originalName,
-            itemToUpdate.name
-          );
-          const docRef = doc(
-            db,
-            "users",
-            currentUser.uid,
-            "equipment",
-            item.id
-          );
-          batch.update(docRef, { name: newName });
-          return { ...item, name: newName };
-        }
-        return item;
-      });
-
-      try {
-        await batch.commit();
-        setEquipment(updatedItemsState);
-        toast.success(t("toast_model_name_updated_successfully"));
-      } catch (error) {
-        console.error("Error updating master name: ", error);
-        toast.error("Lỗi khi cập nhật tên mẫu.");
-      }
-    },
-    [currentUser, equipment, t]
-  );
-
   const deleteMasterItem = useCallback(
     async (itemToDelete) => {
-      // Logic kiểm tra xem mẫu này có đang được sử dụng trong kho không
       const isModelInUse = equipment.some((e) => {
         const baseItemName = e.name.split(" (User:")[0].trim();
         return (
@@ -197,31 +176,23 @@ export const useInventory = (currentUser, t) => {
       });
 
       if (isModelInUse) {
-        // *** LOGIC MỚI: KIỂM TRA NẾU ĐÂY LÀ MỘT BẢN GHI BỊ TRÙNG LẶP ***
-        // Đếm xem có bao nhiêu Mẫu trùng khớp cả tên và danh mục
         const duplicateMasters = equipment.filter(
           (e) =>
             e.status === "master" &&
             e.name === itemToDelete.name &&
             e.category === itemToDelete.category
         );
-
-        // Nếu có nhiều hơn 1 Mẫu như vậy, tức là đang có Mẫu bị trùng lặp
-        // Trong trường hợp này, chúng ta cho phép xóa để dọn dẹp dữ liệu
         if (duplicateMasters.length <= 1) {
           toast.error(
             t("toast_cannot_delete_model_in_use", {
               itemName: itemToDelete.name,
             })
           );
-          return; // Dừng lại nếu Mẫu là duy nhất và đang được sử dụng
+          return;
         }
-        // Nếu có bản trùng lặp, code sẽ tiếp tục chạy xuống dưới để thực hiện xóa
       }
 
       const batch = writeBatch(db);
-
-      // Chỉ xóa MỘT bản ghi được click, không xóa các bản ghi khác
       const docRef = doc(
         db,
         "users",
@@ -230,27 +201,29 @@ export const useInventory = (currentUser, t) => {
         itemToDelete.id
       );
       batch.delete(docRef);
-
       await batch.commit();
 
-      // Cập nhật lại giao diện bằng cách lọc ra item đã bị xóa
       setEquipment((prevEquipment) =>
         prevEquipment.filter((item) => item.id !== itemToDelete.id)
       );
-
+      await logTransaction({
+        type: "inventory",
+        reason: "delete",
+        itemName: itemToDelete.name,
+        details: { from: "Master List" },
+      });
       toast.success(
         t("toast_model_deleted_successfully", { itemName: itemToDelete.name })
       );
     },
-    [currentUser, equipment, t]
+    [currentUser, equipment, t, logTransaction]
   );
 
   const updateMasterItem = useCallback(
     async (itemData) => {
-      // *** LOGIC KIỂM TRA TRÙNG LẶP KHI SỬA ***
       const isDuplicate = equipment.some(
         (e) =>
-          e.id !== itemData.id && // Phải đảm bảo nó không so sánh với chính nó
+          e.id !== itemData.id &&
           e.name.toLowerCase() === itemData.name.toLowerCase() &&
           e.category === itemData.category &&
           e.status === "master"
@@ -262,9 +235,8 @@ export const useInventory = (currentUser, t) => {
             itemData.category
           )}' đã tồn tại.`
         );
-        return false; // Dừng việc cập nhật
+        return false;
       }
-      // *** KẾT THÚC LOGIC KIỂM TRA ***
 
       const docRef = doc(
         db,
@@ -287,7 +259,7 @@ export const useInventory = (currentUser, t) => {
         )
       );
 
-      logTransaction({
+      await logTransaction({
         type: "inventory",
         reason: "update",
         itemName: itemData.name,
@@ -328,7 +300,7 @@ export const useInventory = (currentUser, t) => {
         newItem
       );
       setEquipment((prev) => [...prev, { ...newItem, id: docRef.id }]);
-      logTransaction({
+      await logTransaction({
         type: "procurement",
         reason: "request",
         itemName: newItem.name,
@@ -343,9 +315,11 @@ export const useInventory = (currentUser, t) => {
 
   const startPurchasing = useCallback(
     async (itemsToPurchase) => {
+      if (!currentUser) return;
       const batch = writeBatch(db);
-      let localEquipment = [...equipment];
-      itemsToPurchase.forEach((itemData) => {
+      const updatedEquipment = [...equipment];
+
+      for (const itemData of itemsToPurchase) {
         const docRef = doc(
           db,
           "users",
@@ -359,18 +333,22 @@ export const useInventory = (currentUser, t) => {
           price: parseFloat(itemData.price),
         };
         batch.update(docRef, payload);
-        logTransaction({
+
+        const index = updatedEquipment.findIndex((e) => e.id === itemData.id);
+        if (index !== -1) {
+          updatedEquipment[index] = { ...updatedEquipment[index], ...payload };
+        }
+
+        await logTransaction({
           type: "procurement",
           reason: "purchasing",
-          itemName: equipment.find((e) => e.id === itemData.id).name,
+          itemName: updatedEquipment[index].name,
           quantity: itemData.quantity,
         });
-        const index = localEquipment.findIndex((e) => e.id === itemData.id);
-        if (index > -1)
-          localEquipment[index] = { ...localEquipment[index], ...payload };
-      });
+      }
+
       await batch.commit();
-      setEquipment(localEquipment);
+      setEquipment(updatedEquipment);
       toast.success(t("toast_moved_to_purchasing_list"));
     },
     [currentUser, equipment, logTransaction, t]
@@ -380,17 +358,17 @@ export const useInventory = (currentUser, t) => {
     async (ids) => {
       const batch = writeBatch(db);
       let localEquipment = [...equipment];
-      ids.forEach((id) => {
+      for (const id of ids) {
         const docRef = doc(db, "users", currentUser.uid, "equipment", id);
         batch.update(docRef, { status: "purchased" });
-        logTransaction({
+        await logTransaction({
           type: "procurement",
           reason: "purchased",
           itemName: equipment.find((e) => e.id === id).name,
         });
         const index = localEquipment.findIndex((e) => e.id === id);
         if (index > -1) localEquipment[index].status = "purchased";
-      });
+      }
       await batch.commit();
       setEquipment(localEquipment);
       toast.success(t("toast_purchase_confirmed_successfully"));
@@ -399,12 +377,10 @@ export const useInventory = (currentUser, t) => {
   );
 
   const cancelOrRevertPurchase = useCallback(
-    async (item) => { // <<< SỬA Ở ĐÂY: CHỈ CÒN LẠI "item"
-      // Logic hoàn tác (revert-purchasing) đã được xóa
-      // Giờ hàm này chỉ còn chức năng xóa yêu cầu mua
+    async (item) => {
       await deleteDoc(doc(db, "users", currentUser.uid, "equipment", item.id));
       setEquipment(equipment.filter((e) => e.id !== item.id));
-      logTransaction({
+      await logTransaction({
         type: "procurement",
         reason: "deleted",
         itemName: item.name,
@@ -418,7 +394,7 @@ export const useInventory = (currentUser, t) => {
     async (item, note) => {
       await deleteDoc(doc(db, "users", currentUser.uid, "equipment", item.id));
       setEquipment(equipment.filter((e) => e.id !== item.id));
-      logTransaction({
+      await logTransaction({
         type: "procurement",
         reason: "cancelled",
         itemName: item.name,
@@ -475,7 +451,7 @@ export const useInventory = (currentUser, t) => {
         ...prev.filter((e) => e.id !== item.id),
         ...newItems,
       ]);
-      logTransaction({
+      await logTransaction({
         type: "import",
         reason: "purchase",
         itemName: item.name,
@@ -508,14 +484,11 @@ export const useInventory = (currentUser, t) => {
         return false;
       }
 
-      // --- BƯỚC KIỂM TRA MỚI ---
-      // Kiểm tra xem có SN nào bị trùng lặp ngay trong ô nhập liệu không
       const uniqueSerials = new Set(serials.map((s) => s.toLowerCase()));
       if (uniqueSerials.size !== serials.length) {
         toast.error(t("toast_duplicate_sn_error"));
         return false;
       }
-      // --- KẾT THÚC BƯỚC KIỂM TRA MỚI ---
 
       const existingSNs = equipment
         .map((e) => e.serialNumber?.toLowerCase())
@@ -529,7 +502,6 @@ export const useInventory = (currentUser, t) => {
         return false;
       }
 
-      // ... (phần code lưu vào database giữ nguyên)
       const batch = writeBatch(db);
       const newItems = [];
       const importDate = new Date().toISOString();
@@ -554,7 +526,7 @@ export const useInventory = (currentUser, t) => {
           collection(db, "users", currentUser.uid, "equipment")
         );
         batch.set(newMasterDocRef, newMasterItem);
-        logTransaction({
+        await logTransaction({
           type: "master-list",
           reason: "add-legacy",
           itemName: data.name,
@@ -583,7 +555,7 @@ export const useInventory = (currentUser, t) => {
       await batch.commit();
       await fetchData();
 
-      logTransaction({
+      await logTransaction({
         type: "import",
         reason: "legacy",
         itemName: data.name,
@@ -598,17 +570,12 @@ export const useInventory = (currentUser, t) => {
 
   const updateItem = useCallback(
     async (data) => {
-      // Tìm item gốc trong state hiện tại để so sánh sự thay đổi
       const originalItem = equipment.find((e) => e.id === data.id);
       if (!originalItem) {
         toast.error("Không tìm thấy thiết bị để cập nhật.");
         return false;
       }
-
-      // --- LOGIC MỚI: TỰ ĐỘNG TẠO MẪU KHI SỬA DANH MỤC ---
-      // KIỂM TRA NẾU DANH MỤC BỊ THAY ĐỔI
       if (originalItem.category !== data.category) {
-        // Kiểm tra xem Mẫu mới (Tên + Danh mục mới) đã tồn tại trong Danh sách Mẫu chưa
         const masterExists = equipment.some(
           (e) =>
             e.status === "master" &&
@@ -616,7 +583,6 @@ export const useInventory = (currentUser, t) => {
             e.category === data.category
         );
 
-        // Nếu Mẫu mới CHƯA tồn tại, tự động tạo Mẫu mới
         if (!masterExists) {
           const newMasterItem = {
             name: data.name,
@@ -626,15 +592,14 @@ export const useInventory = (currentUser, t) => {
             quantity: 0,
             price: 0,
           };
-          // Thêm Mẫu mới vào Firestore
           await addDoc(
             collection(db, "users", currentUser.uid, "equipment"),
             newMasterItem
           );
 
-          logTransaction({
+          await logTransaction({
             type: "master-list",
-            reason: "add-auto", // Lý do mới để phân biệt
+            reason: "add-auto",
             itemName: data.name,
             details: { category: data.category, autoCreated: true },
           });
@@ -643,16 +608,12 @@ export const useInventory = (currentUser, t) => {
           );
         }
       }
-      // --- KẾT THÚC LOGIC MỚI ---
 
-      // Tiến hành cập nhật thông tin cho item trong kho như bình thường
       const docRef = doc(db, "users", currentUser.uid, "equipment", data.id);
       await updateDoc(docRef, data);
-
-      // Tải lại toàn bộ dữ liệu để đồng bộ state (bao gồm cả Mẫu mới nếu có)
       await fetchData();
 
-      logTransaction({
+      await logTransaction({
         type: "inventory",
         reason: "update",
         itemName: data.name,
@@ -661,14 +622,14 @@ export const useInventory = (currentUser, t) => {
       toast.success(t("toast_info_updated_successfully"));
       return true;
     },
-    [currentUser, equipment, logTransaction, t, fetchData] // Thêm fetchData vào dependency
+    [currentUser, equipment, logTransaction, t, fetchData]
   );
 
   const deleteItem = useCallback(
     async (item) => {
       await deleteDoc(doc(db, "users", currentUser.uid, "equipment", item.id));
       setEquipment(equipment.filter((e) => e.id !== item.id));
-      logTransaction({
+      await logTransaction({
         type: "inventory",
         reason: "delete",
         itemName: item.name,
@@ -689,33 +650,30 @@ export const useInventory = (currentUser, t) => {
         return;
       }
 
-      // Dữ liệu để cập nhật TRỰC TIẾP trên item gốc
       const dataToUpdate = {
         status: "in-use",
         location: details.department,
-        allocationDetails: { ...details }, // Lưu thông tin người nhận
+        allocationDetails: { ...details },
       };
 
-      // Update item trong Firestore
       await updateDoc(
         doc(db, "users", currentUser.uid, "equipment", targetItem.id),
         dataToUpdate
       );
 
-      // Cập nhật state ở local
       setEquipment((prev) =>
         prev.map((item) =>
           item.id === targetItem.id ? { ...item, ...dataToUpdate } : item
         )
       );
 
-      // Ghi lại Lịch sử (Log)
-      logTransaction({
+      // SỬA LỖI TIMESTAMP Ở ĐÂY
+      await logTransaction({
         type: "export",
         reason: "allocate",
         itemName: targetItem.name,
         details: { ...details, serialNumber: targetItem.serialNumber },
-        timestamp: details.handoverDate,
+        // Không dùng handoverDate, logTransaction sẽ tự lấy giờ hiện tại
       });
 
       toast.success(
@@ -730,64 +688,42 @@ export const useInventory = (currentUser, t) => {
 
   const recallItem = useCallback(
     async (recalledItemData) => {
-      const { itemToRecall, recallReason, maintenanceNote } = recalledItemData;
-      let dataToUpdate;
+      const { itemToRecall, recallReason } = recalledItemData;
+      const dataToUpdate = {
+        status: "available",
+        location: "location_in_stock",
+        condition: { key: recallReason },
+        allocationDetails: null,
+      };
 
-      // Nếu thu hồi do hư hỏng -> chuyển sang Bảo trì
-      if (recallReason === "condition_damaged_needs_maintenance") {
-        dataToUpdate = {
-          status: "maintenance",
-          location: "location_maintenance_room",
-          condition: maintenanceNote || "N/A", // Ghi chú hỏng hóc mới
-          allocationDetails: null, // Xóa thông tin người dùng cũ
-        };
-        toast.success(
-          t("toast_moved_to_maintenance", {
-            itemName: itemToRecall.name,
-            quantity: 1,
-          })
-        );
-      }
-      // Nếu thu hồi vì lý do khác -> trả về kho
-      else {
-        dataToUpdate = {
-          status: "available",
-          location: "location_in_stock",
-          condition: recallReason, // Ghi lại tình trạng khi thu hồi
-          allocationDetails: null, // Xóa thông tin người dùng cũ
-        };
-        toast.success(
-          t("toast_recalled_to_stock", {
-            itemName: itemToRecall.name,
-            quantity: 1,
-          })
-        );
-      }
-
-      // Update item trong Firestore
       await updateDoc(
         doc(db, "users", currentUser.uid, "equipment", itemToRecall.id),
         dataToUpdate
       );
 
-      // Cập nhật state ở local
       setEquipment((prev) =>
         prev.map((item) =>
           item.id === itemToRecall.id ? { ...item, ...dataToUpdate } : item
         )
       );
 
-      // Ghi lại Lịch sử (Log)
-      logTransaction({
+      await logTransaction({
         type: "import",
         reason: "recall",
         itemName: itemToRecall.name,
         details: {
           serialNumber: itemToRecall.serialNumber,
+          recalledFrom: itemToRecall.allocationDetails?.recipientName,
           returnCondition: recallReason,
-          maintenanceNote,
         },
       });
+
+      toast.success(
+        t("toast_recalled_to_stock", {
+          itemName: itemToRecall.name,
+          quantity: 1,
+        })
+      );
     },
     [currentUser, logTransaction, t]
   );
@@ -799,10 +735,9 @@ export const useInventory = (currentUser, t) => {
         status: "maintenance",
         location: "location_maintenance_room",
         condition: note || t("recalled_from_user"),
-        name: item.name.split(" (User:")[0],
         maintenanceDate: new Date().toISOString(),
-        isRecalled: false,
-        allocationDetails: null,
+        allocationDetails: null, // Clear allocation details
+        recalledFrom: item.allocationDetails?.recipientName || "N/A", // Keep track of user
       };
       await updateDoc(
         doc(db, "users", currentUser.uid, "equipment", item.id),
@@ -811,21 +746,24 @@ export const useInventory = (currentUser, t) => {
       setEquipment((prev) =>
         prev.map((eq) => (eq.id === item.id ? { ...eq, ...dataToUpdate } : eq))
       );
-      logTransaction({
+      await logTransaction({
         type: "inventory",
         reason: "update-note",
-        itemName: dataToUpdate.name,
+        itemName: item.name,
         quantity: 1,
-        details: { note: dataToUpdate.condition },
+        details: {
+          note: dataToUpdate.condition,
+          recalledFrom: dataToUpdate.recalledFrom,
+        },
       });
       toast.success(
         t("toast_moved_to_maintenance", {
           quantity: 1,
-          itemName: dataToUpdate.name,
+          itemName: item.name,
         })
       );
     },
-    [currentUser, logTransaction, t]
+    [currentUser, logTransaction, t, equipment]
   );
 
   const updateMaintenanceNote = useCallback(
@@ -838,7 +776,7 @@ export const useInventory = (currentUser, t) => {
           e.id === item.id ? { ...e, condition: newNote } : e
         )
       );
-      logTransaction({
+      await logTransaction({
         type: "inventory",
         reason: "update-note",
         itemName: item.name,
@@ -855,24 +793,20 @@ export const useInventory = (currentUser, t) => {
         key: "condition_repaired",
         params: { note: { value: noteValue, isKey: isNoteKey } },
       };
-      await updateDoc(doc(db, "users", currentUser.uid, "equipment", item.id), {
+      const dataToUpdate = {
         status: "available",
         location: "location_in_stock",
         condition,
-      });
-      setEquipment(
-        equipment.map((e) =>
-          e.id === item.id
-            ? {
-                ...e,
-                status: "available",
-                location: "location_in_stock",
-                condition,
-              }
-            : e
-        )
+        recalledFrom: null, // Clear the recalledFrom field
+      };
+      await updateDoc(
+        doc(db, "users", currentUser.uid, "equipment", item.id),
+        dataToUpdate
       );
-      logTransaction({
+      setEquipment(
+        equipment.map((e) => (e.id === item.id ? { ...e, ...dataToUpdate } : e))
+      );
+      await logTransaction({
         type: "inventory",
         reason: "repair-complete",
         itemName: item.name,
@@ -885,25 +819,25 @@ export const useInventory = (currentUser, t) => {
 
   const markUnrepairable = useCallback(
     async (item) => {
-      await updateDoc(doc(db, "users", currentUser.uid, "equipment", item.id), {
+      const dataToUpdate = {
         status: "liquidation",
         location: "location_liquidation_stock",
-      });
-      setEquipment(
-        equipment.map((e) =>
-          e.id === item.id
-            ? {
-                ...e,
-                status: "liquidation",
-                location: "location_liquidation_stock",
-              }
-            : e
-        )
+      };
+      await updateDoc(
+        doc(db, "users", currentUser.uid, "equipment", item.id),
+        dataToUpdate
       );
-      logTransaction({
+      setEquipment(
+        equipment.map((e) => (e.id === item.id ? { ...e, ...dataToUpdate } : e))
+      );
+      await logTransaction({
         type: "inventory",
         reason: "unrepairable",
         itemName: item.name,
+        details: {
+          recalledFrom:
+            item.recalledFrom || item.allocationDetails?.recipientName,
+        },
       });
       toast.success(t("toast_moved_to_liquidation", { itemName: item.name }));
     },
@@ -914,10 +848,11 @@ export const useInventory = (currentUser, t) => {
     async (item) => {
       await deleteDoc(doc(db, "users", currentUser.uid, "equipment", item.id));
       setEquipment(equipment.filter((e) => e.id !== item.id));
-      logTransaction({
+      await logTransaction({
         type: "inventory",
         reason: "liquidated",
         itemName: item.name,
+        details: { recalledFrom: item.recalledFrom },
       });
       toast.success(
         t("toast_item_liquidated_successfully", { itemName: item.name })
@@ -1038,18 +973,15 @@ export const useInventory = (currentUser, t) => {
       group.originalItems.forEach((item, index) => {
         const updatedData = {};
 
-        // Kiểm tra xem danh mục có thay đổi không
         if (item.category !== formData.category) {
           updatedData.category = formData.category;
         }
 
-        // Kiểm tra xem SN có thay đổi không
         const newSn = formData.serialNumbers[index];
         if (item.serialNumber !== newSn) {
           updatedData.serialNumber = newSn;
         }
 
-        // Nếu có bất kỳ thay đổi nào, thêm vào batch
         if (Object.keys(updatedData).length > 0) {
           const docRef = doc(
             db,
@@ -1064,7 +996,7 @@ export const useInventory = (currentUser, t) => {
 
       try {
         await batch.commit();
-        await fetchData(); // Tải lại dữ liệu mới
+        await fetchData();
         toast.success(t("toast_info_updated_successfully"));
         return true;
       } catch (error) {
@@ -1077,12 +1009,10 @@ export const useInventory = (currentUser, t) => {
   );
 
   return {
-    batchUpdateItems,
     equipment,
     transactions,
     dataLoading,
     addEquipmentType,
-    updateMasterName,
     deleteMasterItem,
     updateMasterItem,
     requestFromMaster,
@@ -1094,8 +1024,8 @@ export const useInventory = (currentUser, t) => {
     addLegacyItem,
     updateItem,
     deleteItem,
-    allocateItem, // Đảm bảo export hàm mới
-    recallItem, // Đảm bảo export hàm mới
+    allocateItem,
+    recallItem,
     markAsDamaged,
     updateMaintenanceNote,
     completeRepair,
@@ -1104,5 +1034,7 @@ export const useInventory = (currentUser, t) => {
     backupData,
     importData,
     resetData,
+    batchUpdateItems,
+    deleteLogs, // Thêm hàm vào return
   };
 };

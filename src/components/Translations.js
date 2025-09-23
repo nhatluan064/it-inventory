@@ -2,8 +2,16 @@
 export const translations = {
   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   vi: {
+    delete_activity_log: "Xóa Lịch sử Hoạt động",
+    delete_log_warning:
+      "Hành động này sẽ xóa vĩnh viễn toàn bộ lịch sử hoạt động. Không thể hoàn tác.",
+    delete_log_button: "Xóa Lịch sử",
+    toast_logs_deleted_successfully:
+      "Đã xóa toàn bộ lịch sử hoạt động thành công.",
+    toast_error_deleting_logs: "Đã xảy ra lỗi khi xóa lịch sử hoạt động.",
     liquidation_empty_title: "Kho thanh lý đang trống.",
-    liquidation_empty_text: "Các thiết bị không thể sửa chữa sẽ được chuyển đến đây để thanh lý.",
+    liquidation_empty_text:
+      "Các thiết bị không thể sửa chữa sẽ được chuyển đến đây để thanh lý.",
     loading_data: "Đang tải dữ liệu...",
     home: "Trang chủ",
     home_page_title: "Trang Chủ & Cập nhật",
@@ -120,8 +128,8 @@ export const translations = {
     dept_sales: "Kinh doanh",
     dept_production_management: "Điều hành sản xuất",
     dept_general_affairs: "Tổng vụ",
-    dept_qc:"Bộ phận QC",
-    dept_warehouse:"Bộ phận Kho",
+    dept_qc: "Bộ phận QC",
+    dept_warehouse: "Bộ phận Kho",
     // --- TOAST MESSAGES ---
     toast_price_is_required:
       "Vui lòng nhập giá thành cho tất cả các thiết bị được chọn.",
@@ -448,6 +456,13 @@ export const translations = {
   },
   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   en: {
+    delete_activity_log: "Delete Activity Log",
+    delete_log_warning:
+      "This action will permanently delete all activity history. This cannot be undone.",
+    delete_log_button: "Delete Log",
+    toast_logs_deleted_successfully: "Successfully deleted all activity logs.",
+    toast_error_deleting_logs:
+      "An error occurred while deleting activity logs.",
     loading_data: "Loading data...",
     home: "Home",
     home_page_title: "Home & Updates",
@@ -561,8 +576,8 @@ export const translations = {
     dept_sales: "Sales",
     dept_production_management: "Production Management",
     dept_general_affairs: "General Affairs",
-    dept_qc:"QC",
-    dept_warehouse:"Warehouse",
+    dept_qc: "QC",
+    dept_warehouse: "Warehouse",
     // --- TOAST MESSAGES ---
     toast_price_is_required: "Please enter a price for all selected items.",
     toast_sn_already_exists_in_inventory:
@@ -878,6 +893,11 @@ export const translations = {
   },
   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   zh: {
+    delete_activity_log: "删除活动日志",
+    delete_log_warning: "此操作将永久删除所有活动历史记录，无法撤销。",
+    delete_log_button: "删除日志",
+    toast_logs_deleted_successfully: "成功删除所有活动日志。",
+    toast_error_deleting_logs: "删除活动日志时出错。",
     loading_data: "正在加载数据...",
     home: "首页",
     home_page_title: "首页与更新",

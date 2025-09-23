@@ -2,26 +2,20 @@
 import React, { useState, useEffect } from "react";
 
 const RecallModal = ({ show, onClose, onSubmit, item, t }) => {
-  const [reasonKey, setReasonKey] = useState("condition_good_as_new");
-  const [maintenanceNote, setMaintenanceNote] = useState("");
+  const [reasonKey, setReasonKey] = useState("recall_reason_replacement");
 
-  const isMaintenance = reasonKey === "condition_damaged_needs_maintenance";
-
-  // --- CẬP NHẬT DANH SÁCH LỰA CHỌN ---
+  // --- DANH SÁCH LỰA CHỌN ĐÃ ĐƯỢC CẬP NHẬT ---
+  // Chỉ bao gồm 3 lý do chính
   const recallOptions = [
-    // Tình trạng vật lý
-    { key: "condition_good_as_new", type: "condition" },
-    { key: "condition_used", type: "condition" },
-    // Lý do thu hồi
-    { key: "recall_reason_resigned", type: "reason" },
     { key: "recall_reason_replacement", type: "reason" },
     { key: "recall_reason_upgrade", type: "reason" },
+    { key: "recall_reason_resigned", type: "reason" },
   ];
 
   useEffect(() => {
     if (show && item) {
-      setReasonKey("condition_good_as_new");
-      setMaintenanceNote("");
+      // Mặc định là "Thay thế"
+      setReasonKey("recall_reason_replacement");
     }
   }, [show, item]);
 
@@ -29,11 +23,9 @@ const RecallModal = ({ show, onClose, onSubmit, item, t }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Gửi đi một object chứa item gốc và lý do thu hồi
     onSubmit({
-      itemToRecall: item, // Gửi item gốc
+      itemToRecall: item,
       recallReason: reasonKey,
-      maintenanceNote: maintenanceNote,
     });
     onClose();
   };
@@ -51,7 +43,7 @@ const RecallModal = ({ show, onClose, onSubmit, item, t }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t("condition_on_recall")} {/* Tên label vẫn giữ nguyên */}
+              {t("condition_on_recall")}
             </label>
             <select
               value={reasonKey}
@@ -65,21 +57,6 @@ const RecallModal = ({ show, onClose, onSubmit, item, t }) => {
               ))}
             </select>
           </div>
-
-          {isMaintenance && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t("failure_note")}
-              </label>
-              <textarea
-                value={maintenanceNote}
-                onChange={(e) => setMaintenanceNote(e.target.value)}
-                placeholder={t("failure_note_placeholder")}
-                className="mt-1 block w-full h-24 p-2 border rounded-md"
-                rows="3"
-              ></textarea>
-            </div>
-          )}
 
           <div className="flex justify-end space-x-3 mt-6">
             <button

@@ -1,7 +1,6 @@
-// src/views/LiquidationView.js
 import React from "react";
 import { Trash2, Package } from "lucide-react";
-import { useSort, SortableHeader } from "../hooks/useSort";
+import { useSort } from "../hooks/useSort";
 
 const LiquidationView = ({ items, onLiquidateItem, t }) => {
   const { items: sortedItems, requestSort, sortConfig } = useSort(items);
@@ -9,6 +8,7 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
     { key: "name", label: "device_name", sortable: true },
     { key: "serialNumber", label: "serial_number_sn", sortable: true },
     { key: "condition", label: "failure_note", sortable: true },
+    { key: "recalledFrom", label: "recalled_from_user", sortable: true },
     {
       key: "actions",
       label: "actions",
@@ -39,7 +39,7 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
                       key={col.key}
                       className={`px-4 py-3.5 text-left font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 border-gray-100 dark:border-gray-700 ${
                         col.className || ""
-                      }`}
+                      } cursor-pointer select-none`}
                       onClick={() => col.sortable && requestSort(col.key)}
                     >
                       {t(col.label)}
@@ -62,6 +62,9 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
                       {item.serialNumber || "N/A"}
                     </td>
                     <td className="px-4 align-middle">{item.condition}</td>
+                    <td className="px-4 font-semibold align-middle">
+                      {item.recalledFrom || "---"}
+                    </td>
                     <td className="px-4 text-center align-middle">
                       <button
                         onClick={() => onLiquidateItem(item)}

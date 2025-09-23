@@ -1,5 +1,6 @@
 // src/modals/CancelNoteModal.js
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 
 const CancelNoteModal = ({ show, onClose, onSubmit, itemName, t }) => {
   const [note, setNote] = useState("");
@@ -8,7 +9,8 @@ const CancelNoteModal = ({ show, onClose, onSubmit, itemName, t }) => {
 
   const handleSubmit = () => {
     if (!note.trim()) {
-      alert(t("please_enter_cancellation_reason"));
+      // Đã thay thế alert bằng toast để có trải nghiệm người dùng tốt hơn
+      toast.error(t("please_enter_cancellation_reason"));
       return;
     }
     onSubmit(note);

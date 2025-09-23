@@ -1,7 +1,6 @@
-// src/views/MaintenanceView.js
 import React from "react";
 import { CheckCircle, XCircle, Edit, Package } from "lucide-react";
-import { useSort, SortableHeader } from "../hooks/useSort";
+import { useSort } from "../hooks/useSort";
 
 const MaintenanceView = ({
   items,
@@ -15,6 +14,7 @@ const MaintenanceView = ({
     requestSort,
     sortConfig,
   } = useSort(items, { key: "maintenanceDate", direction: "descending" });
+
   const columns = [
     { key: "name", label: "device_name", sortable: true },
     { key: "serialNumber", label: "serial_number_sn", sortable: true },
@@ -28,6 +28,7 @@ const MaintenanceView = ({
       className: "text-center",
     },
   ];
+
   const formatDate = (dateString) =>
     new Date(dateString).toLocaleString(t("locale_string"));
 
@@ -44,27 +45,27 @@ const MaintenanceView = ({
 
       <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden">
         <div className="flex-grow overflow-y-auto">
-          <table className="w-full text-xs table-fixed">
-            <thead className="bg-white dark:bg-gray-800 sticky top-0 z-10">
-              <tr>
-                {columns.map((col) => (
-                  <th
-                    key={col.key}
-                    className={`px-4 py-3.5 text-left font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 border-gray-100 dark:border-gray-700 ${
-                      col.className || ""
-                    }`}
-                    onClick={() => col.sortable && requestSort(col.key)}
-                  >
-                    {t(col.label)}
-                    {sortConfig.key === col.key &&
-                      (sortConfig.direction === "ascending" ? " ▲" : " ▼")}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-              {sortedItems.length > 0 ? (
-                sortedItems.map((item) => (
+          {sortedItems.length > 0 ? (
+            <table className="w-full text-xs table-fixed">
+              <thead className="bg-white dark:bg-gray-800 sticky top-0 z-10">
+                <tr>
+                  {columns.map((col) => (
+                    <th
+                      key={col.key}
+                      className={`px-4 py-3.5 text-left font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 border-gray-100 dark:border-gray-700 ${
+                        col.className || ""
+                      } cursor-pointer select-none`}
+                      onClick={() => col.sortable && requestSort(col.key)}
+                    >
+                      {t(col.label)}
+                      {sortConfig.key === col.key &&
+                        (sortConfig.direction === "ascending" ? " ▲" : " ▼")}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                {sortedItems.map((item) => (
                   <tr
                     key={item.id}
                     className="h-16 hover:bg-gray-50 dark:hover:bg-gray-700/50"
@@ -108,19 +109,18 @@ const MaintenanceView = ({
                       </div>
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={columns.length} className="text-center py-16">
-                    <Package className="w-12 h-12 mx-auto text-gray-300" />
-                    <p className="mt-3 text-sm text-gray-500">
-                      {t("no_data_available")}
-                    </p>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="text-center py-16 m-auto">
+              <Package className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
+              <p className="text-sm font-semibold">{t("no_data_available")}</p>
+              <p className="mt-2 text-xs text-gray-500">
+                {t("maintenance_desc")}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

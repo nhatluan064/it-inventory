@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Plus, Package, Search, Edit2, Trash2, Layers, Filter } from "lucide-react";
+import React, { useState, useMemo } from "react";
+import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 
 const MasterListView = ({
@@ -13,22 +13,70 @@ const MasterListView = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [expandedRows, setExpandedRows] = useState({});
+  const [animatingRows, setAnimatingRows] = useState({});
+  const [subSortConfigs, setSubSortConfigs] = useState({});
 
-  const filteredItems = allItems.filter((item) => {
-    const categoryMatch =
-      selectedCategory === "all" || item.category === selectedCategory;
-    const searchMatch = item.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    return categoryMatch && searchMatch;
+  const {
+    items: sortedItems,
+    requestSort: requestMainSort,
+    sortConfig: mainSortConfig,
+  } = useSort(allItems, {
+    key: "category",
+    direction: "ascending",
   });
 
-  const { items: sortedItems, requestSort, sortConfig } = useSort(filteredItems, { key: 'name', direction: 'ascending' });
+  const groupedByCategory = useMemo(() => {
+    let itemsToGroup = sortedItems;
+    if (selectedCategory !== "all") {
+      itemsToGroup = itemsToGroup.filter(
+        (item) => item.category === selectedCategory
+      );
+    }
+    if (searchQuery) {
+      itemsToGroup = itemsToGroup.filter((item) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    return itemsToGroup.reduce((acc, item) => {
+      const key = item.category || "uncategorized";
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(item);
+      return acc;
+    }, {});
+  }, [sortedItems, selectedCategory, searchQuery]);
+
+  const toggleExpand = (name) => {
+    const isExpanded = expandedRows[name];
+    if (isExpanded) {
+      setAnimatingRows((prev) => ({ ...prev, [name]: "closing" }));
+      setTimeout(() => {
+        setExpandedRows((prev) => ({ ...prev, [name]: false }));
+        setAnimatingRows((prev) => ({ ...prev, [name]: undefined }));
+      }, 300);
+    } else {
+      setExpandedRows((prev) => ({ ...prev, [name]: true }));
+      setAnimatingRows((prev) => ({ ...prev, [name]: "opening" }));
+    }
+  };
+
+  const requestSubSort = (groupName, key) => {
+    setSubSortConfigs((prevConfigs) => {
+      const currentConfig = prevConfigs[groupName] || {};
+      let direction = "ascending";
+      if (
+        currentConfig.key === key &&
+        currentConfig.direction === "ascending"
+      ) {
+        direction = "descending";
+      }
+      return { ...prevConfigs, [groupName]: { key, direction } };
+    });
+  };
 
   return (
     <div className="h-full flex flex-col gap-6">
-      {/* --- CARD 1: KHỐI TIÊU ĐỀ VÀ BỘ LỌC --- */}
       <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -39,27 +87,15 @@ const MasterListView = ({
               {t("master_list_desc")}
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
-                className="p-2.5 bg-gray-100 dark:bg-gray-700/50 rounded-lg"
-              >
-                <Filter className="w-5 h-5" />
-              </button>
-            </div>
-            <button
-              onClick={onAddType}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-lg flex items-center justify-center space-x-2 text-sm font-semibold"
-            >
-              <Plus className="w-5 h-5" />
-              <span className="hidden md:inline">{t("add_new_master_item")}</span>
-            </button>
-          </div>
+          <button
+            onClick={onAddType}
+            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-lg flex items-center justify-center space-x-2 text-sm font-semibold"
+          >
+            <Plus className="w-5 h-5" />
+            <span>{t("add_new_master_item")}</span>
+          </button>
         </div>
-        <div
-          className={`grid grid-cols-1 md:grid-cols-2 gap-4 items-end ${isMobileFilterOpen ? "grid" : "hidden md:grid"}`}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
           <div className="relative group w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
@@ -84,96 +120,154 @@ const MasterListView = ({
         </div>
       </div>
 
-      {/* --- CARD 2: KHỐI DANH SÁCH --- */}
       <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden">
         <div className="flex-grow overflow-y-auto">
-          <div className="hidden md:grid md:grid-cols-[1fr,180px,180px,120px] gap-4 px-4 py-3.5 border-b-2 border-gray-100 dark:border-gray-400">
-            <h3 className="font-medium uppercase text-xs text-gray-500 dark:text-gray-400 cursor-pointer select-none" onClick={() => requestSort('name')}>
-              {t("master_item_name")}
-              {sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? ' ▲' : ' ▼')}
-            </h3>
-            <h3 className="font-medium uppercase text-xs text-gray-500 dark:text-gray-400 cursor-pointer select-none" onClick={() => requestSort('category')}>
-              {t("category")}
-              {sortConfig.key === 'category' && (sortConfig.direction === 'ascending' ? ' ▲' : ' ▼')}
-            </h3>
-            <h3 className="font-medium uppercase text-xs text-gray-500 dark:text-gray-400">
-              {t("usage_status")}
-            </h3>
-            <h3 className="font-medium uppercase text-xs text-gray-500 dark:text-gray-400 text-center">
-              {t("actions")}
-            </h3>
-          </div>
+          <table className="w-full text-xs table-fixed">
+            <thead className="bg-white dark:bg-gray-800 sticky top-0 z-10">
+              <tr>
+                <th
+                  className="px-4 py-3.5 text-left font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 cursor-pointer select-none"
+                  onClick={() => requestMainSort("category")}
+                >
+                  {t("category")}
+                  {mainSortConfig.key === "category" &&
+                    (mainSortConfig.direction === "ascending" ? " ▲" : " ▼")}
+                </th>
+                <th className="px-4 py-3.5 text-right font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 w-32">
+                  {t("quantity")}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+              {Object.entries(groupedByCategory).map(([categoryId, items]) => {
+                const isOpening = animatingRows[categoryId] === "opening";
+                const isClosing = animatingRows[categoryId] === "closing";
+                const category = categories.find((c) => c.id === categoryId);
+                const subSortConfig = subSortConfigs[categoryId] || {
+                  key: "name",
+                  direction: "ascending",
+                };
+                const sortedSubItems = [...items].sort((a, b) => {
+                  const aValue = a[subSortConfig.key] || "";
+                  const bValue = b[subSortConfig.key] || "";
+                  const collator = new Intl.Collator(undefined, {
+                    numeric: true,
+                    sensitivity: "base",
+                  });
+                  const comparison = collator.compare(
+                    aValue.toString(),
+                    bValue.toString()
+                  );
+                  return subSortConfig.direction === "ascending"
+                    ? comparison
+                    : -comparison;
+                });
 
-          <div className="p-4 md:p-0 md:divide-y divide-gray-100 dark:divide-gray-700">
-            {sortedItems.length > 0 ? (
-              sortedItems.map((item) => {
-                const isModelInUse = fullEquipmentList.some(
-                  (e) =>
-                    e.name.split(" (User:")[0].trim() === item.name &&
-                    e.category === item.category &&
-                    e.status !== "master"
-                );
-                const statusText = isModelInUse ? t("has_been_used") : t("never_used");
-                const statusColor = isModelInUse ? "text-green-600 dark:text-green-400 font-semibold" : "text-gray-500 dark:text-gray-400";
-                
                 return (
-                  <div
-                    key={item.id}
-                    className="block p-4 border dark:border-gray-600 rounded-lg mb-4 md:border-0 md:rounded-none md:mb-0 
-                               md:grid md:grid-cols-[1fr,180px,180px,120px] md:gap-4 md:items-center md:px-4 md:py-3"
-                  >
-                    <div className="grid grid-cols-2 gap-4 items-start md:contents">
-                      <div>
-                        <label className="block md:hidden text-xs font-medium text-gray-500">{t("master_item_name")}</label>
-                        <p className="font-semibold text-gray-900 dark:text-gray-100">{item.name}</p>
-                      </div>
-                      <div>
-                        <label className="block md:hidden text-xs font-medium text-gray-500">{t("category")}</label>
-                        <div className="flex items-center mt-1 gap-1.5 px-2.5 py-1 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                          <Layers className="w-3.5 h-3.5 text-gray-500" />
-                          <span className="capitalize text-gray-700 dark:text-gray-300 text-xs">
-                            {(categories.find((c) => c.id === item.category) || {}).name || item.category}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-4 md:mt-0">
-                       <label className="block md:hidden text-xs font-medium text-gray-500">{t("usage_status")}</label>
-                      <p className={statusColor}>{statusText}</p>
-                    </div>
-                    <div className="mt-4 md:mt-0 md:text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        {/* <<< SỬA MÀU ICON EDIT TẠI ĐÂY >>> */}
-                        <button
-                          onClick={() => onEditItem(item)}
-                          disabled={isModelInUse}
-                          className="p-2 w-full md:w-auto text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-900/30 disabled:opacity-40 rounded-lg border dark:border-gray-600"
-                          title={isModelInUse ? t("cannot_edit_used_model") : t("edit")}
+                  <React.Fragment key={categoryId}>
+                    <tr
+                      className="bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+                      onClick={() => toggleExpand(categoryId)}
+                    >
+                      <td className="px-4 py-3 font-semibold capitalize">
+                        {category?.name || categoryId}
+                      </td>
+                      <td className="px-4 py-3 text-right font-semibold">
+                        {items.length}
+                      </td>
+                    </tr>
+                    {(expandedRows[categoryId] || isClosing) && (
+                      <tr>
+                        <td
+                          colSpan={2}
+                          className={`p-0 overflow-hidden ${
+                            isOpening ? "animate-slideDown" : ""
+                          } ${isClosing ? "animate-slideUp" : ""}`}
                         >
-                          <Edit2 className="w-4 h-4 mx-auto" />
-                        </button>
-                        {/* <<< SỬA MÀU ICON DELETE TẠI ĐÂY >>> */}
-                        <button
-                          onClick={() => onDeleteItem(item)}
-                          className="p-2 w-full md:w-auto text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg border dark:border-gray-600"
-                          title={t("delete")}
-                        >
-                          <Trash2 className="w-4 h-4 mx-auto" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                          <div className="p-2 text-xs">
+                            <div className="grid grid-cols-12 gap-x-4 items-center p-2 rounded-t-md font-bold italic text-gray-600 dark:text-gray-400">
+                              <div
+                                className="col-span-6 cursor-pointer"
+                                onClick={() =>
+                                  requestSubSort(categoryId, "name")
+                                }
+                              >
+                                {t("master_item_name")}
+                              </div>
+                              <div
+                                className="col-span-4 cursor-pointer"
+                                onClick={() =>
+                                  requestSubSort(categoryId, "usage_status")
+                                }
+                              >
+                                {t("usage_status")}
+                              </div>
+                              <div className="col-span-2 text-center">
+                                {t("actions")}
+                              </div>
+                            </div>
+                            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                              {sortedSubItems.map((item) => {
+                                const isModelInUse = fullEquipmentList.some(
+                                  (e) =>
+                                    e.name.split(" (User:")[0].trim() ===
+                                      item.name &&
+                                    e.category === item.category &&
+                                    e.status !== "master"
+                                );
+                                const statusText = isModelInUse
+                                  ? t("has_been_used")
+                                  : t("never_used");
+                                const statusColor = isModelInUse
+                                  ? "text-green-600 dark:text-green-400 font-semibold"
+                                  : "text-gray-500 dark:text-gray-400";
+                                return (
+                                  <div
+                                    key={item.id}
+                                    className="grid grid-cols-12 gap-x-4 items-center py-2 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                                  >
+                                    <div className="col-span-6 truncate font-semibold flex items-center">
+                                      {item.name}
+                                    </div>
+                                    <div
+                                      className={`col-span-4 truncate ${statusColor} flex items-center`}
+                                    >
+                                      {statusText}
+                                    </div>
+                                    <div className="col-span-2 flex items-center justify-center gap-2">
+                                      <button
+                                        onClick={() => onEditItem(item)}
+                                        disabled={isModelInUse}
+                                        className="p-2 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-lg disabled:opacity-40"
+                                        title={
+                                          isModelInUse
+                                            ? t("cannot_edit_used_model")
+                                            : t("edit")
+                                        }
+                                      >
+                                        <Edit2 className="w-4 h-4" />
+                                      </button>
+                                      <button
+                                        onClick={() => onDeleteItem(item)}
+                                        className="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg"
+                                        title={t("delete")}
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 );
-              })
-            ) : (
-              <div className="text-center py-16">
-                <Package className="w-12 h-12 mx-auto text-gray-300" />
-                <p className="mt-3 text-sm text-gray-500">
-                  {t("no_master_items_found")}
-                </p>
-              </div>
-            )}
-          </div>
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

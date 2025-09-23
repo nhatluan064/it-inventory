@@ -11,10 +11,18 @@ import {
   Upload,
   Download,
   Trash2,
+  History, // Thêm icon mới
 } from "lucide-react";
 import ViewHeader from "../components/ViewHeader";
 
-const SettingsView = ({ onBackupData, onResetData, onImportData, t }) => {
+// Thêm prop onDeleteLogs
+const SettingsView = ({
+  onBackupData,
+  onResetData,
+  onImportData,
+  onDeleteLogs,
+  t,
+}) => {
   const { theme, setTheme, language, setLanguage } = useContext(AppContext);
   const fileInputRef = React.useRef(null);
 
@@ -27,19 +35,16 @@ const SettingsView = ({ onBackupData, onResetData, onImportData, t }) => {
       <ViewHeader title={t("system_settings")} />
       {/* Interface Settings */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        {/* ĐÃ SỬA: text-lg -> text-base, w-5 h-5 -> w-4 h-4 */}
         <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
           <Settings className="w-4 h-4 mr-2" /> {t("interface")}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Theme Selection */}
           <div>
-            {/* ĐÃ SỬA: text-sm -> text-xs */}
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t("theme")}
             </label>
             <div className="flex space-x-2 rounded-lg bg-gray-100 dark:bg-gray-700 p-1">
-              {/* ĐÃ SỬA: text-sm -> text-xs, w-4 h-4 -> w-3.5 h-3.5 */}
               <button
                 onClick={() => setTheme("light")}
                 className={`w-full flex items-center justify-center gap-2 p-2 rounded-md text-xs ${
@@ -50,7 +55,6 @@ const SettingsView = ({ onBackupData, onResetData, onImportData, t }) => {
               >
                 <Sun className="w-3.5 h-3.5" /> {t("light_mode")}
               </button>
-              {/* ĐÃ SỬA: text-sm -> text-xs, w-4 h-4 -> w-3.5 h-3.5 */}
               <button
                 onClick={() => setTheme("dark")}
                 className={`w-full flex items-center justify-center gap-2 p-2 rounded-md text-xs ${
@@ -61,7 +65,6 @@ const SettingsView = ({ onBackupData, onResetData, onImportData, t }) => {
               >
                 <Moon className="w-3.5 h-3.5" /> {t("dark_mode")}
               </button>
-              {/* ĐÃ SỬA: text-sm -> text-xs, w-4 h-4 -> w-3.5 h-3.5 */}
               <button
                 onClick={() => setTheme("system")}
                 className={`w-full flex items-center justify-center gap-2 p-2 rounded-md text-xs ${
@@ -77,12 +80,10 @@ const SettingsView = ({ onBackupData, onResetData, onImportData, t }) => {
 
           {/* Language Selection */}
           <div>
-            {/* ĐÃ SỬA: text-sm -> text-xs */}
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t("language")}
             </label>
             <div className="relative">
-              {/* ĐÃ SỬA: w-5 h-5 -> w-4 h-4 */}
               <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
               <select
                 value={language}
@@ -100,7 +101,6 @@ const SettingsView = ({ onBackupData, onResetData, onImportData, t }) => {
 
       {/* Data Management */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        {/* ĐÃ SỬA: text-lg -> text-base, w-5 h-5 -> w-4 h-4 */}
         <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
           <Database className="w-4 h-4 mr-2" /> {t("data_management")}
         </h3>
@@ -110,11 +110,9 @@ const SettingsView = ({ onBackupData, onResetData, onImportData, t }) => {
             <p className="font-medium text-gray-800 dark:text-gray-200">
               {t("import_data")}
             </p>
-            {/* ĐÃ SỬA: text-sm -> text-xs */}
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
               {t("confirm_override_data")}
             </p>
-            {/* ĐÃ SỬA: text-sm -> text-xs, w-4 h-4 -> w-3.5 h-3.5 */}
             <button
               onClick={handleImportClick}
               className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
@@ -135,7 +133,6 @@ const SettingsView = ({ onBackupData, onResetData, onImportData, t }) => {
             <p className="font-medium text-gray-800 dark:text-gray-200">
               {t("backup_data")}
             </p>
-            {/* ĐÃ SỬA: text-sm -> text-xs, w-4 h-4 -> w-3.5 h-3.5 */}
             <button
               onClick={onBackupData}
               className="mt-2 flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-green-600 rounded-lg hover:bg-green-700"
@@ -144,16 +141,30 @@ const SettingsView = ({ onBackupData, onResetData, onImportData, t }) => {
             </button>
           </div>
 
+          {/* --- KHỐI MỚI: XÓA LOG --- */}
+          <div className="border-t dark:border-gray-700 pt-4">
+            <p className="font-medium text-orange-600 dark:text-orange-400">
+              {t("delete_activity_log")}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+              {t("delete_log_warning")}
+            </p>
+            <button
+              onClick={onDeleteLogs}
+              className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700"
+            >
+              <History className="w-3.5 h-3.5" /> {t("delete_log_button")}
+            </button>
+          </div>
+
           {/* Reset Data */}
           <div className="border-t dark:border-gray-700 pt-4">
             <p className="font-medium text-red-600 dark:text-red-400">
               {t("reset_data")}
             </p>
-            {/* ĐÃ SỬA: text-sm -> text-xs */}
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
               {t("reset_data_warning")}
             </p>
-            {/* ĐÃ SỬA: text-sm -> text-xs, w-4 h-4 -> w-3.5 h-3.5 */}
             <button
               onClick={onResetData}
               className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-red-600 rounded-lg hover:bg-red-700"

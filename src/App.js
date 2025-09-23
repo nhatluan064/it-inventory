@@ -23,7 +23,7 @@ import AuthSuccessPopup from "./Popup/AuthSuccessPopup";
 import SetupProfilePage from "./Pages/SetupProfilePage";
 import HomeView from "./views/HomeView";
 
-// Views
+// Desktop Views
 import DashboardView from "./views/DashboardView";
 import InventoryView from "./views/InventoryView";
 import ReportsView from "./views/ReportsView";
@@ -36,6 +36,17 @@ import MasterListView from "./views/MasterListView";
 import MaintenanceView from "./views/MaintenanceView";
 import LiquidationView from "./views/LiquidationView";
 
+// Mobile Views
+import MobileInventoryView from "./views/Mobile/MobileInventoryView";
+import MobileMasterListView from "./views/Mobile/MobileMasterListView";
+import MobilePendingPurchaseView from "./views/Mobile/MobilePendingPurchaseView";
+import MobilePurchasingView from "./views/Mobile/MobilePurchasingView";
+import MobilePurchasedView from "./views/Mobile/MobilePurchasedView";
+import MobileAllocatedView from "./views/Mobile/MobileAllocatedView";
+import MobileMaintenanceView from "./views/Mobile/MobileMaintenanceView";
+import MobileLiquidationView from "./views/Mobile/MobileLiquidationView";
+import MobileReportsView from "./views/Mobile/MobileReportsView";
+
 // Modals
 import AddEditModal from "./modals/AddEditModal";
 import ConfirmDeleteModal from "./modals/ConfirmDeleteModal";
@@ -44,7 +55,6 @@ import EquipmentTypeModal from "./modals/EquipmentTypeModal";
 import AllocationModal from "./modals/AllocationModal";
 import CancelNoteModal from "./modals/CancelNoteModal";
 import BulkEditModal from "./modals/BulkEditModal";
-// import EditNameModal from "./modals/EditNameModal";
 import RecallModal from "./modals/RecallModal";
 import InfoModal from "./modals/InfoModal";
 import AddFromMasterModal from "./modals/AddFromMasterModal";
@@ -54,7 +64,6 @@ import UserInfoModal from "./modals/UserInfoModal";
 
 const App = () => {
   const [dashboardScrollPosition, setDashboardScrollPosition] = useState(0);
-  // --- UI and Translation States ---
   const [theme, setTheme] = useState(
     () => localStorage.getItem("theme") || "system"
   );
@@ -64,7 +73,6 @@ const App = () => {
   const [activeTab, setActiveTab] = useState("home");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
-  // --- Filter States ---
   const [inventoryFilters, setInventoryFilters] = useState({
     search: "",
     category: "all",
@@ -79,9 +87,10 @@ const App = () => {
     category: "all",
     department: "all",
     handoverDate: "",
+    sortKey: "category",
+    sortDirection: "asc",
   });
 
-  // --- Responsive States ---
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -96,7 +105,6 @@ const App = () => {
     [language]
   );
 
-  // --- Custom Hooks for Logic Management ---
   const {
     currentUser,
     authLoading,
@@ -112,7 +120,6 @@ const App = () => {
   const inventory = useInventory(currentUser, t);
   const modals = useModals();
 
-  // --- Derived Data using useMemo for Performance ---
   const categories = useMemo(
     () => categoryStructure.map((cat) => ({ ...cat, name: t(cat.tKey) })),
     [t]
@@ -233,7 +240,6 @@ const App = () => {
     return masterItems.length;
   }, [masterItems]);
 
-  // --- UI Effects ---
   useEffect(() => {
     localStorage.setItem("theme", theme);
     const root = window.document.documentElement;
@@ -266,7 +272,6 @@ const App = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // --- UI Handlers ---
   const handleTabClick = (tabId) => {
     setActiveTab(tabId);
     if (isMobile) {
@@ -300,6 +305,11 @@ const App = () => {
             itemName: `<strong class="text-red-600">${t("all_data")}</strong>`,
           }),
         };
+      case "delete_logs":
+        return {
+          title: t("delete_activity_log"),
+          text: t("delete_log_warning"),
+        };
       case "move-to-liquidation":
         return {
           title: t("confirm_move_to_liquidation_title"),
@@ -315,13 +325,12 @@ const App = () => {
     [theme, language, t]
   );
 
-  // --- RENDER LOGIC ---
   if (authLoading) {
     return (
       <div className="flex space-x-2">
-        <div class="w-3 h-3 bg-gray-500 rounded-full animate-dot1"></div>
-        <div class="w-3 h-3 bg-gray-500 rounded-full animate-dot2"></div>
-        <div class="w-3 h-3 bg-gray-500 rounded-full animate-dot3"></div>
+        <div className="w-3 h-3 bg-gray-500 rounded-full animate-dot1"></div>
+        <div className="w-3 h-3 bg-gray-500 rounded-full animate-dot2"></div>
+        <div className="w-3 h-3 bg-gray-500 rounded-full animate-dot3"></div>
       </div>
     );
   }
@@ -365,10 +374,10 @@ const App = () => {
 
   if (inventory.dataLoading) {
     return (
-      <div class="flex space-x-2">
-        <div class="w-3 h-3 bg-gray-500 rounded-full animate-dot1"></div>
-        <div class="w-3 h-3 bg-gray-500 rounded-full animate-dot2"></div>
-        <div class="w-3 h-3 bg-gray-500 rounded-full animate-dot3"></div>
+      <div className="flex space-x-2">
+        <div className="w-3 h-3 bg-gray-500 rounded-full animate-dot1"></div>
+        <div className="w-3 h-3 bg-gray-500 rounded-full animate-dot2"></div>
+        <div className="w-3 h-3 bg-gray-500 rounded-full animate-dot3"></div>
       </div>
     );
   }
@@ -381,12 +390,21 @@ const App = () => {
     else if (deleteType === "move-to-liquidation")
       inventory.markUnrepairable(currentItem);
     else if (deleteType === "reset") inventory.resetData();
+    else if (deleteType === "delete_logs") inventory.deleteLogs();
     closeModal("delete");
   };
 
   const renderCurrentView = () => {
     const currentTab = activeTab || "inventory";
     const viewProps = { t, categories, statusColors, statusLabels };
+    const mobileViewProps = {
+      ...viewProps,
+      onViewItem: (item) => modals.openModal("view", item),
+      onEditItem: (item) => modals.openModal("addEdit", item),
+      onAllocateItem: (item) => modals.openModal("allocation", item),
+      onDeleteItem: (item) =>
+        modals.openModal("delete", item, { deleteType: "inventory" }),
+    };
 
     switch (currentTab) {
       case "home":
@@ -405,14 +423,23 @@ const App = () => {
           />
         );
       case "masterList":
-        return (
+        return isMobile ? (
+          <MobileMasterListView
+            {...viewProps}
+            allItems={masterItems}
+            fullEquipmentList={inventory.equipment}
+            onAddType={() => modals.openModal("type")}
+            onEditItem={(item) => modals.openModal("type", item)}
+            onDeleteItem={(item) =>
+              modals.openModal("delete", item, { deleteType: "master" })
+            }
+          />
+        ) : (
           <MasterListView
             {...viewProps}
             allItems={masterItems}
             fullEquipmentList={inventory.equipment}
-            // Mở modal EquipmentType ở chế độ Thêm mới
             onAddType={() => modals.openModal("type")}
-            // Mở modal EquipmentType ở chế độ Sửa
             onEditItem={(item) => modals.openModal("type", item)}
             onDeleteItem={(item) =>
               modals.openModal("delete", item, { deleteType: "master" })
@@ -420,18 +447,32 @@ const App = () => {
           />
         );
       case "pendingPurchase":
-        return (
+        return isMobile ? (
+          <MobilePendingPurchaseView
+            {...viewProps}
+            items={pendingPurchaseItems}
+            onStartPurchase={inventory.startPurchasing}
+            onDeleteItem={inventory.cancelOrRevertPurchase}
+            onOpenAddFromMasterModal={() => modals.openModal("addFromMaster")}
+          />
+        ) : (
           <PendingPurchaseView
             {...viewProps}
             items={pendingPurchaseItems}
             onStartPurchase={inventory.startPurchasing}
-            // Dòng onEditItem đã được xóa
             onDeleteItem={inventory.cancelOrRevertPurchase}
             onOpenAddFromMasterModal={() => modals.openModal("addFromMaster")}
           />
         );
       case "purchasing":
-        return (
+        return isMobile ? (
+          <MobilePurchasingView
+            {...viewProps}
+            items={purchasingItems}
+            onUpdateStatus={inventory.confirmPurchased}
+            onCancel={(item) => modals.openModal("cancelNote", item)}
+          />
+        ) : (
           <PurchasingView
             {...viewProps}
             items={purchasingItems}
@@ -444,7 +485,14 @@ const App = () => {
           />
         );
       case "purchased":
-        return (
+        return isMobile ? (
+          <MobilePurchasedView
+            {...viewProps}
+            items={purchasedItems}
+            onImportItem={inventory.importPurchasedItems}
+            fullInventory={inventory.equipment}
+          />
+        ) : (
           <PurchasedView
             {...viewProps}
             items={purchasedItems}
@@ -453,14 +501,22 @@ const App = () => {
           />
         );
       case "inventory":
-        return (
+        return isMobile ? (
+          <MobileInventoryView
+            {...mobileViewProps}
+            equipment={filteredInventory}
+            unfilteredEquipment={inventoryItems}
+            filters={inventoryFilters}
+            setFilters={setInventoryFilters}
+            onAddLegacyItem={() => modals.openModal("addEdit")}
+          />
+        ) : (
           <InventoryView
             {...viewProps}
             equipment={filteredInventory}
             unfilteredEquipment={inventoryItems}
             filters={inventoryFilters}
             setFilters={setInventoryFilters}
-            // --- SỬA LẠI DÒNG NÀY ---
             onEditItem={(item) => modals.openModal("addEdit", item)}
             onDeleteItem={(item) =>
               modals.openModal("delete", item, { deleteType: "inventory" })
@@ -471,7 +527,18 @@ const App = () => {
           />
         );
       case "allocated":
-        return (
+        return isMobile ? (
+          <MobileAllocatedView
+            {...viewProps}
+            items={allocatedItems}
+            onRecallItem={(item) => modals.openModal("recall", item)}
+            onMarkDamaged={(item) =>
+              modals.openModal("directMaintenanceNote", item)
+            }
+            filters={allocatedFilters}
+            setFilters={setAllocatedFilters}
+          />
+        ) : (
           <AllocatedView
             {...viewProps}
             items={allocatedItems}
@@ -487,35 +554,42 @@ const App = () => {
           />
         );
       case "maintenance":
-        return (
-          <MaintenanceView
-            {...viewProps}
-            items={maintenanceItems}
-            // Thêm 2 dòng dưới đây
-            statusLabels={statusLabels}
-            statusColors={statusColors}
-            onRepairComplete={(item) => modals.openModal("repairNote", item)}
-            onMarkUnrepairable={(item) =>
-              modals.openModal("delete", item, {
-                deleteType: "move-to-liquidation",
-              })
-            }
-            onEditNote={(item) => modals.openModal("note", item)}
-          />
+        const maintenanceViewProps = {
+          ...viewProps,
+          items: maintenanceItems,
+          onRepairComplete: (item) => modals.openModal("repairNote", item),
+          onMarkUnrepairable: (item) =>
+            modals.openModal("delete", item, {
+              deleteType: "move-to-liquidation",
+            }),
+          onEditNote: (item) => modals.openModal("note", item),
+        };
+        return isMobile ? (
+          <MobileMaintenanceView {...maintenanceViewProps} />
+        ) : (
+          <MaintenanceView {...maintenanceViewProps} />
         );
       case "liquidation":
-        return (
-          <LiquidationView
-            {...viewProps}
-            items={liquidationItems}
-            onLiquidateItem={(item) =>
-              modals.openModal("delete", item, { deleteType: "liquidate" })
-            }
-          />
+        const liquidationViewProps = {
+          ...viewProps,
+          items: liquidationItems,
+          onLiquidateItem: (item) =>
+            modals.openModal("delete", item, { deleteType: "liquidate" }),
+        };
+        return isMobile ? (
+          <MobileLiquidationView {...liquidationViewProps} />
+        ) : (
+          <LiquidationView {...liquidationViewProps} />
         );
       case "reports":
-        return (
-          <ReportsView {...viewProps} transactions={inventory.transactions} />
+        const reportsViewProps = {
+          ...viewProps,
+          transactions: inventory.transactions,
+        };
+        return isMobile ? (
+          <MobileReportsView {...reportsViewProps} />
+        ) : (
+          <ReportsView {...reportsViewProps} />
         );
       case "settings":
         return (
@@ -524,6 +598,9 @@ const App = () => {
             onBackupData={inventory.backupData}
             onResetData={() =>
               modals.openModal("delete", null, { deleteType: "reset" })
+            }
+            onDeleteLogs={() =>
+              modals.openModal("delete", null, { deleteType: "delete_logs" })
             }
             onImportData={(e) => inventory.importData(e.target.files[0])}
           />
@@ -593,12 +670,13 @@ const App = () => {
                 masterListCount={uniqueMasterItemsCount}
                 reportsCount={inventory.transactions.length}
                 setActiveTab={handleTabClick}
+                scrollPosition={dashboardScrollPosition}
+                setScrollPosition={setDashboardScrollPosition}
               />
             </div>
           </header>
 
           <main className="flex-1 flex flex-col gap-6 overflow-hidden p-4 sm:p-6 lg:p-8">
-            {/* Mobile Dashboard View */}
             <div className="lg:hidden flex-shrink-0 -mx-4 -mt-4 sm:-mx-6 sm:-mt-6">
               <div className="p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                 <DashboardView
@@ -616,7 +694,6 @@ const App = () => {
               </div>
             </div>
 
-            {/* Wrapper mới cho View, cho phép nó co giãn và có chiều cao xác định */}
             <div className="flex-1 overflow-hidden">{renderCurrentView()}</div>
           </main>
         </div>
@@ -634,7 +711,6 @@ const App = () => {
         <EquipmentTypeModal
           show={modals.modalState.type}
           onClose={() => modals.closeModal("type")}
-          // Thêm logic để gọi đúng hàm onSubmit
           onSubmit={
             modals.currentItem?.id
               ? inventory.updateMasterItem
@@ -642,7 +718,6 @@ const App = () => {
           }
           categories={categories}
           t={t}
-          // Truyền initialData cho chế độ Sửa
           initialData={modals.currentItem}
         />
         <AddEditModal
@@ -655,13 +730,6 @@ const App = () => {
           categories={categories}
           t={t}
         />
-        {/* <EditNameModal
-          show={modals.modalState.editName}
-          onClose={() => modals.closeModal("editName")}
-          onSubmit={inventory.updateMasterName}
-          initialData={modals.currentItem}
-          t={t}
-        /> */}
         <ConfirmDeleteModal
           show={modals.modalState.delete}
           onClose={() => modals.closeModal("delete")}
@@ -676,7 +744,7 @@ const App = () => {
           item={modals.currentItem}
           categories={categories}
           statusLabels={statusLabels}
-          statusColors={statusColors} // <-- THÊM DÒNG NÀY
+          statusColors={statusColors}
           t={t}
         />
         <AllocationModal
