@@ -2,13 +2,17 @@
 import React from "react";
 import ViewHeader from "../components/ViewHeader";
 import StatusChart from "../components/StatusChart";
-import DailyActivityChart from "../components/DailyActivityChart";
-import MonthlyTrendChart from "../components/MonthlyTrendChart";
-import CategoryDistributionChart from "../components/CategoryDistributionChart";
-import TopDevicesChart from "../components/TopDevicesChart";
 import ChartWrapper from "../components/ChartWrapper";
+import { 
+  LazyDailyActivityChart,
+  LazyMonthlyTrendChart, 
+  LazyCategoryDistributionChart,
+  LazyTopDevicesChart,
+  LazyWrapper
+} from "../components/Performance/LazyComponents";
+import { ChartLoadingSkeleton } from "../components/LoadingStates/GlobalLoader";
 
-const HomeView = ({
+const HomeView = React.memo(({
   t,
   equipment,
   pendingPurchaseCount,
@@ -71,7 +75,11 @@ const HomeView = ({
           <ChartWrapper 
             hasData={equipment && equipment.length > 0}
           >
-            <CategoryDistributionChart equipment={equipment} />
+            <LazyWrapper 
+              component={LazyCategoryDistributionChart} 
+              fallback={<ChartLoadingSkeleton />}
+              equipment={equipment} 
+            />
           </ChartWrapper>
         </div>
 
@@ -80,13 +88,21 @@ const HomeView = ({
           <ChartWrapper 
             hasData={equipment && equipment.length > 0}
           >
-            <TopDevicesChart equipment={equipment} />
+            <LazyWrapper 
+              component={LazyTopDevicesChart} 
+              fallback={<ChartLoadingSkeleton />}
+              equipment={equipment} 
+            />
           </ChartWrapper>
           
           <ChartWrapper 
             hasData={activityLogs && Array.isArray(activityLogs)}
           >
-            <DailyActivityChart activityLogs={activityLogs} />
+            <LazyWrapper 
+              component={LazyDailyActivityChart} 
+              fallback={<ChartLoadingSkeleton />}
+              activityLogs={activityLogs} 
+            />
           </ChartWrapper>
         </div>
 
@@ -94,12 +110,19 @@ const HomeView = ({
         <ChartWrapper 
           hasData={activityLogs && Array.isArray(activityLogs)}
         >
-          <MonthlyTrendChart activityLogs={activityLogs} equipment={equipment} />
+          <LazyWrapper 
+            component={LazyMonthlyTrendChart} 
+            fallback={<ChartLoadingSkeleton />}
+            activityLogs={activityLogs} 
+            equipment={equipment} 
+          />
         </ChartWrapper>
       </div>
       </div>
     </div>
   );
-};
+});
+
+HomeView.displayName = 'HomeView';
 
 export default HomeView;

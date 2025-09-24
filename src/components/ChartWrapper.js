@@ -1,8 +1,8 @@
 // src/components/ChartWrapper.js
 import React, { useEffect, useRef } from "react";
-import ErrorBoundary from "./ErrorBoundary";
+import { ErrorBoundary } from "./Performance/LazyComponents";
 
-const ChartWrapper = ({ children, title, isLoading = false, hasData = true }) => {
+const ChartWrapper = React.memo(({ children, title, isLoading = false, hasData = true }) => {
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -70,6 +70,8 @@ const ChartWrapper = ({ children, title, isLoading = false, hasData = true }) =>
       </ErrorBoundary>
     </div>
   );
-};
+});
+
+ChartWrapper.displayName = 'ChartWrapper';
 
 export default ChartWrapper;

@@ -33,6 +33,8 @@
     "build-production": "npm run security-audit && npm run build",
     "deploy": "npm run build-production && firebase deploy",
     "clean": "rimraf build node_modules/.cache",
+    "analyze": "npm run build && npx webpack-bundle-analyzer build/static/js/*.js",
+    "build-analyze": "npm run build && npm run analyze",
     "prestart": "node -e \"if(!require('fs').existsSync('.env')){console.log('⚠️  .env file not found. Run: npm run setup-env');process.exit(1);}\"",
     "prebuild": "npm run prestart"
   },
@@ -42,10 +44,23 @@
       "react-app/jest"
     ],
     "rules": {
-      "no-console": ["warn", { "allow": ["warn", "error"] }],
+      "no-console": [
+        "warn",
+        {
+          "allow": [
+            "warn",
+            "error"
+          ]
+        }
+      ],
       "no-debugger": "error",
       "no-alert": "error",
-      "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
+      "no-unused-vars": [
+        "warn",
+        {
+          "argsIgnorePattern": "^_"
+        }
+      ]
     }
   },
   "browserslist": {
@@ -59,5 +74,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "webpack-bundle-analyzer": "^4.10.2"
   }
 }

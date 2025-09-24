@@ -895,6 +895,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
             toast.error(t("toast_invalid_backup_file"));
             return;
           }
+          // eslint-disable-next-line no-alert
           if (!window.confirm(t("confirm_override_data"))) return;
 
           const batch = writeBatch(db);

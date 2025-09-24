@@ -81,7 +81,7 @@ const MobileMasterListView = ({
         <div className="flex justify-between items-center">
           <div>
             <h2 className="text-lg font-bold">{t("master_list")}</h2>
-            <p className="text-sm text-gray-500">{t("master_list_desc")}</p>
+            <p className="text-xs text-gray-500">{t("master_list_desc")}</p>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -155,7 +155,7 @@ const MobileMasterListView = ({
       </div>
 
       {/* Item List Section */}
-      <div className="flex-grow overflow-y-auto p-4 space-y-4">
+      <div className="flex-grow overflow-y-auto p-3 space-y-2">
         {filteredAndSortedItems.map((item) => {
           const isModelInUse = fullEquipmentList.some(
             (e) =>
@@ -173,14 +173,14 @@ const MobileMasterListView = ({
           return (
             <div
               key={item.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-700 p-4 space-y-3"
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-700 p-3 space-y-2"
             >
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-bold text-base text-blue-600 dark:text-blue-400">
+              <div className="flex items-start gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-blue-600 dark:text-blue-400 leading-tight">
                     {item.name}
                   </p>
-                  <div className="flex items-center mt-1 gap-1.5">
+                  <div className="flex items-center mt-0.5 gap-1">
                     <Layers className="w-3.5 h-3.5 text-gray-500" />
                     <span className="capitalize text-gray-700 dark:text-gray-300 text-xs">
                       {(categories.find((c) => c.id === item.category) || {})
@@ -188,14 +188,16 @@ const MobileMasterListView = ({
                     </span>
                   </div>
                 </div>
-                <span
-                  className={`px-2 py-1 text-xs rounded-full ${statusColor}`}
-                >
-                  {statusText}
-                </span>
+                <div className="flex-shrink-0 self-start">
+                  <span
+                    className={`px-2 py-0.5 text-xs rounded-full font-medium whitespace-nowrap ${statusColor}`}
+                  >
+                    {statusText}
+                  </span>
+                </div>
               </div>
 
-              <div className="border-t dark:border-gray-600 pt-3 flex justify-end space-x-2">
+              <div className="border-t dark:border-gray-600 pt-2 flex justify-end space-x-2">
                 <button
                   onClick={() => onEditItem(item)}
                   disabled={isModelInUse}
