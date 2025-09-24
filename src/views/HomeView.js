@@ -1,7 +1,13 @@
 // src/views/HomeView.js
 import React from "react";
 import ViewHeader from "../components/ViewHeader";
-import DashboardView from "./DashboardView"; // Import DashboardView
+import StatusChart from "../components/StatusChart";
+import DailyActivityChart from "../components/DailyActivityChart";
+import MonthlyTrendChart from "../components/MonthlyTrendChart";
+import CategoryDistributionChart from "../components/CategoryDistributionChart";
+import TopDevicesChart from "../components/TopDevicesChart";
+import ChartWrapper from "../components/ChartWrapper";
+import SimpleBarChart from "../components/SimpleBarChart";
 
 const HomeView = ({
   t,
@@ -12,9 +18,12 @@ const HomeView = ({
   masterListCount,
   reportsCount,
   setActiveTab,
+  chartData, // <-- THÊM PROP NÀY
+  activityLogs, // <-- THÊM PROP ACTIVITY LOGS
 }) => {
   return (
-    <div className="space-y-6 animate-scaleIn">
+    <div className="h-full overflow-y-auto">
+      <div className="space-y-6 animate-scaleIn p-1">
       {/* --- INFO SECTION --- */}
       <div className="space-y-6">
         <ViewHeader
@@ -48,6 +57,47 @@ const HomeView = ({
             <li>Giao diện được nâng cấp toàn diện với phong cách hiện đại.</li>
           </ul>
         </div>
+      </div>
+      {/* --- KHOẢNG BIỂU ĐỒ THỐNG KÊ --- */}
+      <div className="space-y-6">
+        {/* Row 1: Biểu đồ tròn + Biểu đồ phân bố danh mục */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ChartWrapper 
+            title={t("info_chart_title")}
+            hasData={chartData && chartData.data && chartData.data.length > 0}
+          >
+            <StatusChart chartData={chartData} />
+          </ChartWrapper>
+
+          <ChartWrapper 
+            hasData={equipment && equipment.length > 0}
+          >
+            <CategoryDistributionChart equipment={equipment} />
+          </ChartWrapper>
+        </div>
+
+        {/* Row 2: Top Devices + Daily Activity */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <ChartWrapper 
+            hasData={equipment && equipment.length > 0}
+          >
+            <TopDevicesChart equipment={equipment} />
+          </ChartWrapper>
+          
+          <ChartWrapper 
+            hasData={activityLogs && Array.isArray(activityLogs)}
+          >
+            <DailyActivityChart activityLogs={activityLogs} />
+          </ChartWrapper>
+        </div>
+
+        {/* Row 3: Biểu đồ xu hướng 30 ngày */}
+        <ChartWrapper 
+          hasData={activityLogs && Array.isArray(activityLogs)}
+        >
+          <MonthlyTrendChart activityLogs={activityLogs} equipment={equipment} />
+        </ChartWrapper>
+      </div>
       </div>
     </div>
   );

@@ -4,7 +4,6 @@ import {
   XCircle,
   Layers,
   Filter,
-  Search,
   ChevronDown,
   Check,
 } from "lucide-react";

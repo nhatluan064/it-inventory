@@ -1,5 +1,5 @@
 import React from "react";
-import { Trash2, Package } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 
 const LiquidationView = ({ items, onLiquidateItem, t }) => {

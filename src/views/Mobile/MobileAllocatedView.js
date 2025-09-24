@@ -3,7 +3,6 @@ import {
   RotateCcw,
   Wrench,
   Filter,
-  Search,
   ChevronDown,
   Check,
   User,

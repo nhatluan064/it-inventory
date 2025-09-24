@@ -4,7 +4,6 @@ import {
   Filter,
   ChevronDown,
   Check,
-  Package,
   User,
   Wrench,
 } from "lucide-react";

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Search,
   Edit,
@@ -6,8 +6,6 @@ import {
   Eye,
   LogOut,
   Plus,
-  Filter,
-  Package,
   User,
 } from "lucide-react";
 import { useSort } from "../hooks/useSort";

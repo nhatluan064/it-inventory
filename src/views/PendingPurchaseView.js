@@ -81,11 +81,11 @@ const PendingPurchaseView = ({
 
       <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden">
         <div className="flex-grow overflow-y-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-xs">
             <thead className="bg-gray-50 dark:bg-gray-700/50">
               <tr>
                 <th
-                  className="px-4 py-3 text-left font-semibold cursor-pointer select-none"
+                  className="px-3 py-2 text-left font-semibold cursor-pointer select-none text-xs"
                   onClick={() => requestSort("name")}
                 >
                   {t("device_name")}
@@ -93,20 +93,20 @@ const PendingPurchaseView = ({
                     (sortConfig.direction === "ascending" ? " ▲" : " ▼")}
                 </th>
                 <th
-                  className="px-4 py-3 text-left font-semibold cursor-pointer select-none"
+                  className="px-3 py-2 text-left font-semibold cursor-pointer select-none text-xs"
                   onClick={() => requestSort("category")}
                 >
                   {t("category")}
                   {sortConfig.key === "category" &&
                     (sortConfig.direction === "ascending" ? " ▲" : " ▼")}
                 </th>
-                <th className="px-4 py-3 text-center font-semibold">
+                <th className="px-3 py-2 text-center font-semibold text-xs">
                   {t("purchase_quantity")}
                 </th>
-                <th className="px-4 py-3 text-right font-semibold">
+                <th className="px-3 py-2 text-right font-semibold text-xs">
                   {t("price")} (VNĐ)
                 </th>
-                <th className="px-4 py-3 text-center font-semibold">
+                <th className="px-3 py-2 text-center font-semibold text-xs">
                   {t("actions")}
                 </th>
               </tr>
@@ -117,12 +117,12 @@ const PendingPurchaseView = ({
                   key={item.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700/30"
                 >
-                  <td className="p-4 font-semibold">{item.name}</td>
-                  <td className="p-4 capitalize">
+                  <td className="p-3 font-medium text-xs">{item.name}</td>
+                  <td className="p-3 capitalize text-xs">
                     {(categories.find((c) => c.id === item.category) || {})
                       .name || item.category}
                   </td>
-                  <td className="p-4 w-32">
+                  <td className="p-3 w-32">
                     <input
                       type="number"
                       min="1"
@@ -130,10 +130,10 @@ const PendingPurchaseView = ({
                       onChange={(e) =>
                         handleDataChange(item.id, "quantity", e.target.value)
                       }
-                      className="w-full p-2 border-2 rounded-lg text-center dark:bg-gray-700 dark:border-gray-600"
+                      className="w-full p-1.5 border-2 rounded-lg text-center text-xs dark:bg-gray-700 dark:border-gray-600"
                     />
                   </td>
-                  <td className="p-4 w-40">
+                  <td className="p-3 w-40">
                     <input
                       type="number"
                       min="0"
@@ -141,10 +141,10 @@ const PendingPurchaseView = ({
                       onChange={(e) =>
                         handleDataChange(item.id, "price", e.target.value)
                       }
-                      className="w-full p-2 border-2 rounded-lg text-right dark:bg-gray-700 dark:border-gray-600"
+                      className="w-full p-1.5 border-2 rounded-lg text-right text-xs dark:bg-gray-700 dark:border-gray-600"
                     />
                   </td>
-                  <td className="p-4 text-center w-32">
+                  <td className="p-3 text-center w-32">
                     <div className="flex items-center justify-center gap-2">
                       <button
                         onClick={() => handlePurchaseClick(item)}

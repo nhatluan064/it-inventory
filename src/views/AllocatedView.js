@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { RotateCcw, Search, Wrench, Filter } from "lucide-react";
+import { RotateCcw, Search, Wrench } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 import { departments } from "../constants";
 

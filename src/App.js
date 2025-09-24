@@ -1,12 +1,12 @@
-// src/App.js
+// src/App.js - Refactored version
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Toaster } from "react-hot-toast";
-import { Menu, Package } from "lucide-react";
 
 // Custom Hooks
 import { useAuth } from "./hooks/useAuth";
 import { useInventory } from "./hooks/useInventory";
 import { useModals } from "./hooks/useModals";
+import { useViewRendering } from "./hooks/useViewRendering";
 
 // Context
 import AppContext from "./context/AppContext";
@@ -15,85 +15,42 @@ import AppContext from "./context/AppContext";
 import { translations } from "./components/Translations";
 import { categoryStructure, statusColors } from "./constants";
 
-// Layouts and Pages
+// Layouts and Components
 import LoginPage from "./Pages/LoginPage";
-import AccountPage from "./Pages/AccountPage";
-import Sidebar from "./layouts/Sidebar";
 import AuthSuccessPopup from "./Popup/AuthSuccessPopup";
 import SetupProfilePage from "./Pages/SetupProfilePage";
-import HomeView from "./views/HomeView";
+import AppLayout from "./components/App/AppLayout";
+import AppModals from "./components/App/AppModals";
+import GlobalErrorBoundary from "./components/ErrorBoundary/GlobalErrorBoundary";
+import GlobalLoader from "./components/LoadingStates/GlobalLoader";
 
-// Desktop Views
-import DashboardView from "./views/DashboardView";
-import InventoryView from "./views/InventoryView";
-import ReportsView from "./views/ReportsView";
-import SettingsView from "./views/SettingsView";
-import PurchasingView from "./views/PurchasingView";
-import PurchasedView from "./views/PurchasedView";
-import AllocatedView from "./views/AllocatedView";
-import PendingPurchaseView from "./views/PendingPurchaseView";
-import MasterListView from "./views/MasterListView";
-import MaintenanceView from "./views/MaintenanceView";
-import LiquidationView from "./views/LiquidationView";
-
-// Mobile Views
-import MobileInventoryView from "./views/Mobile/MobileInventoryView";
-import MobileMasterListView from "./views/Mobile/MobileMasterListView";
-import MobilePendingPurchaseView from "./views/Mobile/MobilePendingPurchaseView";
-import MobilePurchasingView from "./views/Mobile/MobilePurchasingView";
-import MobilePurchasedView from "./views/Mobile/MobilePurchasedView";
-import MobileAllocatedView from "./views/Mobile/MobileAllocatedView";
-import MobileMaintenanceView from "./views/Mobile/MobileMaintenanceView";
-import MobileLiquidationView from "./views/Mobile/MobileLiquidationView";
-import MobileReportsView from "./views/Mobile/MobileReportsView";
-
-// Modals
-import AddEditModal from "./modals/AddEditModal";
-import ConfirmDeleteModal from "./modals/ConfirmDeleteModal";
-import EquipmentDetailModal from "./modals/EquipmentDetailModal";
-import EquipmentTypeModal from "./modals/EquipmentTypeModal";
-import AllocationModal from "./modals/AllocationModal";
-import CancelNoteModal from "./modals/CancelNoteModal";
-import BulkEditModal from "./modals/BulkEditModal";
-import RecallModal from "./modals/RecallModal";
-import InfoModal from "./modals/InfoModal";
-import AddFromMasterModal from "./modals/AddFromMasterModal";
-import NoteModal from "./modals/NoteModal";
-import RepairNoteModal from "./modals/RepairNoteModal";
-import UserInfoModal from "./modals/UserInfoModal";
+// Utilities
+import {
+  filterInventoryItems,
+  filterAllocatedItems,
+  getItemsByStatus,
+  getInventoryItems,
+  DEFAULT_INVENTORY_FILTERS,
+  DEFAULT_ALLOCATED_FILTERS,
+} from "./utils/filterUtils";
 
 const App = () => {
+  // Theme and UI state
   const [dashboardScrollPosition, setDashboardScrollPosition] = useState(0);
-  const [theme, setTheme] = useState(
-    () => localStorage.getItem("theme") || "system"
-  );
-  const [language, setLanguage] = useState(
-    () => localStorage.getItem("language") || "vi"
-  );
+  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "system");
+  const [language, setLanguage] = useState(() => localStorage.getItem("language") || "vi");
   const [activeTab, setActiveTab] = useState("home");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
-  const [inventoryFilters, setInventoryFilters] = useState({
-    search: "",
-    category: "all",
-    importDate: "",
-    status: "all",
-    condition: "all",
-    location: "all",
-  });
-
-  const [allocatedFilters, setAllocatedFilters] = useState({
-    search: "",
-    category: "all",
-    department: "all",
-    handoverDate: "",
-    sortKey: "category",
-    sortDirection: "asc",
-  });
-
+  // Sidebar state
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
+  // Filter states
+  const [inventoryFilters, setInventoryFilters] = useState(DEFAULT_INVENTORY_FILTERS);
+  const [allocatedFilters, setAllocatedFilters] = useState(DEFAULT_ALLOCATED_FILTERS);
+
+  // Translation function
   const t = useCallback(
     (key, params = {}) => {
       let translation = translations[language]?.[key] || key;
@@ -105,11 +62,12 @@ const App = () => {
     [language]
   );
 
+  // Custom hooks
   const {
     currentUser,
     authLoading,
     authSuccessType,
-    isRegisteringFlow, // <<< LẤY STATE MỚI
+    isRegisteringFlow,
     login,
     googleSignIn,
     signUp,
@@ -118,13 +76,11 @@ const App = () => {
     finishAuthSuccess,
     setupProfile,
   } = useAuth();
+  
   const inventory = useInventory(currentUser, t, setActiveTab);
   const modals = useModals();
 
-  const categories = useMemo(
-    () => categoryStructure.map((cat) => ({ ...cat, name: t(cat.tKey) })),
-    [t]
-  );
+  // Computed values - StatusLabels first to avoid dependency issue
   const statusLabels = useMemo(
     () => ({
       available: t("available"),
@@ -139,108 +95,127 @@ const App = () => {
     }),
     [t]
   );
+
+  const categories = useMemo(
+    () => categoryStructure.map((cat) => ({ ...cat, name: t(cat.tKey) })),
+    [t]
+  );
+
+  // Filtered data
   const pendingPurchaseItems = useMemo(
-    () =>
-      inventory.equipment.filter((item) => item.status === "pending-purchase"),
+    () => getItemsByStatus(inventory.equipment, "pending-purchase"),
     [inventory.equipment]
   );
+
   const purchasingItems = useMemo(
-    () => inventory.equipment.filter((item) => item.status === "purchasing"),
+    () => getItemsByStatus(inventory.equipment, "purchasing"),
     [inventory.equipment]
   );
+
   const purchasedItems = useMemo(
-    () => inventory.equipment.filter((item) => item.status === "purchased"),
+    () => getItemsByStatus(inventory.equipment, "purchased"),
     [inventory.equipment]
   );
+
   const maintenanceItems = useMemo(
-    () => inventory.equipment.filter((item) => item.status === "maintenance"),
+    () => getItemsByStatus(inventory.equipment, "maintenance"),
     [inventory.equipment]
   );
+
   const liquidationItems = useMemo(
-    () => inventory.equipment.filter((item) => item.status === "liquidation"),
+    () => getItemsByStatus(inventory.equipment, "liquidation"),
     [inventory.equipment]
   );
 
   const inventoryItems = useMemo(
-    () =>
-      inventory.equipment.filter(
-        (item) =>
-          !["pending-purchase", "purchasing", "purchased", "master"].includes(
-            item.status
-          )
-      ),
+    () => getInventoryItems(inventory.equipment),
     [inventory.equipment]
   );
 
-  const filteredInventory = useMemo(() => {
-    return inventoryItems.filter((item) => {
-      const { search, category, importDate, status, condition } =
-        inventoryFilters;
-      const query = search.toLowerCase();
+  const filteredInventory = useMemo(
+    () => filterInventoryItems(inventoryItems, inventoryFilters, t),
+    [inventoryItems, inventoryFilters, t]
+  );
 
-      const searchMatch =
-        !query ||
-        item.name?.toLowerCase().includes(query) ||
-        item.serialNumber?.toLowerCase().includes(query);
+  const allocatedItems = useMemo(
+    () => filterAllocatedItems(inventory.equipment, allocatedFilters, t),
+    [inventory.equipment, allocatedFilters, t]
+  );
 
-      const categoryMatch = category === "all" || item.category === category;
-      const dateMatch =
-        !importDate ||
-        new Date(item.importDate).toLocaleDateString("en-CA") === importDate;
-      const statusMatch = status === "all" || item.status === status;
+  const masterItems = useMemo(
+    () => getItemsByStatus(inventory.equipment, "master"),
+    [inventory.equipment]
+  );
 
-      const getConditionKey = (cond) => {
-        if (typeof cond === "object" && cond !== null) return cond.key;
-        return cond;
-      };
-      const conditionMatch =
-        condition === "all" || getConditionKey(item.condition) === condition;
+  const uniqueMasterItemsCount = useMemo(
+    () => masterItems.length,
+    [masterItems]
+  );
 
-      return (
-        searchMatch &&
-        categoryMatch &&
-        dateMatch &&
-        statusMatch &&
-        conditionMatch
-      );
-    });
-  }, [inventoryItems, inventoryFilters]);
+  // Chart data for dashboard
+  const inventoryStatusChartData = useMemo(() => {
+    // Chỉ tính các thiết bị trong kho chính, không tính quy trình mua hàng
+    const mainInventory = inventoryItems;
 
-  const allocatedItems = useMemo(() => {
-    return inventory.equipment.filter((item) => {
-      if (item.status !== "in-use") return false;
+    const counts = mainInventory.reduce((acc, item) => {
+      acc[item.status] = (acc[item.status] || 0) + 1;
+      return acc;
+    }, {});
 
-      const { search, category, department, handoverDate } = allocatedFilters;
-      const query = search.toLowerCase();
-      const details = item.allocationDetails || {};
+    const statusKeys = Object.keys(counts);
+    const labels = statusKeys.map((key) => statusLabels[key] || key);
+    const data = statusKeys.map((key) => counts[key]);
 
-      const searchMatch =
-        !query ||
-        item.name?.toLowerCase().includes(query) ||
-        item.serialNumber?.toLowerCase().includes(query) ||
-        details.recipientName?.toLowerCase().includes(query) ||
-        details.employeeId?.toLowerCase().includes(query);
+    return { labels, data, statusKeys };
+  }, [inventoryItems, statusLabels]);
 
-      const categoryMatch = category === "all" || item.category === category;
-      const departmentMatch =
-        department === "all" || details.department === department;
-      const dateMatch =
-        !handoverDate ||
-        new Date(details.handoverDate).toLocaleDateString("en-CA") ===
-          handoverDate;
+  // Context value
+  const appContextValue = useMemo(
+    () => ({ theme, setTheme, language, setLanguage, t }),
+    [theme, language, t]
+  );
 
-      return searchMatch && categoryMatch && departmentMatch && dateMatch;
-    });
-  }, [inventory.equipment, allocatedFilters]);
+  // Event handlers
+  const handleTabClick = useCallback((tabId) => {
+    setActiveTab(tabId);
+    if (isMobile) {
+      setMobileSidebarOpen(false);
+    }
+  }, [isMobile]);
 
-  const masterItems = useMemo(() => {
-    return inventory.equipment.filter((item) => item.status === "master");
-  }, [inventory.equipment]);
+  // View rendering hook
+  const { renderCurrentView } = useViewRendering({
+    activeTab,
+    isMobile,
+    t,
+    categories,
+    statusColors,
+    statusLabels,
+    inventory,
+    modals,
+    pendingPurchaseItems,
+    purchasingItems,
+    purchasedItems,
+    maintenanceItems,
+    liquidationItems,
+    inventoryItems,
+    filteredInventory,
+    allocatedItems,
+    masterItems,
+    uniqueMasterItemsCount,
+    inventoryFilters,
+    setInventoryFilters,
+    allocatedFilters,
+    setAllocatedFilters,
+    handleTabClick,
+    dashboardScrollPosition,
+    setDashboardScrollPosition,
+    currentUser,
+    passwordReset,
+    inventoryStatusChartData,
+  });
 
-  const uniqueMasterItemsCount = useMemo(() => {
-    return masterItems.length;
-  }, [masterItems]);
-
+  // Effects
   useEffect(() => {
     localStorage.setItem("theme", theme);
     const root = window.document.documentElement;
@@ -273,59 +248,7 @@ const App = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleTabClick = (tabId) => {
-    setActiveTab(tabId);
-    if (isMobile) {
-      setMobileSidebarOpen(false);
-    }
-  };
-
-  const getConfirmationDetails = () => {
-    const name = modals.currentItem?.name || "";
-    const strongName = `<strong class="text-red-600">${name}</strong>`;
-    switch (modals.deleteType) {
-      case "master":
-        return {
-          title: t("confirm_delete_master_title"),
-          text: t("confirm_delete_master_text", { itemName: strongName }),
-        };
-      case "inventory":
-        return {
-          title: t("confirm_delete_inventory_title"),
-          text: t("confirm_delete_inventory_text", { itemName: strongName }),
-        };
-      case "liquidate":
-        return {
-          title: t("confirm_liquidate_title"),
-          text: t("confirm_liquidate_text", { itemName: strongName }),
-        };
-      case "reset":
-        return {
-          title: t("reset_data"),
-          text: t("are_you_sure_reset_data", {
-            itemName: `<strong class="text-red-600">${t("all_data")}</strong>`,
-          }),
-        };
-      case "delete_logs":
-        return {
-          title: t("delete_activity_log"),
-          text: t("delete_log_warning"),
-        };
-      case "move-to-liquidation":
-        return {
-          title: t("confirm_move_to_liquidation_title"),
-          text: t("confirm_move_to_liquidation_text", { itemName: strongName }),
-        };
-      default:
-        return { title: t("confirm"), text: t("are_you_sure_generic") };
-    }
-  };
-
-  const appContextValue = useMemo(
-    () => ({ theme, setTheme, language, setLanguage, t }),
-    [theme, language, t]
-  );
-
+  // Loading screen component
   const renderLoadingScreen = () => (
     <div className="flex h-screen w-screen items-center justify-center">
       <div className="flex space-x-2">
@@ -336,11 +259,7 @@ const App = () => {
     </div>
   );
 
-  // =================================================================
-  //                       LOGIC RENDER MỚI (ĐÃ SỬA LỖI)
-  // =================================================================
-
-  // Ưu tiên 1: Hiển thị trang thông báo nếu đăng ký thành công
+  // Render logic - Early returns for different states
   if (authSuccessType) {
     return (
       <AppContext.Provider value={appContextValue}>
@@ -353,12 +272,10 @@ const App = () => {
     );
   }
 
-  // Ưu tiên 2: Hiển thị màn hình chờ nếu đang loading auth hoặc trong luồng đăng ký
   if (authLoading || isRegisteringFlow) {
     return renderLoadingScreen();
   }
 
-  // Ưu tiên 3: Nếu không có user, hiển thị trang đăng nhập
   if (!currentUser) {
     return (
       <AppContext.Provider value={appContextValue}>
@@ -374,7 +291,6 @@ const App = () => {
     );
   }
 
-  // Ưu tiên 4: Nếu có user nhưng chưa có tên, hiển thị trang nhập thông tin
   if (currentUser && !currentUser.displayName) {
     return (
       <AppContext.Provider value={appContextValue}>
@@ -388,464 +304,57 @@ const App = () => {
     );
   }
 
-  // Ưu tiên 5: Nếu đang tải dữ liệu kho, hiển thị màn hình chờ
   if (inventory.dataLoading) {
-    return renderLoadingScreen();
+    return (
+      <GlobalErrorBoundary t={t}>
+        <GlobalLoader message={t('loading_inventory')} t={t} />
+      </GlobalErrorBoundary>
+    );
   }
 
-  // =================================================================
-  //                       PHẦN RENDER GIAO DIỆN CHÍNH
-  // =================================================================
-
-  const handleConfirmDelete = () => {
-    const { deleteType, currentItem, closeModal } = modals;
-    if (deleteType === "master") inventory.deleteMasterItem(currentItem);
-    else if (deleteType === "inventory") inventory.deleteItem(currentItem);
-    else if (deleteType === "liquidate") inventory.liquidateItem(currentItem);
-    else if (deleteType === "move-to-liquidation")
-      inventory.markUnrepairable(currentItem);
-    else if (deleteType === "reset") inventory.resetData();
-    else if (deleteType === "delete_logs") inventory.deleteLogs();
-    closeModal("delete");
-  };
-
-  const renderCurrentView = () => {
-    const currentTab = activeTab || "inventory";
-    const viewProps = { t, categories, statusColors, statusLabels };
-    const mobileViewProps = {
-      ...viewProps,
-      onViewItem: (item) => modals.openModal("view", item),
-      onEditItem: (item) => modals.openModal("addEdit", item),
-      onAllocateItem: (item) => modals.openModal("allocation", item),
-      onDeleteItem: (item) =>
-        modals.openModal("delete", item, { deleteType: "inventory" }),
-    };
-
-    switch (currentTab) {
-      case "home":
-        return (
-          <HomeView
-            {...viewProps}
-            equipment={inventory.equipment}
-            pendingPurchaseCount={pendingPurchaseItems.length}
-            purchasingCount={purchasingItems.length}
-            purchasedCount={purchasedItems.length}
-            masterListCount={uniqueMasterItemsCount}
-            reportsCount={inventory.transactions.length}
-            setActiveTab={handleTabClick}
-            scrollPosition={dashboardScrollPosition}
-            setScrollPosition={setDashboardScrollPosition}
-          />
-        );
-      case "masterList":
-        return isMobile ? (
-          <MobileMasterListView
-            {...viewProps}
-            allItems={masterItems}
-            fullEquipmentList={inventory.equipment}
-            onAddType={() => modals.openModal("type")}
-            onEditItem={(item) => modals.openModal("type", item)}
-            onDeleteItem={(item) =>
-              modals.openModal("delete", item, { deleteType: "master" })
-            }
-          />
-        ) : (
-          <MasterListView
-            {...viewProps}
-            allItems={masterItems}
-            fullEquipmentList={inventory.equipment}
-            onAddType={() => modals.openModal("type")}
-            onEditItem={(item) => modals.openModal("type", item)}
-            onDeleteItem={(item) =>
-              modals.openModal("delete", item, { deleteType: "master" })
-            }
-          />
-        );
-      case "pendingPurchase":
-        return isMobile ? (
-          <MobilePendingPurchaseView
-            {...viewProps}
-            items={pendingPurchaseItems}
-            onStartPurchase={inventory.startPurchasing}
-            onDeleteItem={inventory.cancelOrRevertPurchase}
-            onOpenAddFromMasterModal={() => modals.openModal("addFromMaster")}
-          />
-        ) : (
-          <PendingPurchaseView
-            {...viewProps}
-            items={pendingPurchaseItems}
-            onStartPurchase={inventory.startPurchasing}
-            onDeleteItem={inventory.cancelOrRevertPurchase}
-            onOpenAddFromMasterModal={() => modals.openModal("addFromMaster")}
-          />
-        );
-      case "purchasing":
-        return isMobile ? (
-          <MobilePurchasingView
-            {...viewProps}
-            items={purchasingItems}
-            onUpdateStatus={inventory.confirmPurchased}
-            onCancel={(item) => modals.openModal("cancelNote", item)}
-          />
-        ) : (
-          <PurchasingView
-            {...viewProps}
-            items={purchasingItems}
-            onUpdateStatus={inventory.confirmPurchased}
-            onCancel={(type, item) =>
-              type === "cancel-purchasing"
-                ? modals.openModal("cancelNote", item)
-                : inventory.cancelOrRevertPurchase(type, item)
-            }
-          />
-        );
-      case "purchased":
-        return isMobile ? (
-          <MobilePurchasedView
-            {...viewProps}
-            items={purchasedItems}
-            onImportItem={inventory.importPurchasedItems}
-            fullInventory={inventory.equipment}
-          />
-        ) : (
-          <PurchasedView
-            {...viewProps}
-            items={purchasedItems}
-            onImportItem={inventory.importPurchasedItems}
-            fullInventory={inventory.equipment}
-          />
-        );
-      case "inventory":
-        return isMobile ? (
-          <MobileInventoryView
-            {...mobileViewProps}
-            equipment={filteredInventory}
-            unfilteredEquipment={inventoryItems}
-            filters={inventoryFilters}
-            setFilters={setInventoryFilters}
-            onAddLegacyItem={() => modals.openModal("addEdit")}
-          />
-        ) : (
-          <InventoryView
-            {...viewProps}
-            equipment={filteredInventory}
-            unfilteredEquipment={inventoryItems}
-            filters={inventoryFilters}
-            setFilters={setInventoryFilters}
-            onEditItem={(item) => modals.openModal("addEdit", item)}
-            onDeleteItem={(item) =>
-              modals.openModal("delete", item, { deleteType: "inventory" })
-            }
-            onViewItem={(item) => modals.openModal("view", item)}
-            onAllocateItem={(item) => modals.openModal("allocation", item)}
-            onAddLegacyItem={() => modals.openModal("addEdit")}
-          />
-        );
-      case "allocated":
-        return isMobile ? (
-          <MobileAllocatedView
-            {...viewProps}
-            items={allocatedItems}
-            onRecallItem={(item) => modals.openModal("recall", item)}
-            onMarkDamaged={(item) =>
-              modals.openModal("directMaintenanceNote", item)
-            }
-            filters={allocatedFilters}
-            setFilters={setAllocatedFilters}
-          />
-        ) : (
-          <AllocatedView
-            {...viewProps}
-            items={allocatedItems}
-            unfilteredAllocatedItems={inventory.equipment.filter(
-              (i) => i.status === "in-use"
-            )}
-            onRecallItem={(item) => modals.openModal("recall", item)}
-            onMarkDamaged={(item) =>
-              modals.openModal("directMaintenanceNote", item)
-            }
-            filters={allocatedFilters}
-            setFilters={setAllocatedFilters}
-          />
-        );
-      case "maintenance":
-        const maintenanceViewProps = {
-          ...viewProps,
-          items: maintenanceItems,
-          onRepairComplete: (item) => modals.openModal("repairNote", item),
-          onMarkUnrepairable: (item) =>
-            modals.openModal("delete", item, {
-              deleteType: "move-to-liquidation",
-            }),
-          onEditNote: (item) => modals.openModal("note", item),
-        };
-        return isMobile ? (
-          <MobileMaintenanceView {...maintenanceViewProps} />
-        ) : (
-          <MaintenanceView {...maintenanceViewProps} />
-        );
-      case "liquidation":
-        const liquidationViewProps = {
-          ...viewProps,
-          items: liquidationItems,
-          onLiquidateItem: (item) =>
-            modals.openModal("delete", item, { deleteType: "liquidate" }),
-        };
-        return isMobile ? (
-          <MobileLiquidationView {...liquidationViewProps} />
-        ) : (
-          <LiquidationView {...liquidationViewProps} />
-        );
-      case "reports":
-        const reportsViewProps = {
-          ...viewProps,
-          transactions: inventory.transactions,
-        };
-        return isMobile ? (
-          <MobileReportsView {...reportsViewProps} />
-        ) : (
-          <ReportsView {...reportsViewProps} />
-        );
-      case "settings":
-        return (
-          <SettingsView
-            {...viewProps}
-            onBackupData={inventory.backupData}
-            onResetData={() =>
-              modals.openModal("delete", null, { deleteType: "reset" })
-            }
-            onDeleteLogs={() =>
-              modals.openModal("delete", null, { deleteType: "delete_logs" })
-            }
-            onImportData={(e) => inventory.importData(e.target.files[0])}
-          />
-        );
-      case "account":
-        return (
-          <AccountPage
-            {...viewProps}
-            currentUser={currentUser}
-            onPasswordReset={passwordReset}
-          />
-        );
-      default:
-        return <HomeView {...viewProps} />;
-    }
-  };
-
+  // Main app render
   return (
-    <AppContext.Provider value={appContextValue}>
-      <div className="flex h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 overflow-hidden">
-        <Sidebar
-          activeTab={activeTab}
-          setActiveTab={handleTabClick}
-          currentUser={currentUser}
-          onLogout={logout}
-          t={t}
-          isCollapsed={isSidebarCollapsed}
-          toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          isMobile={isMobile}
-          isMobileOpen={isMobileSidebarOpen}
-          setMobileOpen={setMobileSidebarOpen}
-          onSettingsClick={() => handleTabClick("settings")}
-          onViewProfile={() => modals.openModal("userInfo", currentUser)}
-        />
+    <GlobalErrorBoundary t={t}>
+      <AppContext.Provider value={appContextValue}>
+        <AppLayout
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        currentUser={currentUser}
+        onLogout={logout}
+        t={t}
+        isSidebarCollapsed={isSidebarCollapsed}
+        toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        isMobile={isMobile}
+        isMobileSidebarOpen={isMobileSidebarOpen}
+        setMobileSidebarOpen={setMobileSidebarOpen}
+        onSettingsClick={() => handleTabClick("settings")}
+        onViewProfile={() => modals.openModal("userInfo", currentUser)}
+        equipment={inventory.equipment}
+        pendingPurchaseCount={pendingPurchaseItems.length}
+        purchasingCount={purchasingItems.length}
+        purchasedCount={purchasedItems.length}
+        masterListCount={uniqueMasterItemsCount}
+        reportsCount={inventory.transactions.length}
+        dashboardScrollPosition={dashboardScrollPosition}
+        setDashboardScrollPosition={setDashboardScrollPosition}
+      >
+        {renderCurrentView()}
+      </AppLayout>
 
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <Toaster
-            position="top-right"
-            reverseOrder={false}
-            containerStyle={{ top: 20, right: 20 }}
-          />
-
-          <header className="lg:hidden sticky top-0 z-30 bg-white dark:bg-gray-800 shadow-md p-4 flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <Package className="w-8 h-8 text-blue-600" />
-              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                {t("it_inventory")}
-              </h1>
-            </div>
-            <button
-              onClick={() => setMobileSidebarOpen(true)}
-              className="p-2 text-gray-600 dark:text-gray-300"
-              aria-label="Open menu"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-          </header>
-
-          <header className="hidden lg:block p-4 sm:p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex-grow min-w-0">
-              <DashboardView
-                t={t}
-                equipment={inventory.equipment}
-                pendingPurchaseCount={pendingPurchaseItems.length}
-                purchasingCount={purchasingItems.length}
-                purchasedCount={purchasedItems.length}
-                masterListCount={uniqueMasterItemsCount}
-                reportsCount={inventory.transactions.length}
-                setActiveTab={handleTabClick}
-                scrollPosition={dashboardScrollPosition}
-                setScrollPosition={setDashboardScrollPosition}
-              />
-            </div>
-          </header>
-
-          <main className="flex-1 flex flex-col gap-6 overflow-hidden p-4 sm:p-6 lg:p-8">
-            <div className="lg:hidden flex-shrink-0 -mx-4 -mt-4 sm:-mx-6 sm:-mt-6">
-              <div className="p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                <DashboardView
-                  t={t}
-                  equipment={inventory.equipment}
-                  pendingPurchaseCount={pendingPurchaseItems.length}
-                  purchasingCount={purchasingItems.length}
-                  purchasedCount={purchasedItems.length}
-                  masterListCount={uniqueMasterItemsCount}
-                  reportsCount={inventory.transactions.length}
-                  setActiveTab={handleTabClick}
-                  scrollPosition={dashboardScrollPosition}
-                  setScrollPosition={setDashboardScrollPosition}
-                />
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-hidden">{renderCurrentView()}</div>
-          </main>
-        </div>
-
-        {/* Modals */}
-        <BulkEditModal
-          show={modals.modalState.bulkEdit}
-          onClose={() => modals.closeModal("bulkEdit")}
-          onSubmit={inventory.batchUpdateItems}
-          group={modals.currentItem}
-          categories={categories}
-          t={t}
-        />
-
-        <EquipmentTypeModal
-          show={modals.modalState.type}
-          onClose={() => modals.closeModal("type")}
-          onSubmit={
-            modals.currentItem?.id
-              ? inventory.updateMasterItem
-              : inventory.addEquipmentType
-          }
-          categories={categories}
-          t={t}
-          initialData={modals.currentItem}
-        />
-        <AddEditModal
-          show={modals.modalState.addEdit}
-          onClose={() => modals.closeModal("addEdit")}
-          onSubmit={
-            modals.currentItem ? inventory.updateItem : inventory.addLegacyItem
-          }
-          initialData={modals.currentItem}
-          categories={categories}
-          t={t}
-        />
-        <ConfirmDeleteModal
-          show={modals.modalState.delete}
-          onClose={() => modals.closeModal("delete")}
-          onConfirm={handleConfirmDelete}
-          title={getConfirmationDetails().title}
-          confirmationText={getConfirmationDetails().text}
-          t={t}
-        />
-        <EquipmentDetailModal
-          show={modals.modalState.view}
-          onClose={() => modals.closeModal("view")}
-          item={modals.currentItem}
-          categories={categories}
-          statusLabels={statusLabels}
-          statusColors={statusColors}
-          t={t}
-        />
-        <AllocationModal
-          show={modals.modalState.allocation}
-          onClose={() => modals.closeModal("allocation")}
-          onSubmit={inventory.allocateItem}
-          item={modals.currentItem}
-          t={t}
-        />
-        <CancelNoteModal
-          show={modals.modalState.cancelNote}
-          onClose={() => modals.closeModal("cancelNote")}
-          onSubmit={(note) =>
-            inventory.cancelWithNote(modals.currentItem, note)
-          }
-          itemName={modals.currentItem?.name}
-          t={t}
-        />
-        <RecallModal
-          show={modals.modalState.recall}
-          onClose={() => modals.closeModal("recall")}
-          onSubmit={inventory.recallItem}
-          item={modals.currentItem}
-          t={t}
-        />
-        <InfoModal
-          show={modals.modalState.info}
-          onClose={() => modals.closeModal("info")}
-          message={modals.infoMessage}
-          t={t}
-        />
-        <AddFromMasterModal
-          show={modals.modalState.addFromMaster}
-          onClose={() => modals.closeModal("addFromMaster")}
-          masterItems={masterItems}
-          pendingItems={pendingPurchaseItems}
-          onAddItem={inventory.requestFromMaster}
-          t={t}
-        />
-        <ConfirmDeleteModal
-          show={modals.modalState.resetConfirm}
-          onClose={() => modals.closeModal("resetConfirm")}
-          onConfirm={inventory.resetData}
-          title={t("reset_data")}
-          confirmationText={t("are_you_sure_reset_data", {
-            itemName: `<strong class="text-red-600">${t("all_data")}</strong>`,
-          })}
-          t={t}
-        />
-        <NoteModal
-          show={modals.modalState.note}
-          onClose={() => modals.closeModal("note")}
-          onSubmit={(newNote) =>
-            inventory.updateMaintenanceNote(modals.currentItem, newNote)
-          }
-          initialNote={modals.currentItem?.condition}
-          title={t("edit_failure_note")}
-          t={t}
-        />
-        <RepairNoteModal
-          show={modals.modalState.repairNote}
-          onClose={() => modals.closeModal("repairNote")}
-          onSubmit={inventory.completeRepair}
-          item={modals.currentItem}
-          t={t}
-        />
-        <NoteModal
-          show={modals.modalState.directMaintenanceNote}
-          onClose={() => modals.closeModal("directMaintenanceNote")}
-          onSubmit={(note) => {
-            inventory.markAsDamaged(modals.currentItem, note);
-            modals.closeModal("directMaintenanceNote");
-          }}
-          initialNote=""
-          title={t("failure_note")}
-          t={t}
-        />
-        <UserInfoModal
-          show={modals.modalState.userInfo}
-          onClose={() => modals.closeModal("userInfo")}
-          currentUser={modals.currentItem}
-          onPasswordReset={passwordReset}
-          t={t}
-        />
-      </div>
+      <AppModals
+        modals={modals}
+        categories={categories}
+        statusLabels={statusLabels}
+        statusColors={statusColors}
+        masterItems={masterItems}
+        pendingPurchaseItems={pendingPurchaseItems}
+        inventory={inventory}
+        currentUser={currentUser}
+        passwordReset={passwordReset}
+        t={t}
+      />
     </AppContext.Provider>
+    </GlobalErrorBoundary>
   );
 };
 

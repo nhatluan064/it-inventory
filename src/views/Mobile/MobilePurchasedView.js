@@ -3,7 +3,6 @@ import {
   LogIn,
   Layers,
   Filter,
-  Search,
   ChevronDown,
   Check,
 } from "lucide-react";

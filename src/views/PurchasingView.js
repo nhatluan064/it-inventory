@@ -27,11 +27,11 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
 
       <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden">
         <div className="flex-grow overflow-y-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-xs">
             <thead className="bg-gray-50 dark:bg-gray-700/50">
               <tr>
                 <th
-                  className="px-4 py-3 text-left font-semibold cursor-pointer select-none"
+                  className="px-3 py-2 text-left font-semibold cursor-pointer select-none text-xs"
                   onClick={() => requestSort("name")}
                 >
                   {t("device_name")}
@@ -39,20 +39,20 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
                     (sortConfig.direction === "ascending" ? " ▲" : " ▼")}
                 </th>
                 <th
-                  className="px-4 py-3 text-left font-semibold cursor-pointer select-none"
+                  className="px-3 py-2 text-left font-semibold cursor-pointer select-none text-xs"
                   onClick={() => requestSort("category")}
                 >
                   {t("category")}
                   {sortConfig.key === "category" &&
                     (sortConfig.direction === "ascending" ? " ▲" : " ▼")}
                 </th>
-                <th className="px-4 py-3 text-center font-semibold">
+                <th className="px-3 py-2 text-center font-semibold text-xs">
                   {t("purchase_quantity")}
                 </th>
-                <th className="px-4 py-3 text-right font-semibold">
+                <th className="px-3 py-2 text-right font-semibold text-xs">
                   {t("price")} (VNĐ)
                 </th>
-                <th className="px-4 py-3 text-center font-semibold">
+                <th className="px-3 py-2 text-center font-semibold text-xs">
                   {t("actions")}
                 </th>
               </tr>
@@ -64,10 +64,10 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
                     key={item.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/30"
                   >
-                    <td className="p-4 font-semibold">{item.name}</td>
-                    <td className="p-4 capitalize">
+                    <td className="p-3 font-medium text-xs">{item.name}</td>
+                    <td className="p-3 capitalize text-xs">
                       <div className="flex items-center gap-1.5">
-                        <Layers className="w-4 h-4 text-gray-500" />
+                        <Layers className="w-3 h-3 text-gray-500" />
                         <span>
                           {(
                             categories.find((c) => c.id === item.category) || {}
@@ -75,13 +75,13 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
                         </span>
                       </div>
                     </td>
-                    <td className="p-4 text-center font-semibold">
+                    <td className="p-3 text-center font-medium text-xs">
                       {item.purchaseQuantity}
                     </td>
-                    <td className="p-4 text-right font-mono">
+                    <td className="p-3 text-right font-mono text-xs">
                       {formatCurrency(item.price)}
                     </td>
-                    <td className="p-4 text-center">
+                    <td className="p-3 text-center">
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => onUpdateStatus([item.id])}

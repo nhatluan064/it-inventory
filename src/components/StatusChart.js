@@ -1,0 +1,137 @@
+// src/components/StatusChart.js
+import React, { useContext } from "react";
+import { Pie } from "react-chartjs-2";
+import "../utils/chartSetup"; // Import chart setup
+import AppContext from "../context/AppContext";
+
+const StatusChart = React.memo(({ chartData }) => {
+  const { theme, t } = useContext(AppContext);
+
+  // Ánh xạ màu từ Tailwind sang mã màu thực tế cho biểu đồ
+  const statusColorMapping = {
+    available: "#22C55E", // green-500
+    "in-use": "#3B82F6", // blue-500
+    maintenance: "#F59E0B", // yellow-500 / amber-500
+    liquidation: "#EF4444", // red-500
+    broken: "#EF4444", // red-500
+  };
+
+  const data = {
+    labels: chartData.labels,
+    datasets: [
+      {
+        label: t("quantity"),
+        data: chartData.data,
+        backgroundColor: chartData.statusKeys.map(
+          (key) => statusColorMapping[key] || "#6B7280"
+        ), // Dùng màu xám cho các trạng thái khác
+        borderColor: theme === "dark" ? "#1F2937" : "#FFFFFF", // Màu viền của các miếng bánh
+        borderWidth: 2,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "right",
+        labels: {
+          color: theme === "dark" ? "#E5E7EB" : "#374151", // Màu chữ của chú thích
+          font: {
+            size: 12,
+          },
+          boxWidth: 20,
+          padding: 20,
+          generateLabels: function(chart) {
+            const data = chart.data;
+            if (data.labels.length && data.datasets.length) {
+              return data.labels.map((label, i) => {
+                const value = data.datasets[0].data[i];
+                return {
+                  text: `${label}: ${value}`,
+                  fillStyle: data.datasets[0].backgroundColor[i],
+                  strokeStyle: data.datasets[0].borderColor,
+                  lineWidth: data.datasets[0].borderWidth,
+                  hidden: false,
+                  index: i
+                };
+              });
+            }
+            return [];
+          }
+        },
+      },
+      datalabels: {
+        display: function(context) {
+          // Chỉ hiển thị label nếu giá trị > 0
+          return context.parsed > 0;
+        },
+        color: '#FFFFFF',
+        font: {
+          weight: 'bold',
+          size: 11
+        },
+        formatter: (value, context) => {
+          const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+          const percentage = ((value / total) * 100).toFixed(0);
+          // Chỉ hiển thị số nếu phần trăm >= 5% để tránh cluttered
+          return percentage >= 5 ? `${value}` : '';
+        },
+        textAlign: 'center',
+        textStrokeColor: '#000000',
+        textStrokeWidth: 1
+      },
+      tooltip: {
+        backgroundColor: theme === "dark" ? "#374151" : "#FFFFFF",
+        titleColor: theme === "dark" ? "#E5E7EB" : "#374151",
+        bodyColor: theme === "dark" ? "#E5E7EB" : "#374151",
+        borderColor: theme === "dark" ? "#4B5563" : "#E5E7EB",
+        borderWidth: 1,
+        callbacks: {
+          label: function(context) {
+            const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+            const percentage = ((context.parsed / total) * 100).toFixed(1);
+            return `${context.label}: ${context.parsed} (${percentage}%)`;
+          }
+        }
+      },
+    },
+  };
+
+  // Kiểm tra dữ liệu hợp lệ
+  if (!chartData || !chartData.data || chartData.data.length === 0) {
+    return (
+      <div className="relative h-64 md:h-80 flex items-center justify-center">
+        <p className="text-gray-500 dark:text-gray-400">
+          {t('no_data_available')}
+        </p>
+      </div>
+    );
+  }
+
+  try {
+    return (
+      <div className="relative h-64 md:h-80">
+        <Pie 
+          key={`status-chart-${Date.now()}`}
+          data={data} 
+          options={options}
+          redraw={true}
+        />
+      </div>
+    );
+  } catch (error) {
+    console.error('StatusChart render error:', error);
+    return (
+      <div className="relative h-64 md:h-80 flex items-center justify-center">
+        <p className="text-red-500 dark:text-red-400">
+          Lỗi hiển thị biểu đồ trạng thái
+        </p>
+      </div>
+    );
+  }
+});
+
+export default StatusChart;

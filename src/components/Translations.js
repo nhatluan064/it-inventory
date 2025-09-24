@@ -2,6 +2,19 @@
 export const translations = {
   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   vi: {
+    info_chart_title: "Tình trạng Kho hiện tại",
+    daily_activity_chart_title: "Hoạt động 7 ngày gần nhất",
+    monthly_trend_chart_title: "Xu hướng hoạt động 30 ngày",
+    chart_import_label: "Nhập kho",
+    chart_export_label: "Xuất kho", 
+    chart_maintenance_label: "Bảo trì",
+    chart_total_activity_label: "Tổng hoạt động",
+    chart_cumulative_import_label: "Tích lũy Nhập kho",
+    chart_cumulative_export_label: "Tích lũy Xuất kho",
+    chart_daily_activity_label: "Hoạt động hàng ngày",
+    category_distribution_title: "Phân bố thiết bị theo danh mục",
+    top_devices_title: "Top 5 thiết bị phổ biến nhất",
+    total: "Tổng cộng",
     delete_activity_log: "Xóa Lịch sử Hoạt động",
     delete_log_warning:
       "Hành động này sẽ xóa vĩnh viễn toàn bộ lịch sử hoạt động. Không thể hoàn tác.",
@@ -456,6 +469,19 @@ export const translations = {
   },
   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   en: {
+    info_chart_title: "Current Inventory Status",
+    daily_activity_chart_title: "Last 7 Days Activity",
+    monthly_trend_chart_title: "30 Days Activity Trend",
+    chart_import_label: "Import",
+    chart_export_label: "Export",
+    chart_maintenance_label: "Maintenance", 
+    chart_total_activity_label: "Total Activity",
+    chart_cumulative_import_label: "Cumulative Import",
+    chart_cumulative_export_label: "Cumulative Export",
+    chart_daily_activity_label: "Daily Activity",
+    category_distribution_title: "Device Distribution by Category",
+    top_devices_title: "Top 5 Most Popular Devices",
+    total: "Total",
     delete_activity_log: "Delete Activity Log",
     delete_log_warning:
       "This action will permanently delete all activity history. This cannot be undone.",
@@ -893,6 +919,19 @@ export const translations = {
   },
   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   zh: {
+    info_chart_title: "当前库存状态",
+    daily_activity_chart_title: "最近7天活动",
+    monthly_trend_chart_title: "30天活动趋势",
+    chart_import_label: "入库",
+    chart_export_label: "出库",
+    chart_maintenance_label: "维护",
+    chart_total_activity_label: "总活动",
+    chart_cumulative_import_label: "累计入库",
+    chart_cumulative_export_label: "累计出库", 
+    chart_daily_activity_label: "每日活动",
+    category_distribution_title: "按类别分布设备",
+    top_devices_title: "前5名最受欢迎设备",
+    total: "总计",
     delete_activity_log: "删除活动日志",
     delete_log_warning: "此操作将永久删除所有活动历史记录，无法撤销。",
     delete_log_button: "删除日志",
