@@ -7,8 +7,10 @@ import AppContext from "../context/AppContext";
 const TopDevicesChart = ({ equipment }) => {
   const { theme, t } = useContext(AppContext);
 
-  // Debug: log data
-  console.log('TopDevicesChart equipment:', equipment);
+  // Debug: log data (development only)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('TopDevicesChart equipment:', equipment);
+  }
 
   // Tạo dữ liệu Top 5 thiết bị được sử dụng nhiều nhất
   const chartData = useMemo(() => {

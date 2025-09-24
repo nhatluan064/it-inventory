@@ -34,7 +34,7 @@ const EquipmentTypeModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name || !category) {
-      alert(t("please_fill_all_fields"));
+      toast.error(t("please_fill_all_fields"));
       return;
     }
     // Nếu là chế độ sửa, gửi cả ID

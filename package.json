@@ -1,7 +1,10 @@
 {
-  "name": "my-app",
-  "version": "0.1.0",
+  "name": "it-inventory-management",
+  "version": "1.0.0",
   "private": true,
+  "description": "IT Inventory Management System with Firebase",
+  "author": "Your Name",
+  "license": "MIT",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",
@@ -23,13 +26,27 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "setup-env": "node scripts/setup-env.js",
+    "security-audit": "npm audit --audit-level moderate",
+    "security-fix": "npm audit fix --force",
+    "build-production": "npm run security-audit && npm run build",
+    "deploy": "npm run build-production && firebase deploy",
+    "clean": "rimraf build node_modules/.cache",
+    "prestart": "node -e \"if(!require('fs').existsSync('.env')){console.log('⚠️  .env file not found. Run: npm run setup-env');process.exit(1);}\"",
+    "prebuild": "npm run prestart"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+      "no-console": ["warn", { "allow": ["warn", "error"] }],
+      "no-debugger": "error",
+      "no-alert": "error",
+      "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
+    }
   },
   "browserslist": {
     "production": [

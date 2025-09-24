@@ -7,7 +7,6 @@ import MonthlyTrendChart from "../components/MonthlyTrendChart";
 import CategoryDistributionChart from "../components/CategoryDistributionChart";
 import TopDevicesChart from "../components/TopDevicesChart";
 import ChartWrapper from "../components/ChartWrapper";
-import SimpleBarChart from "../components/SimpleBarChart";
 
 const HomeView = ({
   t,
