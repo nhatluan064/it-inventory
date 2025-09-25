@@ -37,23 +37,60 @@ const InventoryView = ({
   const [animatingRows, setAnimatingRows] = useState({});
   const [subSortConfigs, setSubSortConfigs] = useState({});
 
+  // State để quản lý sorting category riêng
+  const [categorySortConfig, setCategorySortConfig] = useState({
+    key: "category",
+    direction: "ascending",
+  });
+
   const {
     items: sortedItems,
     requestSort: requestMainSort,
     sortConfig: mainSortConfig,
   } = useSort(equipment, {
-    key: "category",
+    key: "name", 
     direction: "ascending",
   });
 
+  // Handler riêng cho category sort
+  const handleCategorySort = () => {
+    setCategorySortConfig(prev => ({
+      key: "category",
+      direction: prev.direction === "ascending" ? "descending" : "ascending"
+    }));
+  };
+
   const groupedByCategory = useMemo(() => {
-    return sortedItems.reduce((acc, item) => {
+    const grouped = sortedItems.reduce((acc, item) => {
       const key = item.category || "uncategorized";
       if (!acc[key]) acc[key] = [];
       acc[key].push(item);
       return acc;
     }, {});
-  }, [sortedItems]);
+    
+    // Sắp xếp các categories dựa trên mainSortConfig
+    const sortedGrouped = {};
+    const sortedCategoryIds = Object.keys(grouped).sort((a, b) => {
+      const categoryA = categories.find(c => c.id === a)?.name || a;
+      const categoryB = categories.find(c => c.id === b)?.name || b;
+      
+      // Sử dụng localeCompare với tiếng Việt và option chuẩn hóa
+      const comparison = categoryA.localeCompare(categoryB, 'vi', { 
+        sensitivity: 'base',
+        numeric: true,
+        ignorePunctuation: true
+      });
+      
+      // Áp dụng hướng sắp xếp từ categorySortConfig
+      return categorySortConfig.direction === "ascending" ? comparison : -comparison;
+    });
+    
+    sortedCategoryIds.forEach(categoryId => {
+      sortedGrouped[categoryId] = grouped[categoryId];
+    });
+    
+    return sortedGrouped;
+  }, [sortedItems, categories, categorySortConfig]);
 
   const categoryCounts = useMemo(() => {
     if (!unfilteredEquipment) return {};
@@ -206,11 +243,10 @@ const InventoryView = ({
               <tr>
                 <th
                   className="px-4 py-3.5 text-left font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 cursor-pointer select-none"
-                  onClick={() => requestMainSort("category")}
+                  onClick={handleCategorySort}
                 >
                   {t("category")}
-                  {mainSortConfig.key === "category" &&
-                    (mainSortConfig.direction === "ascending" ? " ▲" : " ▼")}
+                  {categorySortConfig.direction === "ascending" ? " ▲" : " ▼"}
                 </th>
                 <th className="px-4 py-3.5 text-right font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 w-32">
                   {t("quantity")}

@@ -23,6 +23,7 @@ const envExamplePath = path.join(__dirname, '..', '.env.example');
 
 if (fs.existsSync(envPath)) {
   console.log('✅ .env file already exists');
+  console.log('💡 If you need to reconfigure, delete .env and run this script again');
   rl.close();
   process.exit(0);
 }
