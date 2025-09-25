@@ -126,6 +126,7 @@ const MaintenanceView = ({
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 };
 

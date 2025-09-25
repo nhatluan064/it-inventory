@@ -1,6 +1,7 @@
 import React from "react";
 import { Trash2 } from "lucide-react";
 import { useSort } from "../hooks/useSort";
+import PageTransition from "../components/PageTransition";
 
 const LiquidationView = ({ items, onLiquidateItem, t }) => {
   const { items: sortedItems, requestSort, sortConfig } = useSort(items);
@@ -18,7 +19,8 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
   ];
 
   return (
-    <div className="h-full flex flex-col gap-6">
+    <PageTransition animationType="zoom">
+      <div className="h-full flex flex-col gap-6">
       <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-500 to-gray-600 bg-clip-text text-transparent">
           {t("liquidation_list")}
@@ -92,6 +94,7 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
         )}
       </div>
     </div>
+    </PageTransition>
   );
 };
 
