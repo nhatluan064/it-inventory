@@ -198,10 +198,11 @@ Dự án này được cấp phép theo **MIT License** - xem file [LICENSE](LIC
 ---
 
 <div align="center">
-  <p><strong>Được tạo với ❤️ bởi IT Inventory Team</strong></p>
+  <p><strong>Được tạo với AI Gemini, Claude, ChatGPT, Copilot Github, bởi Nhật Luân IT Networking</strong></p>
   <p>© 2024 IT Inventory Management System | Hệ thống Quản lý Thiết bị CNTT</p>
   
   [![Vietnam](https://img.shields.io/badge/Made%20in-Vietnam-red.svg)](https://vietnam.travel)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 </div>
+
 
