@@ -38,7 +38,7 @@ const StatusChart = React.memo(({ chartData }) => {
       legend: {
         position: "right",
         labels: {
-          color: theme === "dark" ? "#E5E7EB" : "#374151", // Màu chữ của chú thích
+          color: theme === "dark" ? "#F9FAFB" : "#374151", // Màu chữ của chú thích - sáng hơn trong dark mode
           font: {
             size: 12,
           },
