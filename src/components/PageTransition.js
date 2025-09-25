@@ -1,28 +1,49 @@
 // src/components/PageTransition.js
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
-const PageTransition = ({ children, className = "" }) => {
-  const [isVisible, setIsVisible] = useState(false);
+const PageTransition = ({ 
+  children, 
+  className = "",
+  animationType = "slideUp", // slideUp, slideLeft, slideRight, zoom, flipX, flipY, fade
+  duration = 600,
+  enableStagger = false
+}) => {
+  const getAnimationClass = () => {
+    // Simple, stable animation classes
+    switch (animationType) {
+      case "slideLeft":
+        return "animate-slideInLeft";
+      case "slideRight":
+        return "animate-slideInRight";
+      case "zoom":
+        return "animate-zoomIn";
+      case "flipX":
+        return "animate-flipInX";
+      case "flipY":
+        return "animate-flipInY";
+      case "fade":
+        return "animate-fadeIn";
+      default:
+        return "animate-slideInUp";
+    }
+  };
 
-  useEffect(() => {
-    // Trigger animation after component mounts
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, 50);
-
-    return () => clearTimeout(timer);
-  }, []);
+  const getStaggerClass = () => {
+    return enableStagger ? "stagger-fade-in" : "";
+  };
 
   return (
     <div 
       className={`
-        transition-all duration-500 ease-out
-        ${isVisible 
-          ? 'opacity-100 translate-y-0' 
-          : 'opacity-0 translate-y-8'
-        }
+        ${getAnimationClass()}
+        ${getStaggerClass()}
         ${className}
-      `}
+      `.replace(/\s+/g, ' ').trim()}
+      style={{
+        animationDuration: `${duration}ms`,
+        opacity: 1, // Ensure visibility
+        transform: 'none' // Prevent transform conflicts
+      }}
     >
       {children}
     </div>

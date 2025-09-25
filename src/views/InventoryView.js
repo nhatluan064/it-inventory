@@ -10,8 +10,8 @@ import {
 } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 import { AnimatedButton } from "../components/AnimatedButton";
-import { AnimatedCard } from "../components/AnimatedCard";
-import { useStaggeredAnimation, useInViewAnimation } from "../hooks/useAnimations";
+
+import PageTransition from "../components/PageTransition";
 
 const InventoryView = ({
   equipment,
@@ -39,8 +39,6 @@ const InventoryView = ({
 
   const {
     items: sortedItems,
-    requestSort: requestMainSort,
-    sortConfig: mainSortConfig,
   } = useSort(equipment, {
     key: "name", 
     direction: "ascending",
@@ -138,8 +136,9 @@ const InventoryView = ({
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   return (
-    <div className="h-full flex flex-col gap-6 animate-fadeIn">{/* Page transition animation */}
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">{/* Filter section animation */}
+    <PageTransition animationType="slideLeft" enableStagger={true}>
+      <div className="h-full flex flex-col gap-6">
+        <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
@@ -450,7 +449,8 @@ const InventoryView = ({
           </table>
         </div>
       </div>
-    </div>
+      </div>
+    </PageTransition>
   );
 };
 

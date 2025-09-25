@@ -9,18 +9,21 @@ export const AnimatedButton = ({
   icon = null,
   onClick,
   className = "",
+  ripple = true,
+  glow = false, // eslint-disable-line no-unused-vars
+  float = false, // eslint-disable-line no-unused-vars
   ...props 
 }) => {
-  const baseClasses = "relative inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 transform active:scale-95";
+  const baseClasses = "relative inline-flex items-center justify-center font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 transform active:scale-95 overflow-hidden";
   
   const variants = {
-    primary: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 hover:shadow-lg hover:-translate-y-0.5",
-    secondary: "bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500 hover:shadow-lg hover:-translate-y-0.5", 
-    success: "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 hover:shadow-lg hover:-translate-y-0.5",
-    danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 hover:shadow-lg hover:-translate-y-0.5",
-    warning: "bg-yellow-600 text-white hover:bg-yellow-700 focus:ring-yellow-500 hover:shadow-lg hover:-translate-y-0.5",
-    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-blue-500",
-    ghost: "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-gray-500"
+    primary: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 hover:shadow-2xl hover:-translate-y-1 hover:scale-105",
+    secondary: "bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500 hover:shadow-2xl hover:-translate-y-1 hover:scale-105", 
+    success: "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 hover:shadow-2xl hover:-translate-y-1 hover:scale-105",
+    danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 hover:shadow-2xl hover:-translate-y-1 hover:scale-105",
+    warning: "bg-yellow-600 text-white hover:bg-yellow-700 focus:ring-yellow-500 hover:shadow-2xl hover:-translate-y-1 hover:scale-105",
+    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-blue-500 hover:shadow-xl hover:-translate-y-0.5",
+    ghost: "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-gray-500 hover:shadow-lg hover:-translate-y-0.5"
   };
 
   const sizes = {
@@ -30,12 +33,48 @@ export const AnimatedButton = ({
     xl: "px-8 py-4 text-xl"
   };
 
-  const buttonClasses = `${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`;
+  const additionalClasses = [
+    glow ? "animate-glow" : "",
+    float ? "float-animation" : "",
+    ripple ? "btn-ripple" : ""
+  ].filter(Boolean).join(" ");
+
+  const buttonClasses = `${baseClasses} ${variants[variant]} ${sizes[size]} ${additionalClasses} ${className}`;
+
+  const handleClick = (e) => {
+    if (ripple) {
+      // Create ripple effect
+      const button = e.currentTarget;
+      const rect = button.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = e.clientX - rect.left - size / 2;
+      const y = e.clientY - rect.top - size / 2;
+      
+      const rippleElement = document.createElement('span');
+      rippleElement.style.cssText = `
+        position: absolute;
+        width: ${size}px;
+        height: ${size}px;
+        left: ${x}px;
+        top: ${y}px;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 50%;
+        pointer-events: none;
+        transform: scale(0);
+        animation: ripple 0.6s linear;
+      `;
+      
+      button.appendChild(rippleElement);
+      setTimeout(() => rippleElement.remove(), 600);
+    }
+    
+    if (onClick) onClick(e);
+  };
 
   return (
     <button
       className={buttonClasses}
-      onClick={onClick}
+      onClick={handleClick}
       disabled={loading}
       {...props}
     >

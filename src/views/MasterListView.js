@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { useSort } from "../hooks/useSort";
+import PageTransition from "../components/PageTransition";
 
 const MasterListView = ({
   allItems,
@@ -76,7 +77,8 @@ const MasterListView = ({
   };
 
   return (
-    <div className="h-full flex flex-col gap-6">
+    <PageTransition animationType="slideRight" enableStagger={true}>
+      <div className="h-full flex flex-col gap-6">
       <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -269,9 +271,8 @@ const MasterListView = ({
             </tbody>
           </table>
         </div>
+        </div>
       </div>
-    </div>
+    </PageTransition>
   );
-};
-
-export default MasterListView;
+};export default MasterListView;

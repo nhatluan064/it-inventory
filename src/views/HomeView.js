@@ -10,6 +10,7 @@ import {
   LazyWrapper,
 } from "../components/Performance/LazyComponents";
 import { ChartLoadingSkeleton } from "../components/LoadingStates/GlobalLoader";
+import PageTransition from "../components/PageTransition";
 
 const HomeView = React.memo(
   ({
@@ -19,10 +20,11 @@ const HomeView = React.memo(
     activityLogs, 
   }) => {
     return (
-      <div className="h-full overflow-y-auto">
-        <div className="space-y-6 p-1">
-          {/* Page Transition Animation */}
-          <div className="animate-fadeIn">
+      <PageTransition animationType="zoom" enableStagger={true}>
+        <div className="h-full overflow-y-auto">
+          <div className="space-y-6 p-1">
+            {/* Page Transition Animation */}
+            <div>
             {/* --- KHOẢNG BIỂU ĐỒ THỐNG KÊ --- */}
             <div className="space-y-6">
               {/* Row 1: Biểu đồ tròn + Biểu đồ phân bố danh mục */}
@@ -79,6 +81,7 @@ const HomeView = React.memo(
           </div>
         </div>
       </div>
+    </PageTransition>
     );
   }
 );

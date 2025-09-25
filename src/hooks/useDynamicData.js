@@ -35,16 +35,16 @@ export const useDynamicData = (currentUser, t) => {
     if (!currentUser) return;
 
     try {
-      // Initialize categories
-      const categoriesRef = collection(db, "categories");
+      // Initialize categories with user-specific path
+      const categoriesRef = collection(db, "users", currentUser.uid, "categories");
       const categoriesQuery = query(categoriesRef, orderBy("name"));
       
-      // Initialize departments
-      const departmentsRef = collection(db, "departments");
+      // Initialize departments with user-specific path
+      const departmentsRef = collection(db, "users", currentUser.uid, "departments");
       const departmentsQuery = query(departmentsRef, orderBy("name"));
       
-      // Initialize positions
-      const positionsRef = collection(db, "positions");
+      // Initialize positions with user-specific path
+      const positionsRef = collection(db, "users", currentUser.uid, "positions");
       const positionsQuery = query(positionsRef, orderBy("name"));
 
       // Listen to categories
@@ -148,7 +148,7 @@ export const useDynamicData = (currentUser, t) => {
         createdBy: currentUser.uid
       };
 
-      await addDoc(collection(db, "categories"), newCategory);
+      await addDoc(collection(db, "users", currentUser.uid, "categories"), newCategory);
       toast.success("Thêm danh mục thành công");
       return true;
     } catch (error) {
@@ -162,7 +162,7 @@ export const useDynamicData = (currentUser, t) => {
     if (!currentUser) return;
     
     try {
-      const categoryRef = doc(db, "categories", categoryId);
+      const categoryRef = doc(db, "users", currentUser.uid, "categories", categoryId);
       await updateDoc(categoryRef, {
         name: categoryData.name,
         updatedAt: new Date(),
@@ -182,7 +182,7 @@ export const useDynamicData = (currentUser, t) => {
     if (!currentUser) return;
     
     try {
-      await deleteDoc(doc(db, "categories", categoryId));
+      await deleteDoc(doc(db, "users", currentUser.uid, "categories", categoryId));
       toast.success("Xóa danh mục thành công");
       return true;
     } catch (error) {
@@ -216,7 +216,7 @@ export const useDynamicData = (currentUser, t) => {
         createdBy: currentUser.uid
       };
 
-      await addDoc(collection(db, "departments"), newDepartment);
+      await addDoc(collection(db, "users", currentUser.uid, "departments"), newDepartment);
       toast.success("Thêm phòng ban thành công");
       return true;
     } catch (error) {
@@ -230,7 +230,7 @@ export const useDynamicData = (currentUser, t) => {
     if (!currentUser) return;
     
     try {
-      const departmentRef = doc(db, "departments", departmentId);
+      const departmentRef = doc(db, "users", currentUser.uid, "departments", departmentId);
       await updateDoc(departmentRef, {
         name: departmentData.name,
         updatedAt: new Date(),
@@ -250,7 +250,7 @@ export const useDynamicData = (currentUser, t) => {
     if (!currentUser) return;
     
     try {
-      await deleteDoc(doc(db, "departments", departmentId));
+      await deleteDoc(doc(db, "users", currentUser.uid, "departments", departmentId));
       toast.success("Xóa phòng ban thành công");
       return true;
     } catch (error) {
@@ -284,7 +284,7 @@ export const useDynamicData = (currentUser, t) => {
         createdBy: currentUser.uid
       };
 
-      await addDoc(collection(db, "positions"), newPosition);
+      await addDoc(collection(db, "users", currentUser.uid, "positions"), newPosition);
       toast.success("Thêm chức danh thành công");
       return true;
     } catch (error) {
@@ -298,7 +298,7 @@ export const useDynamicData = (currentUser, t) => {
     if (!currentUser) return;
     
     try {
-      const positionRef = doc(db, "positions", positionId);
+      const positionRef = doc(db, "users", currentUser.uid, "positions", positionId);
       await updateDoc(positionRef, {
         name: positionData.name,
         updatedAt: new Date(),
@@ -318,7 +318,7 @@ export const useDynamicData = (currentUser, t) => {
     if (!currentUser) return;
     
     try {
-      await deleteDoc(doc(db, "positions", positionId));
+      await deleteDoc(doc(db, "users", currentUser.uid, "positions", positionId));
       toast.success("Xóa chức danh thành công");
       return true;
     } catch (error) {

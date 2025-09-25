@@ -1,6 +1,7 @@
 import React from "react";
 import { CheckCircle, XCircle, Edit, Package } from "lucide-react";
 import { useSort } from "../hooks/useSort";
+import PageTransition from "../components/PageTransition";
 
 const MaintenanceView = ({
   items,
@@ -33,7 +34,8 @@ const MaintenanceView = ({
     new Date(dateString).toLocaleString(t("locale_string"));
 
   return (
-    <div className="h-full flex flex-col gap-6">
+    <PageTransition animationType="slideRight">
+      <div className="h-full flex flex-col gap-6">
       <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
           {t("maintenance_management")}

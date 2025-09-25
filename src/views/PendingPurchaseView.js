@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { ShoppingCart, Trash2, Plus, Search } from "lucide-react";
 import toast from "react-hot-toast";
 import { useSort } from "../hooks/useSort";
+import PageTransition from "../components/PageTransition";
 
 const PendingPurchaseView = ({
   items,
@@ -45,7 +46,8 @@ const PendingPurchaseView = ({
   };
 
   return (
-    <div className="h-full flex flex-col gap-6">
+    <PageTransition animationType="slideUp">
+      <div className="h-full flex flex-col gap-6">
       <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6">
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -167,6 +169,7 @@ const PendingPurchaseView = ({
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 };
 

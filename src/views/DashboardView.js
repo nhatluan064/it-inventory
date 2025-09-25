@@ -11,13 +11,14 @@ import {
   LogOut,
   Home,
 } from "lucide-react";
+import PageTransition from "../components/PageTransition";
 
 // <<< DI CHUYỂN COMPONENT CON RA NGOÀI >>>
 // Component con StatCard
 const StatCard = ({ IconComponent, title, value, gradient, tabId, setActiveTab }) => (
     <button
       onClick={() => setActiveTab(tabId)}
-      className={`rounded-lg p-4 text-white shadow-md ${gradient} w-48 flex-shrink-0 text-left transition-transform transform hover:-translate-y-1 cursor-pointer flex items-center space-x-4`}
+      className={`rounded-lg p-4 text-white shadow-md ${gradient} w-48 flex-shrink-0 text-left card-hover cursor-pointer flex items-center space-x-4 transform transition-all duration-300 ease-out hover:shadow-xl`}
     >
       {IconComponent && <IconComponent className="w-8 h-8 opacity-75 flex-shrink-0" />}
       <div>
@@ -31,7 +32,7 @@ const StatCard = ({ IconComponent, title, value, gradient, tabId, setActiveTab }
 const CombinedStatCard = ({ IconComponent, title1, value1, title2, value2, gradient, tabId, setActiveTab }) => (
     <button
       onClick={() => setActiveTab(tabId)}
-      className={`rounded-lg shadow-md ${gradient} w-64 flex-shrink-0 transition-transform transform hover:-translate-y-1 cursor-pointer overflow-hidden flex items-center p-4 space-x-4`}
+      className={`rounded-lg shadow-md ${gradient} w-64 flex-shrink-0 card-hover cursor-pointer overflow-hidden flex items-center p-4 space-x-4 transform transition-all duration-300 ease-out hover:shadow-xl`}
     >
       {IconComponent && <IconComponent className="w-8 h-8 opacity-75 flex-shrink-0" />}
       <div className="flex-grow flex items-center">
@@ -112,11 +113,12 @@ const DashboardView = ({
   const liquidationCount = equipment.filter((e) => e.status === "liquidation").length;
 
   return (
-    <div className="overflow-hidden">
-      <div
-        ref={scrollContainerRef}
-        className="overflow-x-auto scrollbar-hide py-3 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 flex space-x-4 cursor-grab active:cursor-grabbing hide-scrollbar"
-      >
+    <PageTransition animationType="slideUp" enableStagger={true}>
+      <div className="overflow-hidden">
+        <div
+          ref={scrollContainerRef}
+          className="overflow-x-auto scrollbar-hide py-3 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 flex space-x-4 cursor-grab active:cursor-grabbing hide-scrollbar"
+        >
         <StatCard
           setActiveTab={setActiveTab}
           IconComponent={Home}
@@ -199,8 +201,9 @@ const DashboardView = ({
           gradient="bg-gradient-to-r from-pink-500 to-pink-600"
           tabId="reports"
         />
+        </div>
       </div>
-    </div>
+    </PageTransition>
   );
 };
 
