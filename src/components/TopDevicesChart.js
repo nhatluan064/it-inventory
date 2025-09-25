@@ -213,9 +213,9 @@ const TopDevicesChart = ({ equipment }) => {
 
   try {
     return (
-      <div className="relative h-64 md:h-80">
+      <div className="relative h-64 md:h-80 overflow-hidden scrollbar-hide chart-container">
         <Bar 
-          key={`top-devices-${Date.now()}`}
+          key={`top-devices-${theme}-${Date.now()}`}
           data={chartData} 
           options={options}
           redraw={true}

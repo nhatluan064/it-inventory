@@ -7,6 +7,7 @@ import { useAuth } from "./hooks/useAuth";
 import { useInventory } from "./hooks/useInventory";
 import { useModals } from "./hooks/useModals";
 import { useViewRendering } from "./hooks/useViewRendering";
+import { useDynamicData } from "./hooks/useDynamicData";
 
 // Context
 import AppContext from "./context/AppContext";
@@ -79,6 +80,7 @@ const App = () => {
   
   const inventory = useInventory(currentUser, t, setActiveTab);
   const modals = useModals();
+  const dynamicData = useDynamicData(currentUser, t);
 
   // Computed values - StatusLabels first to avoid dependency issue
   const statusLabels = useMemo(
@@ -96,10 +98,14 @@ const App = () => {
     [t]
   );
 
-  const categories = useMemo(
-    () => categoryStructure.map((cat) => ({ ...cat, name: t(cat.tKey) })),
-    [t]
-  );
+  // Use dynamic categories instead of hardcoded ones
+  const categories = useMemo(() => {
+    if (dynamicData.loading) {
+      // Fallback to default categories while loading
+      return categoryStructure.map((cat) => ({ ...cat, name: t(cat.tKey) }));
+    }
+    return dynamicData.categories;
+  }, [dynamicData.categories, dynamicData.loading, t]);
 
   // Filtered data
   const pendingPurchaseItems = useMemo(

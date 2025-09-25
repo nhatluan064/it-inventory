@@ -54,8 +54,8 @@ const PurchasedView = ({
   };
 
   return (
-    <div className="h-full flex flex-col gap-6">
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6">
+    <div className="h-full flex flex-col gap-6 animate-fadeIn">{/* Page transition */}
+      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">{/* Header animation */}
         <h2 className="text-2xl font-bold bg-gradient-to-r from-teal-500 via-emerald-500 to-green-500 bg-clip-text text-transparent">
           {t("purchased_list")}
         </h2>
@@ -64,7 +64,7 @@ const PurchasedView = ({
         </p>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden">
+      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">{/* Table animation */}
         <div className="flex-grow overflow-y-auto">
           <table className="w-full text-xs">
             <thead className="bg-gray-50 dark:bg-gray-700/50">

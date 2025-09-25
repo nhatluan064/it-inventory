@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { AnimatedForm } from "../components/AnimatedForm";
+import { AnimatedButton } from "../components/AnimatedButton";
 
 const defaultFormState = {
   name: "",
@@ -98,8 +100,11 @@ const AddEditModal = ({
   const categoryOptions = categories.filter((c) => c.id !== "all");
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 w-full max-w-lg">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4 animate-fadeIn">
+      <div 
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 w-full max-w-lg animate-scaleIn"
+        style={{ backdropFilter: 'blur(8px)' }}
+      >
         <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
           {isEditing
             ? t("edit_device_modal_title")
@@ -238,21 +243,23 @@ const AddEditModal = ({
             />
           </div>
 
-          <div className="flex justify-end space-x-3 pt-6">
-            <button
+          <div className="flex justify-end space-x-3 pt-6 animate-slideInUp">
+            <AnimatedButton
               type="button"
               onClick={onClose}
-              className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
+              variant="secondary"
+              className="px-4 py-2"
             >
               {t("cancel")}
-            </button>
-            <button
+            </AnimatedButton>
+            <AnimatedButton
               type="submit"
               disabled={isSubmitting}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-blue-400"
+              variant="primary"
+              className="px-4 py-2"
             >
               {isSubmitting ? "..." : isEditing ? t("save_changes") : t("add")}
-            </button>
+            </AnimatedButton>
           </div>
         </form>
       </div>

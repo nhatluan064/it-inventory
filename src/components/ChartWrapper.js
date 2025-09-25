@@ -59,14 +59,16 @@ const ChartWrapper = React.memo(({ children, title, isLoading = false, hasData =
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-6" ref={chartRef}>
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-6 overflow-hidden scrollbar-hide chart-wrapper" ref={chartRef}>
       {title && (
         <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-4">
           {title}
         </h3>
       )}
       <ErrorBoundary>
-        {children}
+        <div className="overflow-hidden scrollbar-hide chart-container">
+          {children}
+        </div>
       </ErrorBoundary>
     </div>
   );

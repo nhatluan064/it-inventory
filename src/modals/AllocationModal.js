@@ -9,15 +9,17 @@ import {
   Hash,
   Calendar,
 } from "lucide-react";
-import { positions, departments } from "../constants";
+import { useDynamicData } from "../hooks/useDynamicData";
 
 const AllocationModal = ({ show, onClose, onSubmit, item, t }) => {
+  const { positionsList, departmentsList } = useDynamicData();
+  
   const [formData, setFormData] = useState({
     recipientName: "",
     employeeId: "",
-    position: positions[0]?.id || "",
+    position: "",
     positionDescription: "",
-    department: departments[0]?.id || "",
+    department: "",
     condition: "",
     handoverDate: new Date().toISOString(),
   });
@@ -49,14 +51,14 @@ const AllocationModal = ({ show, onClose, onSubmit, item, t }) => {
       setFormData({
         recipientName: "",
         employeeId: "",
-        position: positions[0]?.id || "",
+        position: positionsList[0]?.id || "",
         positionDescription: "",
-        department: departments[0]?.id || "",
+        department: departmentsList[0]?.id || "",
         condition: displayCondition,
         handoverDate: new Date().toISOString(),
       });
     }
-  }, [show, item, t]);
+  }, [show, item, t, positionsList, departmentsList]);
 
   if (!show || !item) return null;
 
@@ -88,16 +90,16 @@ const AllocationModal = ({ show, onClose, onSubmit, item, t }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 w-full max-w-2xl">
-        <h2 className="text-2xl font-bold mb-2 text-gray-800 dark:text-gray-100">
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex justify-center items-center p-4 animate-fadeIn">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 sm:p-8 w-full max-w-2xl animate-scaleIn transform transition-all duration-300 hover:shadow-3xl">
+        <h2 className="text-2xl font-bold mb-2 text-gray-800 dark:text-gray-100 animate-slideInDown">
           {t("allocate_device")}
         </h2>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
           {t("allocating")}: <span className="font-semibold">{item.name}</span>
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 animate-slideInUp">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -110,7 +112,7 @@ const AllocationModal = ({ show, onClose, onSubmit, item, t }) => {
                   name="recipientName"
                   value={formData.recipientName}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                  className="w-full pl-10 pr-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 focus-ring transition-all duration-200 hover:border-blue-400 focus:border-blue-500"
                   required
                 />
               </div>
@@ -147,9 +149,9 @@ const AllocationModal = ({ show, onClose, onSubmit, item, t }) => {
                   className="w-full pl-10 pr-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 appearance-none"
                   required
                 >
-                  {positions.map((pos) => (
+                  {positionsList.map((pos) => (
                     <option key={pos.id} value={pos.id}>
-                      {t(pos.tKey)}
+                      {pos.name}
                     </option>
                   ))}
                 </select>
@@ -180,9 +182,9 @@ const AllocationModal = ({ show, onClose, onSubmit, item, t }) => {
                 className="w-full pl-10 pr-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 appearance-none"
                 required
               >
-                {departments.map((dept) => (
+                {departmentsList.map((dept) => (
                   <option key={dept.id} value={dept.id}>
-                    {t(dept.tKey)}
+                    {dept.name}
                   </option>
                 ))}
               </select>
@@ -243,13 +245,13 @@ const AllocationModal = ({ show, onClose, onSubmit, item, t }) => {
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg"
+              className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-6 py-2 rounded-lg transition-all duration-200 hover:bg-gray-300 dark:hover:bg-gray-500 hover:scale-105 focus-ring"
             >
               {t("cancel")}
             </button>
             <button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg transition-all duration-200 hover:bg-blue-700 hover:scale-105 focus-ring btn-ripple animate-pulse"
             >
               {t("confirm_allocation")}
             </button>

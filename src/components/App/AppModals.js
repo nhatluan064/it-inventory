@@ -154,9 +154,7 @@ const AppModals = ({
       <CancelNoteModal
         show={modals.modalState.cancelNote}
         onClose={() => modals.closeModal("cancelNote")}
-        onSubmit={(note) =>
-          inventory.cancelWithNote(modals.currentItem, note)
-        }
+        onSubmit={(note) => inventory.cancelWithNote(modals.currentItem, note)}
         itemName={modals.currentItem?.name}
         t={t}
       />

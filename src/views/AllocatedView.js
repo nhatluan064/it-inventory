@@ -1,14 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { RotateCcw, Search, Wrench } from "lucide-react";
 import { useSort } from "../hooks/useSort";
-import { departments } from "../constants";
-
-const animationStyles = `
-  @keyframes slideDown { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 1000px; } }
-  @keyframes slideUp { from { opacity: 1; max-height: 1000px; } to { opacity: 0; max-height: 0; } }
-  .animate-slideDown { animation: slideDown 0.4s ease-out forwards; }
-  .animate-slideUp { animation: slideUp 0.3s ease-in forwards; }
-`;
+import { useDynamicData } from "../hooks/useDynamicData";
+import { AnimatedCard } from "../components/AnimatedCard";
 
 const AllocatedView = ({
   items,
@@ -20,6 +14,7 @@ const AllocatedView = ({
   setFilters,
   t,
 }) => {
+  const { departmentsList } = useDynamicData();
   const [expandedRows, setExpandedRows] = useState({});
   const [animatingRows, setAnimatingRows] = useState({});
   const [subSortConfigs, setSubSortConfigs] = useState({});
@@ -57,10 +52,10 @@ const AllocatedView = ({
     }, {});
   }, [unfilteredAllocatedItems]);
 
-  const departmentOptions = useMemo(
-    () => [{ id: "all", tKey: "all" }, ...departments],
-    []
-  );
+  const departmentOptions = useMemo(() => {
+    const allOption = { id: "all", name: t("all") };
+    return [allOption, ...departmentsList];
+  }, [departmentsList, t]);
 
   const toggleExpand = (name) => {
     const isExpanded = expandedRows[name];
@@ -91,10 +86,9 @@ const AllocatedView = ({
   };
 
   return (
-    <div className="h-full flex flex-col gap-6">
-      <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
+    <div className="h-full flex flex-col gap-6 animate-fadeIn">{/* Page transition */}
 
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6">
+      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">{/* Filter section animation */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
@@ -153,7 +147,7 @@ const AllocatedView = ({
             >
               {departmentOptions.map((dept) => (
                 <option key={dept.id} value={dept.id}>
-                  {t(dept.tKey)}
+                  {dept.name}
                 </option>
               ))}
             </select>
@@ -173,7 +167,7 @@ const AllocatedView = ({
         </div>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden">
+      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">{/* Table container animation */}
         <div className="flex-grow overflow-y-auto">
           <table className="w-full text-xs table-fixed">
             <thead className="bg-white dark:bg-gray-800 sticky top-0 z-10">
@@ -314,7 +308,7 @@ const AllocatedView = ({
                                   </div>
                                   <div className="col-span-2 text-left truncate">
                                     {item.allocationDetails?.department
-                                      ? t(item.allocationDetails.department)
+                                      ? (departmentsList.find(dept => dept.id === item.allocationDetails.department)?.name || item.allocationDetails.department)
                                       : "N/A"}
                                   </div>
                                   <div className="col-span-1 text-left truncate">
@@ -325,14 +319,14 @@ const AllocatedView = ({
                                   <div className="col-span-2 flex items-center justify-center space-x-1">
                                     <button
                                       onClick={() => onRecallItem(item)}
-                                      className="p-2 rounded-lg text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30"
+                                      className="p-2 rounded-lg text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 animate-hoverScale transition-all duration-200"
                                       title={t("recall_device")}
                                     >
                                       <RotateCcw className="w-4 h-4" />
                                     </button>
                                     <button
                                       onClick={() => onMarkDamaged(item)}
-                                      className="p-2 rounded-lg text-orange-500 hover:bg-orange-100 dark:hover:bg-orange-900/30"
+                                      className="p-2 rounded-lg text-orange-500 hover:bg-orange-100 dark:hover:bg-orange-900/30 animate-hoverScale transition-all duration-200"
                                       title={t("maintenance")}
                                     >
                                       <Wrench className="w-4 h-4" />

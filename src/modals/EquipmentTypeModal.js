@@ -1,6 +1,9 @@
 // src/modals/EquipmentTypeModal.js
 import React, { useState, useEffect } from "react";
+import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
+import { useDynamicData } from "../hooks/useDynamicData";
+import { useAuth } from "../hooks/useAuth";
 
 const EquipmentTypeModal = ({
   show,
@@ -10,8 +13,12 @@ const EquipmentTypeModal = ({
   t,
   initialData,
 }) => {
+  const { currentUser } = useAuth();
+  const { autoAddCategoryIfNotExists } = useDynamicData(currentUser, t);
   const [name, setName] = useState("");
   const [category, setCategory] = useState("pc");
+  const [customCategory, setCustomCategory] = useState("");
+  const [showCustomCategory, setShowCustomCategory] = useState(false);
 
   const isEditing = !!initialData;
 
@@ -24,6 +31,8 @@ const EquipmentTypeModal = ({
         // Reset form cho chế độ Thêm mới
         setName("");
         setCategory("pc");
+        setShowCustomCategory(false);
+        setCustomCategory("");
       }
     }
   }, [show, initialData, isEditing]);
@@ -32,16 +41,28 @@ const EquipmentTypeModal = ({
     return null;
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !category) {
+    
+    let finalCategory = category;
+    
+    // Handle custom category
+    if (showCustomCategory && customCategory.trim()) {
+      const newCategoryId = await autoAddCategoryIfNotExists(customCategory.trim());
+      if (newCategoryId) {
+        finalCategory = newCategoryId;
+      }
+    }
+    
+    if (!name || !finalCategory) {
       toast.error(t("please_fill_all_fields"));
       return;
     }
+    
     // Nếu là chế độ sửa, gửi cả ID
     const dataToSend = isEditing
-      ? { ...initialData, name, category }
-      : { name, category };
+      ? { ...initialData, name, category: finalCategory }
+      : { name, category: finalCategory };
     onSubmit(dataToSend);
     onClose();
   };
@@ -77,18 +98,46 @@ const EquipmentTypeModal = ({
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {t("category")}
             </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200"
-              required
-            >
-              {categoryOptions.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
+            <div className="space-y-2 mt-1">
+              <select
+                value={showCustomCategory ? "custom" : category}
+                onChange={(e) => {
+                  if (e.target.value === "custom") {
+                    setShowCustomCategory(true);
+                  } else {
+                    setShowCustomCategory(false);
+                    setCategory(e.target.value);
+                  }
+                }}
+                className="block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200"
+                required={!showCustomCategory}
+              >
+                <option value="">-- Chọn danh mục --</option>
+                {categoryOptions.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+                <option value="custom" className="font-bold text-blue-600">
+                  + Thêm danh mục mới...
                 </option>
-              ))}
-            </select>
+              </select>
+              
+              {showCustomCategory && (
+                <div className="relative">
+                  <Plus className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Nhập danh mục mới..."
+                    value={customCategory}
+                    onChange={(e) => setCustomCategory(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-blue-300 focus:border-blue-500 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200"
+                    required
+                    autoFocus
+                  />
+                </div>
+              )}
+            </div>
           </div>
           <div className="flex justify-end space-x-3 pt-6">
             <button

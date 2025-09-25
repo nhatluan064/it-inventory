@@ -48,7 +48,7 @@ const RecallModal = ({ show, onClose, onSubmit, item, t }) => {
             <select
               value={reasonKey}
               onChange={(e) => setReasonKey(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200"
+              className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
             >
               {recallOptions.map((opt) => (
                 <option key={opt.key} value={opt.key}>

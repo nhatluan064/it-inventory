@@ -1,5 +1,6 @@
 // src/modals/ConfirmDeleteModal.js
 import React, { useRef, useEffect } from "react";
+import { AnimatedButton } from "../components/AnimatedButton";
 
 const ConfirmDeleteModal = ({
   show,
@@ -39,10 +40,13 @@ const ConfirmDeleteModal = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center"
+      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center animate-fadeIn"
       onKeyDown={handleKeyDown}
     >
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-md">
+      <div 
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-md animate-scaleIn animate-pulse-glow"
+        style={{ backdropFilter: 'blur(4px)' }}
+      >
         <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
           {title || t("confirm")}
         </h2>
@@ -52,21 +56,23 @@ const ConfirmDeleteModal = ({
             __html: confirmationText || t("are_you_sure_generic"),
           }}
         />
-        <div className="flex justify-end space-x-3">
-          <button
+        <div className="flex justify-end space-x-3 animate-slideInUp">
+          <AnimatedButton
             ref={cancelButtonRef}
             onClick={onClose}
-            className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            variant="secondary"
+            className="px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-400"
           >
             {t("cancel")}
-          </button>
-          <button
+          </AnimatedButton>
+          <AnimatedButton
             ref={deleteButtonRef}
             onClick={onConfirm}
-            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400"
+            variant="danger"
+            className="px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-400"
           >
             {t("confirm")}
-          </button>
+          </AnimatedButton>
         </div>
       </div>
     </div>

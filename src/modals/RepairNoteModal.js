@@ -45,7 +45,7 @@ const RepairNoteModal = ({ show, onClose, onSubmit, item, t }) => {
             <select
               value={noteKey}
               onChange={(e) => setNoteKey(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200"
+              className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
             >
               {noteOptions.map((key) => (
                 <option key={key} value={key}>
@@ -62,7 +62,7 @@ const RepairNoteModal = ({ show, onClose, onSubmit, item, t }) => {
               <textarea
                 value={customNote}
                 onChange={(e) => setCustomNote(e.target.value)}
-                className="mt-1 block w-full h-24 p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600 dark:placeholder-gray-400"
+                className="mt-1 block w-full h-24 p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                 required
               />
             </div>

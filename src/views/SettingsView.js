@@ -14,6 +14,8 @@ import {
   History, // Thêm icon mới
 } from "lucide-react";
 import ViewHeader from "../components/ViewHeader";
+import DynamicDataManager from "../components/DynamicDataManager";
+import { useAuth } from "../hooks/useAuth";
 
 // Thêm prop onDeleteLogs
 const SettingsView = ({
@@ -24,6 +26,7 @@ const SettingsView = ({
   t,
 }) => {
   const { theme, setTheme, language, setLanguage } = useContext(AppContext);
+  const { currentUser } = useAuth();
   const fileInputRef = React.useRef(null);
 
   const handleImportClick = () => {
@@ -174,6 +177,9 @@ const SettingsView = ({
           </div>
         </div>
       </div>
+
+      {/* Dynamic Data Management */}
+      <DynamicDataManager currentUser={currentUser} t={t} />
     </div>
   );
 };

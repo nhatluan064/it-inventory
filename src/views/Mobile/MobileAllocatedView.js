@@ -9,7 +9,7 @@ import {
   Building,
   Calendar,
 } from "lucide-react";
-import { departments } from "../../constants";
+import { useDynamicData } from "../../hooks/useDynamicData";
 
 const MobileAllocatedView = ({
   items,
@@ -20,6 +20,7 @@ const MobileAllocatedView = ({
   filters,
   setFilters,
 }) => {
+  const { departmentsList } = useDynamicData();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
 
@@ -70,10 +71,10 @@ const MobileAllocatedView = ({
     { key: "allocationDetails.handoverDate", label: t("handover_date") },
   ];
 
-  const departmentOptions = useMemo(
-    () => [{ id: "all", tKey: "all" }, ...departments],
-    []
-  );
+  const departmentOptions = useMemo(() => {
+    const allOption = { id: "all", name: t("all") };
+    return [allOption, ...departmentsList];
+  }, [departmentsList, t]);
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
@@ -124,7 +125,7 @@ const MobileAllocatedView = ({
               >
                 {departmentOptions.map((dept) => (
                   <option key={dept.id} value={dept.id}>
-                    {t(dept.tKey)}
+                    {dept.name}
                   </option>
                 ))}
               </select>
@@ -194,7 +195,9 @@ const MobileAllocatedView = ({
                 <div className="flex items-center gap-2">
                   <Building className="w-4 h-4 text-gray-400" />
                   <span className="font-medium">
-                    {t(item.allocationDetails?.department)}
+                    {item.allocationDetails?.department
+                      ? (departmentsList.find(dept => dept.id === item.allocationDetails.department)?.name || item.allocationDetails.department)
+                      : "N/A"}
                   </span>
                 </div>
               </div>

@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import Global Animations */
+@import './styles/animations.css';
+
 @layer base {
   /*
     Thiết lập font chữ, màu nền, và màu chữ mặc định cho toàn bộ trang.
@@ -34,16 +37,85 @@
 @layer utilities {
   /*
     Class tiện ích để ẩn thanh cuộn.
-    Giữ lại từ code gốc của bạn.
+    Giữ lại từ code gốc của bạn và bổ sung thêm.
   */
   /* Ẩn thanh cuộn nhưng vẫn cuộn được */
   .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar-thumb {
+    background: transparent !important;
   }
 
   .scrollbar-hide {
-    -ms-overflow-style: none; /* IE & Edge */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none !important; /* IE & Edge */
+    scrollbar-width: none !important; /* Firefox */
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  /* Áp dụng cho tất cả các element con trong chart */
+  .scrollbar-hide * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+
+  .scrollbar-hide *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* Đặc biệt cho Chart.js components */
+  canvas::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .chartjs-render-monitor::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Ẩn thanh cuộn cho tất cả elements trong chart containers */
+  div[class*="chart"]::-webkit-scrollbar,
+  div[class*="Chart"]::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Force ẩn overflow cho chart containers */
+  .chart-container,
+  .chart-wrapper,
+  [class*="chart-"],
+  [class*="Chart-"] {
+    overflow: hidden !important;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+
+  /* Global rules cho tất cả Chart.js elements */
+  .chartjs-render-monitor,
+  .chartjs-size-monitor {
+    overflow: hidden !important;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+
+  .chartjs-render-monitor::-webkit-scrollbar,
+  .chartjs-size-monitor::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Ẩn thanh cuộn cho tất cả canvas elements */
+  canvas {
+    overflow: hidden !important;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
   }
 
   /*

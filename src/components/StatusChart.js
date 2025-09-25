@@ -1,5 +1,5 @@
 // src/components/StatusChart.js
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { Pie } from "react-chartjs-2";
 import "../utils/chartSetup"; // Import chart setup
 import AppContext from "../context/AppContext";
@@ -31,21 +31,22 @@ const StatusChart = React.memo(({ chartData }) => {
     ],
   };
 
-  const options = {
+  const options = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "right",
         labels: {
-          color: theme === "dark" ? "#F9FAFB" : "#374151", // Màu chữ của chú thích - sáng hơn trong dark mode
+          color: theme === "dark" ? "#F9FAFB" : "#374151",
           font: {
             size: 12,
           },
           boxWidth: 20,
           padding: 20,
-          generateLabels: function(chart) {
+          generateLabels: function (chart) {
             const data = chart.data;
+            const legendColor = theme === "dark" ? "#F9FAFB" : "#374151";
             if (data.labels.length && data.datasets.length) {
               return data.labels.map((label, i) => {
                 const value = data.datasets[0].data[i];
@@ -54,34 +55,37 @@ const StatusChart = React.memo(({ chartData }) => {
                   fillStyle: data.datasets[0].backgroundColor[i],
                   strokeStyle: data.datasets[0].borderColor,
                   lineWidth: data.datasets[0].borderWidth,
+                  fontColor: legendColor,
+                  color: legendColor, // Thêm property này
+                  textColor: legendColor, // Thêm property này
                   hidden: false,
-                  index: i
+                  index: i,
                 };
               });
             }
             return [];
-          }
+          },
         },
       },
       datalabels: {
-        display: function(context) {
+        display: function (context) {
           // Chỉ hiển thị label nếu giá trị > 0
           return context.parsed > 0;
         },
-        color: '#FFFFFF',
+        color: "#FFFFFF",
         font: {
-          weight: 'bold',
-          size: 11
+          weight: "bold",
+          size: 11,
         },
         formatter: (value, context) => {
           const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
           const percentage = ((value / total) * 100).toFixed(0);
           // Chỉ hiển thị số nếu phần trăm >= 5% để tránh cluttered
-          return percentage >= 5 ? `${value}` : '';
+          return percentage >= 5 ? `${value}` : "";
         },
-        textAlign: 'center',
-        textStrokeColor: '#000000',
-        textStrokeWidth: 1
+        textAlign: "center",
+        textStrokeColor: "#000000",
+        textStrokeWidth: 1,
       },
       tooltip: {
         backgroundColor: theme === "dark" ? "#374151" : "#FFFFFF",
@@ -90,22 +94,25 @@ const StatusChart = React.memo(({ chartData }) => {
         borderColor: theme === "dark" ? "#4B5563" : "#E5E7EB",
         borderWidth: 1,
         callbacks: {
-          label: function(context) {
-            const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+          label: function (context) {
+            const total = context.dataset.data.reduce(
+              (sum, val) => sum + val,
+              0
+            );
             const percentage = ((context.parsed / total) * 100).toFixed(1);
             return `${context.label}: ${context.parsed} (${percentage}%)`;
-          }
-        }
+          },
+        },
       },
     },
-  };
+  }), [theme]);
 
   // Kiểm tra dữ liệu hợp lệ
   if (!chartData || !chartData.data || chartData.data.length === 0) {
     return (
       <div className="relative h-64 md:h-80 flex items-center justify-center">
         <p className="text-gray-500 dark:text-gray-400">
-          {t('no_data_available')}
+          {t("no_data_available")}
         </p>
       </div>
     );
@@ -113,17 +120,17 @@ const StatusChart = React.memo(({ chartData }) => {
 
   try {
     return (
-      <div className="relative h-64 md:h-80">
-        <Pie 
-          key={`status-chart-${Date.now()}`}
-          data={data} 
+      <div className="relative h-64 md:h-80 overflow-hidden scrollbar-hide chart-container">
+        <Pie
+          key={`status-chart-${theme}-${Date.now()}`}
+          data={data}
           options={options}
           redraw={true}
         />
       </div>
     );
   } catch (error) {
-    console.error('StatusChart render error:', error);
+    console.error("StatusChart render error:", error);
     return (
       <div className="relative h-64 md:h-80 flex items-center justify-center">
         <p className="text-red-500 dark:text-red-400">

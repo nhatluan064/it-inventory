@@ -9,15 +9,9 @@ import {
   User,
 } from "lucide-react";
 import { useSort } from "../hooks/useSort";
-
-const animationStyles = `
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  .animate-fadeIn { animation: fadeIn 0.5s ease-out; }
-  @keyframes slideDown { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 1000px; } }
-  @keyframes slideUp { from { opacity: 1; max-height: 1000px; } to { opacity: 0; max-height: 0; } }
-  .animate-slideDown { animation: slideDown 0.4s ease-out forwards; }
-  .animate-slideUp { animation: slideUp 0.3s ease-in forwards; }
-`;
+import { AnimatedButton } from "../components/AnimatedButton";
+import { AnimatedCard } from "../components/AnimatedCard";
+import { useStaggeredAnimation, useInViewAnimation } from "../hooks/useAnimations";
 
 const InventoryView = ({
   equipment,
@@ -144,9 +138,8 @@ const InventoryView = ({
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   return (
-    <div className="h-full flex flex-col gap-6 animate-fadeIn">
-      <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6">
+    <div className="h-full flex flex-col gap-6 animate-fadeIn">{/* Page transition animation */}
+      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">{/* Filter section animation */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
@@ -157,13 +150,14 @@ const InventoryView = ({
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <button
+            <AnimatedButton
               onClick={onAddLegacyItem}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-lg flex items-center justify-center space-x-2 text-sm font-semibold"
+              variant="primary"
+              className="flex items-center space-x-2 text-sm font-semibold"
             >
               <Plus className="w-5 h-5" />
               <span>{t("import_unlisted_device")}</span>
-            </button>
+            </AnimatedButton>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
@@ -235,7 +229,7 @@ const InventoryView = ({
         </div>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden">
+      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">{/* Table container animation */}
         {/* Sửa đổi ở đây */}
         <div className="flex-grow overflow-y-auto scrollbar-hide">
           <table className="w-full text-xs table-fixed">
@@ -254,7 +248,7 @@ const InventoryView = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-              {Object.entries(groupedByCategory).map(([categoryId, items]) => {
+              {Object.entries(groupedByCategory).map(([categoryId, items], categoryIndex) => {
                 const isOpening = animatingRows[categoryId] === "opening";
                 const isClosing = animatingRows[categoryId] === "closing";
                 const category = categories.find((c) => c.id === categoryId);
@@ -280,7 +274,8 @@ const InventoryView = ({
                 return (
                   <React.Fragment key={categoryId}>
                     <tr
-                      className="bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+                      className="bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer animate-fadeInUp transition-all duration-300"
+                      style={{ animationDelay: `${categoryIndex * 0.1}s` }}
                       onClick={() => toggleExpand(categoryId)}
                     >
                       <td className="px-4 py-3 font-semibold capitalize">
@@ -359,16 +354,17 @@ const InventoryView = ({
                               </div>
                             </div>
                             <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                              {sortedSubItems.map((item) => {
+                              {sortedSubItems.map((item, itemIndex) => {
                                 const isInUse = item.status === "in-use";
                                 return (
                                   <div
                                     key={item.id}
-                                    className={`grid grid-cols-12 gap-x-4 items-center py-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 ${
+                                    className={`grid grid-cols-12 gap-x-4 items-center py-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 animate-slideInLeft transition-all duration-300 ${
                                       isInUse
                                         ? "bg-blue-50 dark:bg-blue-900/20"
                                         : ""
                                     }`}
+                                    style={{ animationDelay: `${itemIndex * 0.05}s` }}
                                   >
                                     <div
                                       className={`col-span-2 truncate font-semibold ${
@@ -415,25 +411,25 @@ const InventoryView = ({
                                         <button
                                           onClick={() => onAllocateItem(item)}
                                           disabled={item.status !== "available"}
-                                          className="p-2 rounded-lg text-blue-500 hover:bg-blue-100 disabled:opacity-30"
+                                          className="p-2 rounded-lg text-blue-500 hover:bg-blue-100 disabled:opacity-30 animate-hoverScale transition-all duration-200"
                                         >
                                           <LogOut className="w-4 h-4" />
                                         </button>
                                         <button
                                           onClick={() => onViewItem(item)}
-                                          className="p-2 rounded-lg text-emerald-500 hover:bg-emerald-100"
+                                          className="p-2 rounded-lg text-emerald-500 hover:bg-emerald-100 animate-hoverScale transition-all duration-200"
                                         >
                                           <Eye className="w-4 h-4" />
                                         </button>
                                         <button
                                           onClick={() => onEditItem(item)}
-                                          className="p-2 rounded-lg text-amber-500 hover:bg-amber-100"
+                                          className="p-2 rounded-lg text-amber-500 hover:bg-amber-100 animate-hoverScale transition-all duration-200"
                                         >
                                           <Edit className="w-4 h-4" />
                                         </button>
                                         <button
                                           onClick={() => onDeleteItem(item)}
-                                          className="p-2 rounded-lg text-red-500 hover:bg-red-100"
+                                          className="p-2 rounded-lg text-red-500 hover:bg-red-100 animate-hoverScale transition-all duration-200"
                                         >
                                           <Trash2 className="w-4 h-4" />
                                         </button>

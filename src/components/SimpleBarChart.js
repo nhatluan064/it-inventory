@@ -59,11 +59,11 @@ const SimpleBarChart = ({ title, data, labels }) => {
 
   try {
     return (
-      <div className="relative h-64 md:h-80">
+      <div className="relative h-64 md:h-80 overflow-hidden scrollbar-hide chart-container">
         <Bar 
           data={chartData} 
           options={options}
-          key={`simple-bar-${Date.now()}`}
+          key={`simple-bar-${theme}-${Date.now()}`}
         />
       </div>
     );
