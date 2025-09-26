@@ -7,7 +7,7 @@ import {
   ChevronsLeft,
   X,
   Package,
-  MessageHeart,
+  Heart,
 } from "lucide-react";
 
 const Sidebar = ({
@@ -154,7 +154,7 @@ const Sidebar = ({
                   onClick={onFeedback}
                   className="w-full flex items-center space-x-3 py-1.5 px-4 rounded-lg font-medium text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 group feedback-button"
                 >
-                  <MessageHeart className="w-4 h-4 transform group-hover:scale-110 transition-transform duration-300" />
+                  <Heart className="w-4 h-4 transform group-hover:scale-110 transition-transform duration-300" />
                   <span className="transform group-hover:translate-x-1 transition-transform duration-300">{t("feedback_title")}</span>
                 </button>
                 
@@ -193,7 +193,7 @@ const Sidebar = ({
                     title={t("feedback_title")}
                     className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 transform hover:scale-110 feedback-button"
                   >
-                    <MessageHeart className="w-4 h-4" />
+                    <Heart className="w-4 h-4" />
                   </button>
                   
                   <button
@@ -229,7 +229,7 @@ const Sidebar = ({
                   title={t("feedback_title")}
                   className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-300 transform hover:scale-110 hover:rotate-12 feedback-button"
                 >
-                  <MessageHeart className="w-4 h-4" />
+                  <Heart className="w-4 h-4" />
                 </button>
                 
                 <button
