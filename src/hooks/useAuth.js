@@ -26,7 +26,11 @@ export const useAuth = () => {
       if (!isRegisteringFlow) {
         setCurrentUser(user);
       }
-      setAuthLoading(false);
+      
+      // Thêm delay 2 giây để user có thể thấy loading animation
+      setTimeout(() => {
+        setAuthLoading(false);
+      }, 2000);
     });
     return () => unsubscribe();
   }, [isRegisteringFlow]); // Thêm dependency

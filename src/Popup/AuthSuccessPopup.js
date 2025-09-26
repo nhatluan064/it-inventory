@@ -3,8 +3,8 @@ import React, { useState, useEffect } from "react";
 import { MailCheck, CheckCircle, Sparkles } from "lucide-react";
 
 const AuthSuccessPopup = ({ type, onFinished, t }) => {
-  // State để đếm ngược và animation
-  const [countdown, setCountdown] = useState(3);
+  // State để đếm ngược và animation - Tăng lên 5 giây cho user thưởng thức animation
+  const [countdown, setCountdown] = useState(5);
   const [showConfetti, setShowConfetti] = useState(false);
 
   const content = {
@@ -111,7 +111,7 @@ const AuthSuccessPopup = ({ type, onFinished, t }) => {
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
           <div 
             className="h-full bg-gradient-to-r from-green-400 to-blue-500 rounded-full transition-all duration-1000 loading-progress-glow"
-            style={{ width: `${((3 - countdown) / 3) * 100}%` }}
+            style={{ width: `${((5 - countdown) / 5) * 100}%` }}
           />
         </div>
 
