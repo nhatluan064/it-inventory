@@ -44,7 +44,7 @@ const MaintenanceView = ({
       </div>
 
       <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">{/* Table container animation */}
-        <div className="flex-grow overflow-y-auto">
+        <div className="flex-grow overflow-y-auto hide-scrollbar">
           {sortedItems.length > 0 ? (
             <table className="w-full text-xs table-fixed">
               <thead className="bg-white dark:bg-gray-800 sticky top-0 z-10">

@@ -65,7 +65,7 @@ const PurchasedView = ({
       </div>
 
       <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">{/* Table animation */}
-        <div className="flex-grow overflow-y-auto">
+        <div className="flex-grow overflow-y-auto hide-scrollbar">
           <table className="w-full text-xs">
             <thead className="bg-gray-50 dark:bg-gray-700/50">
               <tr>

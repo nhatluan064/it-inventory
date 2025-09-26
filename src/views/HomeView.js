@@ -19,7 +19,7 @@ const HomeView = React.memo(
     activityLogs, 
   }) => {
     return (
-      <div className="h-full overflow-y-auto animate-fadeIn">
+      <div className="h-full overflow-y-auto hide-scrollbar animate-fadeIn">
         <div className="space-y-6 p-1">
           {/* --- KHOẢNG BIỂU ĐỒ THỐNG KÊ --- */}
           <div className="space-y-6 animate-slideInUp">
