@@ -52,7 +52,7 @@ const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
   const sortOptions = [{ key: "name", label: t("device_name") }];
 
   return (
-    <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
+    <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">
       {/* Header và Bộ lọc */}
       <div className="flex-shrink-0 p-4 bg-white dark:bg-gray-800 shadow-sm">
         <div className="flex justify-between items-center">
@@ -62,7 +62,7 @@ const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
           </div>
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="mobile-btn-icon mobile-optimized"
           >
             <Filter className="w-5 h-5" />
           </button>

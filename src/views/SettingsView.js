@@ -7,37 +7,19 @@ import {
   Sun,
   Moon,
   Globe,
-  Database,
-  Upload,
-  Download,
-  Trash2,
-  History, // Thêm icon mới
 } from "lucide-react";
 import ViewHeader from "../components/ViewHeader";
-import DynamicDataManager from "../components/DynamicDataManager";
-import { useAuth } from "../hooks/useAuth";
 
-// Thêm prop onDeleteLogs
-const SettingsView = ({
-  onBackupData,
-  onResetData,
-  onImportData,
-  onDeleteLogs,
-  t,
-}) => {
+const SettingsView = ({ t }) => {
   const { theme, setTheme, language, setLanguage } = useContext(AppContext);
-  const { currentUser } = useAuth();
-  const fileInputRef = React.useRef(null);
-
-  const handleImportClick = () => {
-    fileInputRef.current.click();
-  };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto animate-scaleIn">
-      <ViewHeader title={t("system_settings")} />
+    <div className="space-y-8 max-w-4xl mx-auto animate-fadeIn">
+      <div className="animate-slideInDown">
+        <ViewHeader title={t("system_settings")} />
+      </div>
       {/* Interface Settings */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 animate-slideInUp">
         <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
           <Settings className="w-4 h-4 mr-2" /> {t("interface")}
         </h3>
@@ -50,7 +32,7 @@ const SettingsView = ({
             <div className="flex space-x-2 rounded-lg bg-gray-100 dark:bg-gray-700 p-1">
               <button
                 onClick={() => setTheme("light")}
-                className={`w-full flex items-center justify-center gap-2 p-2 rounded-md text-xs ${
+                className={`w-full flex items-center justify-center gap-2 p-2 rounded-md text-xs animate-hoverScale ${
                   theme === "light"
                     ? "bg-white dark:bg-gray-500 shadow"
                     : "hover:bg-white/50 dark:hover:bg-gray-600"
@@ -60,7 +42,7 @@ const SettingsView = ({
               </button>
               <button
                 onClick={() => setTheme("dark")}
-                className={`w-full flex items-center justify-center gap-2 p-2 rounded-md text-xs ${
+                className={`w-full flex items-center justify-center gap-2 p-2 rounded-md text-xs animate-hoverScale ${
                   theme === "dark"
                     ? "bg-white dark:bg-gray-800 shadow"
                     : "hover:bg-white/50 dark:hover:bg-gray-600"
@@ -70,7 +52,7 @@ const SettingsView = ({
               </button>
               <button
                 onClick={() => setTheme("system")}
-                className={`w-full flex items-center justify-center gap-2 p-2 rounded-md text-xs ${
+                className={`w-full flex items-center justify-center gap-2 p-2 rounded-md text-xs animate-hoverScale ${
                   theme === "system"
                     ? "bg-white dark:bg-gray-500 shadow"
                     : "hover:bg-white/50 dark:hover:bg-gray-600"
@@ -101,85 +83,6 @@ const SettingsView = ({
           </div>
         </div>
       </div>
-
-      {/* Data Management */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-          <Database className="w-4 h-4 mr-2" /> {t("data_management")}
-        </h3>
-        <div className="space-y-4">
-          {/* Import Data */}
-          <div>
-            {/* <p className="font-medium text-gray-800 dark:text-gray-200">
-              {t("import_data")}
-            </p> */}
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-              {t("confirm_override_data")}
-            </p>
-            <button
-              onClick={handleImportClick}
-              className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-            >
-              <Upload className="w-3.5 h-3.5" /> {t("import_button_text")}
-            </button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={onImportData}
-              className="hidden"
-              accept=".json"
-            />
-          </div>
-
-          {/* Backup Data */}
-          <div>
-            <p className="font-medium text-gray-800 dark:text-gray-200">
-              {t("backup_data")}
-            </p>
-            <button
-              onClick={onBackupData}
-              className="mt-2 flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-green-600 rounded-lg hover:bg-green-700"
-            >
-              <Download className="w-3.5 h-3.5" /> {t("backup_button_text")}
-            </button>
-          </div>
-
-          {/* --- KHỐI MỚI: XÓA LOG --- */}
-          <div className="border-t dark:border-gray-700 pt-4">
-            <p className="font-medium text-orange-600 dark:text-orange-400">
-              {t("delete_activity_log")}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-              {t("delete_log_warning")}
-            </p>
-            <button
-              onClick={onDeleteLogs}
-              className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700"
-            >
-              <History className="w-3.5 h-3.5" /> {t("delete_log_button")}
-            </button>
-          </div>
-
-          {/* Reset Data */}
-          <div className="border-t dark:border-gray-700 pt-4">
-            <p className="font-medium text-red-600 dark:text-red-400">
-              {t("reset_data")}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-              {t("reset_data_warning")}
-            </p>
-            <button
-              onClick={onResetData}
-              className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-red-600 rounded-lg hover:bg-red-700"
-            >
-              <Trash2 className="w-3.5 h-3.5" /> {t("reset_button_text")}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Dynamic Data Management */}
-      <DynamicDataManager currentUser={currentUser} t={t} />
     </div>
   );
 };

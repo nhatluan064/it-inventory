@@ -1,7 +1,6 @@
 import React from "react";
 import { CheckCircle, XCircle, Edit, Package } from "lucide-react";
 import { useSort } from "../hooks/useSort";
-import PageTransition from "../components/PageTransition";
 
 const MaintenanceView = ({
   items,
@@ -34,9 +33,8 @@ const MaintenanceView = ({
     new Date(dateString).toLocaleString(t("locale_string"));
 
   return (
-    <PageTransition animationType="slideRight">
-      <div className="h-full flex flex-col gap-6">
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6">
+    <div className="h-full flex flex-col gap-6 animate-fadeIn">{/* Page transition */}
+      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">{/* Header animation */}
         <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
           {t("maintenance_management")}
         </h2>
@@ -45,7 +43,7 @@ const MaintenanceView = ({
         </p>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden">
+      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">{/* Table container animation */}
         <div className="flex-grow overflow-y-auto">
           {sortedItems.length > 0 ? (
             <table className="w-full text-xs table-fixed">
@@ -89,21 +87,21 @@ const MaintenanceView = ({
                       <div className="flex items-center justify-center space-x-1">
                         <button
                           onClick={() => onEditNote(item)}
-                          className="p-2 rounded-lg text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                          className="p-2 rounded-lg text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 animate-hoverScale transition-all duration-200"
                           title={t("edit_failure_note")}
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => onRepairComplete(item)}
-                          className="p-2 rounded-lg text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30"
+                          className="p-2 rounded-lg text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 animate-hoverScale transition-all duration-200"
                           title={t("repair_completed")}
                         >
                           <CheckCircle className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => onMarkUnrepairable(item)}
-                          className="p-2 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30"
+                          className="p-2 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 animate-hoverScale transition-all duration-200"
                           title={t("mark_unrepairable")}
                         >
                           <XCircle className="w-4 h-4" />
@@ -126,7 +124,6 @@ const MaintenanceView = ({
         </div>
       </div>
     </div>
-    </PageTransition>
   );
 };
 

@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { useSort } from "../hooks/useSort";
-import PageTransition from "../components/PageTransition";
 
 const MasterListView = ({
   allItems,
@@ -77,9 +76,8 @@ const MasterListView = ({
   };
 
   return (
-    <PageTransition animationType="slideRight" enableStagger={true}>
-      <div className="h-full flex flex-col gap-6">
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6">
+    <div className="h-full flex flex-col gap-6 animate-fadeIn">{/* Page transition */}
+      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">{/* Header animation */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
@@ -91,7 +89,7 @@ const MasterListView = ({
           </div>
           <button
             onClick={onAddType}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-lg flex items-center justify-center space-x-2 text-sm font-semibold"
+            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-lg flex items-center justify-center space-x-2 text-sm font-semibold animate-hoverScale transition-all duration-200"
           >
             <Plus className="w-5 h-5" />
             <span>{t("add_new_master_item")}</span>
@@ -122,7 +120,7 @@ const MasterListView = ({
         </div>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden">
+      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">{/* Table container animation */}
         <div className="flex-grow overflow-y-auto scrollbar-hide">
           <table className="w-full text-xs table-fixed">
             <thead className="bg-white dark:bg-gray-800 sticky top-0 z-10">
@@ -168,7 +166,8 @@ const MasterListView = ({
                 return (
                   <React.Fragment key={categoryId}>
                     <tr
-                      className="bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+                      className="bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer animate-fadeInUp transition-all duration-300"
+                      style={{ animationDelay: `${Object.keys(groupedByCategory).indexOf(categoryId) * 0.1}s` }}
                       onClick={() => toggleExpand(categoryId)}
                     >
                       <td className="px-4 py-3 font-semibold capitalize">
@@ -209,7 +208,7 @@ const MasterListView = ({
                               </div>
                             </div>
                             <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                              {sortedSubItems.map((item) => {
+                              {sortedSubItems.map((item, itemIndex) => {
                                 const isModelInUse = fullEquipmentList.some(
                                   (e) =>
                                     e.name.split(" (User:")[0].trim() ===
@@ -226,7 +225,8 @@ const MasterListView = ({
                                 return (
                                   <div
                                     key={item.id}
-                                    className="grid grid-cols-12 gap-x-4 items-center py-2 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                                    className="grid grid-cols-12 gap-x-4 items-center py-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 animate-slideInLeft transition-all duration-300"
+                                    style={{ animationDelay: `${itemIndex * 0.05}s` }}
                                   >
                                     <div className="col-span-6 truncate font-semibold flex items-center">
                                       {item.name}
@@ -240,7 +240,7 @@ const MasterListView = ({
                                       <button
                                         onClick={() => onEditItem(item)}
                                         disabled={isModelInUse}
-                                        className="p-2 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-lg disabled:opacity-40"
+                                        className="p-2 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-lg disabled:opacity-40 animate-hoverScale transition-all duration-200"
                                         title={
                                           isModelInUse
                                             ? t("cannot_edit_used_model")
@@ -251,7 +251,7 @@ const MasterListView = ({
                                       </button>
                                       <button
                                         onClick={() => onDeleteItem(item)}
-                                        className="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg"
+                                        className="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg animate-hoverScale transition-all duration-200"
                                         title={t("delete")}
                                       >
                                         <Trash2 className="w-4 h-4" />
@@ -271,8 +271,9 @@ const MasterListView = ({
             </tbody>
           </table>
         </div>
-        </div>
       </div>
-    </PageTransition>
+    </div>
   );
-};export default MasterListView;
+};
+
+export default MasterListView;

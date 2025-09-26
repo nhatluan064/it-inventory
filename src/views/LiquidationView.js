@@ -1,7 +1,6 @@
 import React from "react";
 import { Trash2 } from "lucide-react";
 import { useSort } from "../hooks/useSort";
-import PageTransition from "../components/PageTransition";
 
 const LiquidationView = ({ items, onLiquidateItem, t }) => {
   const { items: sortedItems, requestSort, sortConfig } = useSort(items);
@@ -19,9 +18,8 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
   ];
 
   return (
-    <PageTransition animationType="zoom">
-      <div className="h-full flex flex-col gap-6">
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6">
+    <div className="h-full flex flex-col gap-6 animate-fadeIn">{/* Page transition */}
+      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">{/* Header animation */}
         <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-500 to-gray-600 bg-clip-text text-transparent">
           {t("liquidation_list")}
         </h2>
@@ -30,7 +28,7 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
         </p>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden">
+      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">{/* Table container animation */}
         {sortedItems.length > 0 ? (
           <div className="flex-grow overflow-y-auto">
             <table className="w-full text-xs table-fixed">
@@ -70,7 +68,7 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
                     <td className="px-4 text-center align-middle">
                       <button
                         onClick={() => onLiquidateItem(item)}
-                        className="p-2 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30"
+                        className="p-2 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 animate-hoverScale transition-all duration-200"
                         title={t("confirm_liquidated")}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -94,7 +92,6 @@ const LiquidationView = ({ items, onLiquidateItem, t }) => {
         )}
       </div>
     </div>
-    </PageTransition>
   );
 };
 

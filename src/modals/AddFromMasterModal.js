@@ -21,15 +21,15 @@ const AddFromMasterModal = ({
   const pendingItemNames = pendingItems.map((item) => item.name);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-lg h-[80vh] flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4 animate-fadeIn">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-lg h-[80vh] flex flex-col animate-scaleIn transform">{/* Modal animation */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
             {t("add_to_purchase_request_from_master")}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 animate-hoverScale transition-all duration-200"
           >
             <X className="w-6 h-6" />
           </button>
@@ -67,10 +67,10 @@ const AddFromMasterModal = ({
                     <button
                       onClick={() => onAddItem(item)}
                       disabled={isPending}
-                      className={`flex items-center gap-2 px-3 py-1 text-sm rounded-md transition-colors ${
+                      className={`flex items-center gap-2 px-3 py-1 text-sm rounded-md transition-all duration-200 ${
                         isPending
                           ? "bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                          : "bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900"
+                          : "bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900 animate-hoverScale"
                       }`}
                     >
                       <PlusCircle className="w-4 h-4" />

@@ -101,7 +101,7 @@ const MobilePurchasedView = ({
   ];
 
   return (
-    <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
+    <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">
       <div className="flex-shrink-0 p-4 bg-white dark:bg-gray-800 shadow-sm">
         <div className="flex justify-between items-center">
           <div>
@@ -110,7 +110,7 @@ const MobilePurchasedView = ({
           </div>
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="mobile-btn-icon mobile-optimized"
           >
             <Filter className="w-5 h-5" />
           </button>
@@ -156,13 +156,13 @@ const MobilePurchasedView = ({
         )}
       </div>
 
-      <div className="flex-grow overflow-y-auto p-4 space-y-4">
+      <div className="flex-grow overflow-y-auto p-4 space-y-4 mobile-stagger">
         {filteredAndSortedItems.map((item) => {
           const isImporting = importingIds.includes(item.id);
           return (
             <div
               key={item.id}
-              className={`bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-700 p-4 space-y-3 transition-opacity duration-300 ${
+              className={`bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-700 p-4 space-y-3 mobile-card transition-opacity duration-300 ${
                 isImporting ? "opacity-50" : ""
               }`}
             >

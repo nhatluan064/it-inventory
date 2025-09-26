@@ -8,7 +8,7 @@ const PurchasedView = ({
   onImportItem,
   categories,
   t,
-  fullInventory,
+  _fullInventory,
 }) => {
   const [importingIds, setImportingIds] = useState([]);
   const [serialNumbers, setSerialNumbers] = useState({});
@@ -138,7 +138,7 @@ const PurchasedView = ({
                           onClick={() => handleImportClick(item)}
                           disabled={isImporting}
                           title={t("import_to_inventory")}
-                          className={`p-2.5 rounded-lg transition-all duration-300 flex justify-center items-center w-full max-w-[100px] mx-auto ${
+                          className={`p-2.5 rounded-lg transition-all duration-200 flex justify-center items-center w-full max-w-[100px] mx-auto animate-hoverScale ${
                             isImporting
                               ? "bg-gray-300 text-gray-500 cursor-wait"
                               : "bg-blue-100 text-blue-600 hover:bg-blue-200 dark:bg-blue-900/50 dark:text-blue-300 dark:hover:bg-blue-900"

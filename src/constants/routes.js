@@ -5,6 +5,7 @@
 import InventoryView from "../views/InventoryView";
 import ReportsView from "../views/ReportsView";
 import SettingsView from "../views/SettingsView";
+import AdvancedSettingsView from "../views/AdvancedSettingsView";
 import PurchasingView from "../views/PurchasingView";
 import PurchasedView from "../views/PurchasedView";
 import AllocatedView from "../views/AllocatedView";
@@ -41,6 +42,7 @@ export const ROUTE_NAMES = {
   LIQUIDATION: "liquidation",
   REPORTS: "reports",
   SETTINGS: "settings",
+  ADVANCED_SETTINGS: "advancedSettings",
   ACCOUNT: "account"
 };
 
@@ -89,6 +91,10 @@ export const VIEW_COMPONENTS = {
   [ROUTE_NAMES.SETTINGS]: {
     desktop: SettingsView,
     mobile: SettingsView // Settings view sử dụng chung
+  },
+  [ROUTE_NAMES.ADVANCED_SETTINGS]: {
+    desktop: AdvancedSettingsView,
+    mobile: AdvancedSettingsView // Advanced Settings view sử dụng chung
   },
   [ROUTE_NAMES.ACCOUNT]: {
     desktop: AccountPage,

@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 import { CSVLink } from "react-csv";
-import PageTransition from "../components/PageTransition";
 
 const ReportsView = ({ transactions, t }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -185,12 +184,12 @@ const ReportsView = ({ transactions, t }) => {
         detailsText: renderDetails(trans),
       };
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortedTransactions, logDetails, t]);
 
   return (
-    <PageTransition animationType="flipX">
-      <div className="h-full flex flex-col gap-6">
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6">
+    <div className="h-full flex flex-col gap-6 animate-fadeIn">{/* Page transition */}
+      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">{/* Header animation */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
@@ -204,7 +203,7 @@ const ReportsView = ({ transactions, t }) => {
             data={csvData}
             headers={headers}
             filename={"inventory_report.csv"}
-            className="p-2.5 bg-green-100 dark:bg-green-700/50 rounded-lg text-green-600 dark:text-green-300"
+            className="p-2.5 bg-green-100 dark:bg-green-700/50 rounded-lg text-green-600 dark:text-green-300 animate-hoverScale transition-all duration-200"
           >
             <Download className="w-5 h-5" />
           </CSVLink>
@@ -267,7 +266,7 @@ const ReportsView = ({ transactions, t }) => {
         </div>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden">
+      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">{/* Table container animation */}
         <div className="flex-grow overflow-y-auto scrollbar-hide">
           <table className="w-full text-xs table-fixed">
             <thead className="bg-white dark:bg-gray-800 sticky top-0 z-10">
@@ -344,7 +343,6 @@ const ReportsView = ({ transactions, t }) => {
         </div>
       </div>
     </div>
-    </PageTransition>
   );
 };
 

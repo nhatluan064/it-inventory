@@ -10,7 +10,7 @@ const AccountPage = ({ currentUser, onPasswordReset, t }) => {
       .then(() => {
         toast.success(t("login_password_reset_sent"));
       })
-      .catch((error) => {
+      .catch((_error) => {
         toast.error(t("login_error_password_reset"));
       });
   };
@@ -23,8 +23,8 @@ const AccountPage = ({ currentUser, onPasswordReset, t }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 sm:p-8 max-w-2xl mx-auto">
-      <div className="flex flex-col items-center text-center">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 sm:p-8 max-w-2xl mx-auto animate-fadeIn">
+      <div className="flex flex-col items-center text-center animate-slideInDown">
         <div className="w-24 h-24 mb-4 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
           <span className="text-white text-4xl font-medium">
             {currentUser.displayName
@@ -38,7 +38,7 @@ const AccountPage = ({ currentUser, onPasswordReset, t }) => {
         <p className="text-sm text-gray-500 dark:text-gray-400">{t('user_profile')}</p>
       </div>
 
-      <div className="mt-8 space-y-4">
+      <div className="mt-8 space-y-4 animate-slideInUp">
         <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
           <Mail className="w-5 h-5 text-gray-400 mr-4 flex-shrink-0" />
           <div>
@@ -68,7 +68,7 @@ const AccountPage = ({ currentUser, onPasswordReset, t }) => {
         </h3>
         <button
           onClick={handlePasswordReset}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 animate-hoverScale"
         >
           <Key className="w-4 h-4" /> {t('change_password_button')}
         </button>

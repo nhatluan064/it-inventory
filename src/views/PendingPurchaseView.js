@@ -2,7 +2,6 @@ import React, { useState, useMemo } from "react";
 import { ShoppingCart, Trash2, Plus, Search } from "lucide-react";
 import toast from "react-hot-toast";
 import { useSort } from "../hooks/useSort";
-import PageTransition from "../components/PageTransition";
 
 const PendingPurchaseView = ({
   items,
@@ -46,9 +45,8 @@ const PendingPurchaseView = ({
   };
 
   return (
-    <PageTransition animationType="slideUp">
-      <div className="h-full flex flex-col gap-6">
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6">
+    <div className="h-full flex flex-col gap-6 animate-fadeIn">{/* Page transition */}
+      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">{/* Header animation */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-500 via-gray-600 to-gray-700 bg-clip-text text-transparent">
@@ -60,7 +58,7 @@ const PendingPurchaseView = ({
           </div>
           <button
             onClick={onOpenAddFromMasterModal}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-lg flex items-center justify-center space-x-2 text-sm font-semibold"
+            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-3 rounded-lg flex items-center justify-center space-x-2 text-sm font-semibold animate-hoverScale transition-all duration-200"
           >
             <Plus className="w-5 h-5" />
             <span>{t("add_from_master_list")}</span>
@@ -81,7 +79,7 @@ const PendingPurchaseView = ({
         </div>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden">
+      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">{/* Table container animation */}
         <div className="flex-grow overflow-y-auto">
           <table className="w-full text-xs">
             <thead className="bg-gray-50 dark:bg-gray-700/50">
@@ -150,13 +148,13 @@ const PendingPurchaseView = ({
                     <div className="flex items-center justify-center gap-2">
                       <button
                         onClick={() => handlePurchaseClick(item)}
-                        className="p-2 text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg"
+                        className="p-2 text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg animate-hoverScale transition-all duration-200"
                       >
                         <ShoppingCart className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => onDeleteItem(item)}
-                        className="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg"
+                        className="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg animate-hoverScale transition-all duration-200"
                       >
                         <Trash2 className="w-5 h-5" />
                       </button>
@@ -169,7 +167,6 @@ const PendingPurchaseView = ({
         </div>
       </div>
     </div>
-    </PageTransition>
   );
 };
 

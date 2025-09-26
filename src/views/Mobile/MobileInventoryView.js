@@ -70,7 +70,7 @@ const MobileInventoryView = ({
   ];
 
   return (
-    <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
+    <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">
       <div className="flex-shrink-0 p-4 bg-white dark:bg-gray-800 shadow-sm">
         <div className="flex justify-between items-center">
           <div>
@@ -80,20 +80,20 @@ const MobileInventoryView = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="mobile-btn-icon mobile-optimized"
             >
               <Filter className="w-5 h-5" />
             </button>
             <button
               onClick={onAddLegacyItem}
-              className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600"
+              className="mobile-btn-primary rounded-full p-2 mobile-optimized"
             >
               <Plus className="w-5 h-5" />
             </button>
           </div>
         </div>
         {isFilterOpen && (
-          <div className="mt-4 space-y-4 animate-fadeIn">
+          <div className="mt-4 space-y-4 mobile-filter-enter">
             <div className="grid grid-cols-2 gap-4">
               <input
                 type="text"
@@ -159,11 +159,11 @@ const MobileInventoryView = ({
           </div>
         )}
       </div>
-      <div className="flex-grow overflow-y-auto p-4 space-y-4">
+      <div className="flex-grow overflow-y-auto p-4 space-y-4 mobile-stagger">
         {equipment.map((item) => (
           <div
             key={item.id}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-700 p-4 space-y-3"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-700 p-4 space-y-3 mobile-card"
           >
             <div className="flex justify-between items-start">
               <div>
@@ -227,26 +227,26 @@ const MobileInventoryView = ({
             <div className="border-t dark:border-gray-600 pt-3 flex justify-end space-x-2">
               <button
                 onClick={() => onViewItem(item)}
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="mobile-btn-icon mobile-optimized"
               >
                 <Eye className="w-5 h-5 text-emerald-500" />
               </button>
               <button
                 onClick={() => onEditItem(item)}
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="mobile-btn-icon mobile-optimized"
               >
                 <Edit className="w-5 h-5 text-amber-500" />
               </button>
               <button
                 disabled={item.status !== "available"}
                 onClick={() => onAllocateItem(item)}
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+                className="mobile-btn-icon mobile-optimized disabled:opacity-50"
               >
                 <LogOut className="w-5 h-5 text-blue-500" />
               </button>
               <button
                 onClick={() => onDeleteItem(item)}
-                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="mobile-btn-icon mobile-optimized"
               >
                 <Trash2 className="w-5 h-5 text-red-500" />
               </button>

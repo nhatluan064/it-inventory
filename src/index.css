@@ -57,8 +57,19 @@
   .scrollbar-hide {
     -ms-overflow-style: none !important; /* IE & Edge */
     scrollbar-width: none !important; /* Firefox */
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
+  }
+
+  /* Specific class for dashboard horizontal scrolling */
+  .dashboard-scroll {
+    -ms-overflow-style: none !important; /* IE & Edge */
+    scrollbar-width: none !important; /* Firefox */
+    -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
+  }
+
+  .dashboard-scroll::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 
   /* Áp dụng cho tất cả các element con trong chart */

@@ -17,7 +17,6 @@ const AppLayout = ({
   isMobile,
   isMobileSidebarOpen,
   setMobileSidebarOpen,
-  onSettingsClick,
   onViewProfile,
   children,
   // Dashboard props
@@ -50,7 +49,6 @@ const AppLayout = ({
         isMobile={isMobile}
         isMobileOpen={isMobileSidebarOpen}
         setMobileOpen={setMobileSidebarOpen}
-        onSettingsClick={onSettingsClick}
         onViewProfile={onViewProfile}
       />
 

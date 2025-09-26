@@ -5,6 +5,7 @@ import { ROUTE_NAMES, VIEW_COMPONENTS } from "../constants/routes";
 // Pages
 import AccountPage from "../Pages/AccountPage";
 import SettingsView from "../views/SettingsView";
+import AdvancedSettingsView from "../views/AdvancedSettingsView";
 
 export const useViewRendering = ({
   activeTab,
@@ -237,6 +238,13 @@ export const useViewRendering = ({
         case ROUTE_NAMES.SETTINGS:
           return (
             <SettingsView
+              {...viewProps}
+            />
+          );
+
+        case ROUTE_NAMES.ADVANCED_SETTINGS:
+          return (
+            <AdvancedSettingsView
               {...viewProps}
               onBackupData={inventory.backupData}
               onResetData={() =>

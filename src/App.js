@@ -333,7 +333,7 @@ const App = () => {
         isMobile={isMobile}
         isMobileSidebarOpen={isMobileSidebarOpen}
         setMobileSidebarOpen={setMobileSidebarOpen}
-        onSettingsClick={() => handleTabClick("settings")}
+
         onViewProfile={() => modals.openModal("userInfo", currentUser)}
         equipment={inventory.equipment}
         pendingPurchaseCount={pendingPurchaseItems.length}

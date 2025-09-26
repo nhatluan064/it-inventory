@@ -3,7 +3,6 @@ import React, { useRef, useEffect } from "react";
 import NavigationTabs from "./NavigationTabs";
 import {
   SlidersHorizontal,
-  Settings,
   LogOut,
   ChevronsLeft,
   X,
@@ -13,7 +12,6 @@ import {
 const Sidebar = ({
   currentUser,
   onLogout,
-  onSettingsClick,
   activeTab,
   setActiveTab,
   t,
@@ -157,13 +155,7 @@ const Sidebar = ({
                   <LogOut className="w-4 h-4" />
                   <span>{t("logout")}</span>
                 </button>
-                <button
-                  onClick={onSettingsClick}
-                  className="w-full flex items-center space-x-3 py-1.5 px-4 rounded-lg font-medium text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50"
-                >
-                  <Settings className="w-4 h-4" />
-                  <span>{t("settings")}</span>
-                </button>
+
               </div>
             </div>
 
@@ -193,13 +185,7 @@ const Sidebar = ({
                   >
                     <LogOut className="w-4 h-4" />
                   </button>
-                  <button
-                    onClick={onSettingsClick}
-                    title={t("settings")}
-                    className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50"
-                  >
-                    <Settings className="w-4 h-4" />
-                  </button>
+
                 </div>
               </div>
             </div>
@@ -227,13 +213,7 @@ const Sidebar = ({
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
-                <button
-                  onClick={onSettingsClick}
-                  title={t("settings")}
-                  className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50"
-                >
-                  <Settings className="w-4 h-4" />
-                </button>
+
               </div>
             </div>
           </div>

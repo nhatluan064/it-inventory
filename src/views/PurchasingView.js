@@ -1,7 +1,6 @@
 import React from "react";
 import { CheckCircle, XCircle, Layers } from "lucide-react";
 import { useSort } from "../hooks/useSort";
-import PageTransition from "../components/PageTransition";
 
 const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
   const {
@@ -16,9 +15,8 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
   };
 
   return (
-    <PageTransition animationType="slideLeft">
-      <div className="h-full flex flex-col gap-6">
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6">
+    <div className="h-full flex flex-col gap-6 animate-fadeIn">{/* Page transition */}
+      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">{/* Filter section animation */}
         <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-500 via-purple-600 to-pink-500 bg-clip-text text-transparent">
           {t("purchasing_list")}
         </h2>
@@ -27,7 +25,7 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
         </p>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden">
+      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">{/* Table container animation */}
         <div className="flex-grow overflow-y-auto">
           <table className="w-full text-xs">
             <thead className="bg-gray-50 dark:bg-gray-700/50">
@@ -87,14 +85,14 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => onUpdateStatus([item.id])}
-                          className="p-2 text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg"
+                          className="p-2 text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg animate-hoverScale transition-all duration-200"
                           title={t("confirm_purchased_count", { count: 1 })}
                         >
                           <CheckCircle className="w-5 h-5" />
                         </button>
                         <button
                           onClick={() => onCancel("cancel-purchasing", item)}
-                          className="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg"
+                          className="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg animate-hoverScale transition-all duration-200"
                           title={t("cancel_purchase")}
                         >
                           <XCircle className="w-5 h-5" />
@@ -115,7 +113,6 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
         </div>
       </div>
     </div>
-    </PageTransition>
   );
 };
 

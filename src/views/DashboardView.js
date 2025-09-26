@@ -117,7 +117,7 @@ const DashboardView = ({
       <div className="overflow-hidden">
         <div
           ref={scrollContainerRef}
-          className="overflow-x-auto scrollbar-hide py-3 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 flex space-x-4 cursor-grab active:cursor-grabbing hide-scrollbar"
+          className="overflow-x-auto dashboard-scroll py-3 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 flex space-x-4 cursor-grab active:cursor-grabbing"
         >
         <StatCard
           setActiveTab={setActiveTab}

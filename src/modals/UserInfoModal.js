@@ -12,7 +12,7 @@ const UserInfoModal = ({ show, onClose, currentUser, onPasswordReset, t }) => {
         toast.success(t("login_password_reset_sent"));
         onClose(); // Close the modal after requesting reset
       })
-      .catch((error) => {
+      .catch((_error) => {
         toast.error(t("login_error_password_reset"));
       });
   };
@@ -26,13 +26,13 @@ const UserInfoModal = ({ show, onClose, currentUser, onPasswordReset, t }) => {
 
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 z-[70] flex justify-center items-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 w-full max-w-md relative animate-fade-in-up">
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+    <div className="fixed inset-0 bg-black bg-opacity-60 z-[70] flex justify-center items-center p-4 animate-fadeIn">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 w-full max-w-md relative animate-slideInUp">
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 animate-hoverScale">
           <X className="w-6 h-6" />
         </button>
 
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center animate-slideInDown">
           <div className="w-24 h-24 mb-4 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
             <span className="text-white text-4xl font-medium">
               {currentUser.displayName
@@ -46,7 +46,7 @@ const UserInfoModal = ({ show, onClose, currentUser, onPasswordReset, t }) => {
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('user_profile')}</p>
         </div>
 
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 space-y-4 animate-slideInUp">
           <div className="flex items-center">
             <Mail className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />
             <div>
@@ -73,7 +73,7 @@ const UserInfoModal = ({ show, onClose, currentUser, onPasswordReset, t }) => {
         <div className="mt-8 border-t dark:border-gray-700 pt-6">
           <button
             onClick={handlePasswordReset}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 animate-hoverScale"
           >
             <Key className="w-4 h-4" /> {t('change_password_button')}
           </button>

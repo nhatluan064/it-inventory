@@ -11,6 +11,8 @@ import {
   ClipboardList,
   Wrench,
   Trash2,
+  Settings,
+  Sliders,
 } from "lucide-react";
 
 const NavigationTabs = ({ activeTab, setActiveTab, t, isCollapsed }) => {
@@ -45,6 +47,13 @@ const NavigationTabs = ({ activeTab, setActiveTab, t, isCollapsed }) => {
     {
       titleKey: "nav_title_reports",
       items: [{ id: "reports", name: t("reports"), icon: FileText }],
+    },
+    {
+      titleKey: "nav_title_system",
+      items: [
+        { id: "settings", name: t("settings"), icon: Settings },
+        { id: "advancedSettings", name: t("advanced_settings"), icon: Sliders },
+      ],
     },
   ];
 

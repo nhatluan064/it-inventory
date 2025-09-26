@@ -559,6 +559,63 @@
   }
 }
 
+/* HOVER ANIMATIONS */
+/* ================= */
+
+.animate-hoverScale {
+  transition: all 0.2s ease-out;
+}
+
+.animate-hoverScale:hover {
+  transform: translateY(-2px) scale(1.05);
+}
+
+/* MODAL ANIMATIONS */
+/* ================ */
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-modalSlideIn {
+  animation: modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-modalFadeIn {
+  animation: modalFadeIn 0.2s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* CUSTOM EASING FUNCTIONS */
 /* ======================= */
 
@@ -576,4 +633,247 @@
 
 .ease-expo {
   transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* ========================================= */
+/* MOBILE ANIMATION STANDARDS */
+/* ========================================= */
+
+/* MOBILE PAGE TRANSITIONS */
+/* ======================= */
+
+@keyframes mobilePageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes mobileCardStagger {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes mobileFilterSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 300px;
+  }
+}
+
+/* MOBILE BUTTON INTERACTIONS */
+/* ========================== */
+
+@keyframes mobileButtonPress {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes mobileButtonRipple {
+  from {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* MOBILE UTILITY CLASSES */
+/* ====================== */
+
+.mobile-page-enter {
+  animation: mobilePageEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.mobile-card-stagger {
+  animation: mobileCardStagger 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.mobile-filter-slide {
+  animation: mobileFilterSlide 0.3s ease-out forwards;
+}
+
+/* MOBILE STAGGERED ANIMATIONS */
+.mobile-stagger > *:nth-child(1) { animation: mobileCardStagger 0.4s ease-out 0.05s both; }
+.mobile-stagger > *:nth-child(2) { animation: mobileCardStagger 0.4s ease-out 0.1s both; }
+.mobile-stagger > *:nth-child(3) { animation: mobileCardStagger 0.4s ease-out 0.15s both; }
+.mobile-stagger > *:nth-child(4) { animation: mobileCardStagger 0.4s ease-out 0.2s both; }
+.mobile-stagger > *:nth-child(5) { animation: mobileCardStagger 0.4s ease-out 0.25s both; }
+.mobile-stagger > *:nth-child(6) { animation: mobileCardStagger 0.4s ease-out 0.3s both; }
+.mobile-stagger > *:nth-child(7) { animation: mobileCardStagger 0.4s ease-out 0.35s both; }
+.mobile-stagger > *:nth-child(8) { animation: mobileCardStagger 0.4s ease-out 0.4s both; }
+
+/* MOBILE BUTTON STYLES */
+/* ==================== */
+
+.mobile-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-btn:active {
+  animation: mobileButtonPress 0.15s ease-out;
+}
+
+.mobile-btn-primary {
+  @apply mobile-btn bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.mobile-btn-primary:hover {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  transform: translateY(-1px);
+}
+
+.mobile-btn-secondary {
+  @apply mobile-btn bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600;
+}
+
+.mobile-btn-danger {
+  @apply mobile-btn bg-red-500 text-white hover:bg-red-600 active:bg-red-700;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.mobile-btn-success {
+  @apply mobile-btn bg-green-500 text-white hover:bg-green-600 active:bg-green-700;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+.mobile-btn-warning {
+  @apply mobile-btn bg-yellow-500 text-white hover:bg-yellow-600 active:bg-yellow-700;
+  box-shadow: 0 2px 8px rgba(234, 179, 8, 0.3);
+}
+
+.mobile-btn-icon {
+  @apply mobile-btn p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-btn-icon:active {
+  transform: scale(0.9);
+}
+
+/* MOBILE CARD ANIMATIONS */
+/* ====================== */
+
+.mobile-card {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.mobile-card-enter {
+  animation: mobileCardStagger 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* MOBILE FILTER ANIMATIONS */
+/* ========================= */
+
+.mobile-filter-enter {
+  animation: mobileFilterSlide 0.3s ease-out forwards;
+}
+
+.mobile-filter-exit {
+  animation: mobileFilterSlide 0.2s ease-in reverse forwards;
+}
+
+/* TOUCH FEEDBACK */
+/* =============== */
+
+.mobile-touch-feedback {
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-touch-feedback::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.mobile-touch-feedback:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* MOBILE RESPONSIVE ANIMATIONS */
+/* ============================ */
+
+@media (max-width: 768px) {
+  .animate-hoverScale:hover {
+    transform: none; /* Disable hover on mobile */
+  }
+  
+  .mobile-optimized {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* LOADING STATES FOR MOBILE */
+/* ========================== */
+
+@keyframes mobileSpinner {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.mobile-loading {
+  animation: mobileSpinner 1s linear infinite;
+}
+
+.mobile-skeleton {
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.1) 25%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    rgba(255, 255, 255, 0.1) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }

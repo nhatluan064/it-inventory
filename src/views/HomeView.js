@@ -10,7 +10,6 @@ import {
   LazyWrapper,
 } from "../components/Performance/LazyComponents";
 import { ChartLoadingSkeleton } from "../components/LoadingStates/GlobalLoader";
-import PageTransition from "../components/PageTransition";
 
 const HomeView = React.memo(
   ({
@@ -20,13 +19,10 @@ const HomeView = React.memo(
     activityLogs, 
   }) => {
     return (
-      <PageTransition animationType="zoom" enableStagger={true}>
-        <div className="h-full overflow-y-auto">
-          <div className="space-y-6 p-1">
-            {/* Page Transition Animation */}
-            <div>
-            {/* --- KHOẢNG BIỂU ĐỒ THỐNG KÊ --- */}
-            <div className="space-y-6">
+      <div className="h-full overflow-y-auto animate-fadeIn">
+        <div className="space-y-6 p-1">
+          {/* --- KHOẢNG BIỂU ĐỒ THỐNG KÊ --- */}
+          <div className="space-y-6 animate-slideInUp">
               {/* Row 1: Biểu đồ tròn + Biểu đồ phân bố danh mục */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <ChartWrapper
@@ -68,20 +64,18 @@ const HomeView = React.memo(
                 </ChartWrapper>
               </div>
 
-              {/* Row 3: Biểu đồ xu hướng 30 ngày */}
-              <ChartWrapper hasData={activityLogs && Array.isArray(activityLogs)}>
-                <LazyWrapper
-                  component={LazyMonthlyTrendChart}
-                  fallback={<ChartLoadingSkeleton />}
-                  activityLogs={activityLogs}
-                  equipment={equipment}
-                />
-              </ChartWrapper>
-            </div>
+            {/* Row 3: Biểu đồ xu hướng 30 ngày */}
+            <ChartWrapper hasData={activityLogs && Array.isArray(activityLogs)}>
+              <LazyWrapper
+                component={LazyMonthlyTrendChart}
+                fallback={<ChartLoadingSkeleton />}
+                activityLogs={activityLogs}
+                equipment={equipment}
+              />
+            </ChartWrapper>
           </div>
         </div>
       </div>
-    </PageTransition>
     );
   }
 );

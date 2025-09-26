@@ -2,7 +2,6 @@ import React, { useState, useMemo } from "react";
 import { RotateCcw, Search, Wrench } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 import { useDynamicData } from "../hooks/useDynamicData";
-import { AnimatedCard } from "../components/AnimatedCard";
 
 const AllocatedView = ({
   items,
@@ -217,7 +216,8 @@ const AllocatedView = ({
                 return (
                   <React.Fragment key={categoryId}>
                     <tr
-                      className="bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+                      className="bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer animate-fadeInUp transition-all duration-300"
+                      style={{ animationDelay: `${Object.keys(groupedByCategory).indexOf(categoryId) * 0.1}s` }}
                       onClick={() => toggleExpand(categoryId)}
                     >
                       <td className="px-4 py-3 font-semibold capitalize">
@@ -291,10 +291,11 @@ const AllocatedView = ({
                               </div>
                             </div>
                             <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                              {sortedSubItems.map((item) => (
+                              {sortedSubItems.map((item, itemIndex) => (
                                 <div
                                   key={item.id}
-                                  className="grid grid-cols-12 gap-x-4 items-center py-2 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                                  className="grid grid-cols-12 gap-x-4 items-center py-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 animate-slideInLeft transition-all duration-300"
+                                  style={{ animationDelay: `${itemIndex * 0.05}s` }}
                                 >
                                   <div className="col-span-3 text-left truncate font-semibold">
                                     {item.name}
