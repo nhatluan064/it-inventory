@@ -18,6 +18,7 @@ export const useModals = () => {
     directMaintenanceNote: false,
     userInfo: false, // Add this for the new modal
     bulkEdit: false,
+    feedback: false, // Add this for the feedback modal
   });
 
   const [currentItem, setCurrentItem] = useState(null);

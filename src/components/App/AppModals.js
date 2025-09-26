@@ -15,6 +15,7 @@ import AddFromMasterModal from "../../modals/AddFromMasterModal";
 import NoteModal from "../../modals/NoteModal";
 import RepairNoteModal from "../../modals/RepairNoteModal";
 import UserInfoModal from "../../modals/UserInfoModal";
+import FeedbackModal from "../../modals/FeedbackModal";
 
 const AppModals = ({
   modals,
@@ -238,6 +239,14 @@ const AppModals = ({
         onClose={() => modals.closeModal("userInfo")}
         currentUser={modals.currentItem}
         onPasswordReset={passwordReset}
+        t={t}
+      />
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={modals.modalState.feedback}
+        onClose={() => modals.closeModal("feedback")}
+        user={currentUser}
         t={t}
       />
     </>

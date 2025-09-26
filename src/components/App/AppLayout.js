@@ -11,6 +11,7 @@ const AppLayout = ({
   setActiveTab,
   currentUser,
   onLogout,
+  onFeedback,
   t,
   isSidebarCollapsed,
   toggleSidebar,
@@ -43,6 +44,7 @@ const AppLayout = ({
         setActiveTab={handleTabClick}
         currentUser={currentUser}
         onLogout={onLogout}
+        onFeedback={onFeedback}
         t={t}
         isCollapsed={isSidebarCollapsed}
         toggleSidebar={toggleSidebar}

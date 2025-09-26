@@ -372,6 +372,7 @@ const App = () => {
         setActiveTab={setActiveTab}
         currentUser={currentUser}
         onLogout={logout}
+        onFeedback={() => modals.openModal("feedback")}
         t={t}
         isSidebarCollapsed={isSidebarCollapsed}
         toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
