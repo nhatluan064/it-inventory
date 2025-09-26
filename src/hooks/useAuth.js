@@ -19,6 +19,8 @@ export const useAuth = () => {
   const [authSuccessType, setAuthSuccessType] = useState(null);
   // CỜ HIỆU MỚI: Báo cho App.js biết đang trong luồng đăng ký
   const [isRegisteringFlow, setIsRegisteringFlow] = useState(false);
+  // STATE MỚI: Quản lý post-login loading screen
+  const [isPostLoginLoading, setIsPostLoginLoading] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -45,6 +47,9 @@ export const useAuth = () => {
       await signOut(auth);
       throw new Error("EMAIL_NOT_VERIFIED");
     }
+    
+    // Kích hoạt post-login loading screen
+    setIsPostLoginLoading(true);
   };
 
   const googleSignIn = async () => {
@@ -101,17 +106,23 @@ export const useAuth = () => {
     }
   };
 
+  const finishPostLoginLoading = () => {
+    setIsPostLoginLoading(false);
+  };
+
   return {
     currentUser,
     authLoading,
     authSuccessType,
     isRegisteringFlow, // Export cờ hiệu ra ngoài
+    isPostLoginLoading, // Export post-login loading state
     login,
     googleSignIn,
     signUp,
     logout,
     passwordReset,
     finishAuthSuccess,
+    finishPostLoginLoading, // Export function to finish post-login loading
     setupProfile,
   };
 };

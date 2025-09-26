@@ -25,6 +25,7 @@ import AppLayout from "./components/App/AppLayout";
 import AppModals from "./components/App/AppModals";
 import GlobalErrorBoundary from "./components/ErrorBoundary/GlobalErrorBoundary";
 import GlobalLoader from "./components/LoadingStates/GlobalLoader";
+import PostLoginLoader from "./components/LoadingStates/PostLoginLoader";
 
 // Utilities
 import {
@@ -70,12 +71,14 @@ const App = () => {
     authLoading,
     authSuccessType,
     isRegisteringFlow,
+    isPostLoginLoading,
     login,
     googleSignIn,
     signUp,
     logout,
     passwordReset,
     finishAuthSuccess,
+    finishPostLoginLoading,
     setupProfile,
   } = useAuth();
   
@@ -309,6 +312,19 @@ const App = () => {
 
   if (authLoading || isRegisteringFlow) {
     return renderLoadingScreen();
+  }
+
+  // Hiển thị Post-Login Loading Screen
+  if (isPostLoginLoading) {
+    return (
+      <AppContext.Provider value={appContextValue}>
+        <PostLoginLoader 
+          onComplete={finishPostLoginLoading}
+          t={t}
+          user={currentUser}
+        />
+      </AppContext.Provider>
+    );
   }
 
   if (!currentUser) {
