@@ -150,10 +150,10 @@ const Sidebar = ({
               <div className="mt-3 space-y-1 pl-4">
                 <button
                   onClick={onLogout}
-                  className="w-full flex items-center space-x-3 py-1.5 px-4 rounded-lg font-medium text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                  className="w-full flex items-center space-x-3 py-1.5 px-4 rounded-lg font-medium text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-all duration-300 group auth-logout-button"
                 >
-                  <LogOut className="w-4 h-4" />
-                  <span>{t("logout")}</span>
+                  <LogOut className="w-4 h-4 transform group-hover:scale-110 transition-transform duration-300" />
+                  <span className="transform group-hover:translate-x-1 transition-transform duration-300">{t("logout")}</span>
                 </button>
 
               </div>
@@ -181,7 +181,7 @@ const Sidebar = ({
                   <button
                     onClick={onLogout}
                     title={t("logout")}
-                    className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                    className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-all duration-300 transform hover:scale-110 auth-logout-button"
                   >
                     <LogOut className="w-4 h-4" />
                   </button>
@@ -209,7 +209,7 @@ const Sidebar = ({
                 <button
                   onClick={onLogout}
                   title={t("logout")}
-                  className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50"
+                  className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300 transform hover:scale-110 hover:rotate-12 auth-logout-button"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>

@@ -1,6 +1,7 @@
 // src/App.js - Refactored version
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Toaster } from "react-hot-toast";
+import { Package } from "lucide-react";
 
 // Custom Hooks
 import { useAuth } from "./hooks/useAuth";
@@ -254,13 +255,41 @@ const App = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Loading screen component
+  // Enhanced Loading screen component
   const renderLoadingScreen = () => (
-    <div className="flex h-screen w-screen items-center justify-center">
-      <div className="flex space-x-2">
-        <div className="w-3 h-3 bg-gray-500 rounded-full animate-dot1"></div>
-        <div className="w-3 h-3 bg-gray-500 rounded-full animate-dot2"></div>
-        <div className="w-3 h-3 bg-gray-500 rounded-full animate-dot3"></div>
+    <div className="page-loader-container">
+      <div className="page-loader-content">
+        {/* Logo and App Name */}
+        <div className="page-loader-logo">
+          <div className="p-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-6 auth-success-pulse">
+            <Package className="w-16 h-16 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-2 auth-success-celebration">
+            IT Inventory
+          </h1>
+          <p className="text-blue-200 text-lg mb-8 auth-profile-setup">
+            {t('loading_application')}
+          </p>
+        </div>
+
+        {/* Enhanced Progress Bar */}
+        <div className="page-loader-progress">
+          <div className="page-loader-bar bg-gradient-to-r from-yellow-400 via-pink-500 to-red-500"></div>
+        </div>
+
+        {/* Loading Dots */}
+        <div className="loading-dots-container">
+          <span className="animate-dot1"></span>
+          <span className="animate-dot2"></span>
+          <span className="animate-dot3"></span>
+        </div>
+
+        {/* Loading Status */}
+        <div className="mt-6 text-center">
+          <p className="text-white text-sm opacity-80 auth-loading-text">
+            {authLoading ? t('authenticating') : t('initializing')}
+          </p>
+        </div>
       </div>
     </div>
   );

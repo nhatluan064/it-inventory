@@ -4,21 +4,29 @@ import { Loader2 } from 'lucide-react';
 
 const GlobalLoader = ({ message, t }) => {
   return (
-    <div className="fixed inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 max-w-sm mx-4 text-center">
-        <div className="flex justify-center mb-4">
-          <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+    <div className="fixed inset-0 bg-gradient-to-br from-blue-50/95 to-purple-50/95 dark:from-gray-900/95 dark:to-blue-900/95 backdrop-blur-md z-50 flex items-center justify-center loading-overlay">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 max-w-md mx-4 text-center transform scale-100 auth-profile-setup">
+        <div className="flex justify-center mb-6">
+          <div className="relative">
+            <Loader2 className="w-12 h-12 text-blue-600 enhanced-spin" />
+            <div className="absolute inset-0 w-12 h-12 border-2 border-blue-200 rounded-full animate-pulse"></div>
+          </div>
         </div>
         
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 auth-success-celebration">
           {t ? t('loading') : 'Loading...'}
         </h3>
         
         {message && (
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-gray-600 dark:text-gray-300 auth-loading-text">
             {message}
           </p>
         )}
+
+        {/* Loading Progress Indicator */}
+        <div className="mt-6 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1 overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-pulse"></div>
+        </div>
       </div>
     </div>
   );

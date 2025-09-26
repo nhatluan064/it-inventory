@@ -63,8 +63,19 @@ export const useAuth = () => {
   };
 
   const logout = async () => {
+    // Add logout animation to body
+    document.body.classList.add('auth-logout-fade');
+    
+    // Wait for animation to start
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
     await signOut(auth);
     setAuthSuccessType(null);
+    
+    // Remove animation class after logout
+    setTimeout(() => {
+      document.body.classList.remove('auth-logout-fade');
+    }, 100);
   };
 
   const passwordReset = (email) => {

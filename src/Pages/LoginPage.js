@@ -20,6 +20,13 @@ const LoginPage = ({
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    
+    // Add submit animation
+    e.target.classList.add('auth-login-submit');
+    setTimeout(() => {
+      e.target.classList.remove('auth-login-submit');
+    }, 300);
+    
     setIsLoading(true);
     try {
       await onLogin(email, password);
@@ -95,16 +102,20 @@ const LoginPage = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col justify-center items-center p-4">
-      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 space-y-6">
-        <div className="flex flex-col items-center">
-          <div className="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-full">
-            <Package className="w-10 h-10 text-blue-600 dark:text-blue-400" />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col justify-center items-center p-4">
+      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 space-y-6 auth-welcome-slide relative overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-10 animate-pulse"></div>
+        <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-full opacity-10 animate-pulse" style={{ animationDelay: '1s' }}></div>
+        
+        <div className="flex flex-col items-center relative z-10">
+          <div className="p-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/50 dark:to-purple-900/50 rounded-full auth-success-pulse">
+            <Package className="w-12 h-12 text-blue-600 dark:text-blue-400" />
           </div>
-          <h2 className="mt-4 text-3xl font-bold text-center text-gray-800 dark:text-gray-100">
+          <h2 className="mt-4 text-3xl font-bold text-center text-gray-800 dark:text-gray-100 auth-success-celebration">
             IT Inventory
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600 dark:text-gray-400 text-center mt-2 auth-profile-setup">
             {isRegistering
               ? t("register_welcome_message")
               : t("login_welcome_message")}
@@ -188,13 +199,22 @@ const LoginPage = ({
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full flex justify-center py-3 px-4 border rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400"
+            className={`w-full flex justify-center py-3 px-4 border rounded-lg text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 font-semibold shadow-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl disabled:scale-100 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 ${
+              isLoading ? 'auth-login-loading' : 'auth-login-submit'
+            }`}
           >
-            {isLoading
-              ? "..."
-              : isRegistering
-              ? t("register_button")
-              : t("login_button")}
+            {isLoading ? (
+              <div className="flex items-center justify-center auth-loading-content">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                <span className="auth-loading-text">
+                  {isRegistering ? t("registering_button") : t("logging_in")}
+                </span>
+              </div>
+            ) : (
+              <span className="auth-button-text">
+                {isRegistering ? t("register_button") : t("login_button")}
+              </span>
+            )}
           </button>
         </form>
 
