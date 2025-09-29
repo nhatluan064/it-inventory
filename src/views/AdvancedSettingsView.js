@@ -108,7 +108,7 @@ const AdvancedSettingsView = ({
 
   const renderSystemSection = () => (
     <div className="animate-slideInUp">
-      <DynamicDataManager currentUser={currentUser} t={t} />
+      <DynamicDataManager currentUser={currentUser} />
     </div>
   );
 

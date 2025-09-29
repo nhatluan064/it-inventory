@@ -8,7 +8,7 @@
  * @param {Function} t - Translation function
  * @returns {Array} Filtered inventory items
  */
-export const filterInventoryItems = (inventoryItems, filters, t) => {
+export const filterInventoryItems = (inventoryItems, filters) => {
   return inventoryItems.filter((item) => {
     const { search, category, importDate, status, condition } = filters;
     const query = search.toLowerCase();
@@ -19,7 +19,7 @@ export const filterInventoryItems = (inventoryItems, filters, t) => {
       item.name?.toLowerCase().includes(query) ||
       item.serialNumber?.toLowerCase().includes(query);
 
-    // Category match
+    // Category match - improved logic
     const categoryMatch = category === "all" || item.category === category;
 
     // Date match
@@ -55,7 +55,7 @@ export const filterInventoryItems = (inventoryItems, filters, t) => {
  * @param {Function} t - Translation function
  * @returns {Array} Filtered allocated items
  */
-export const filterAllocatedItems = (equipment, filters, t) => {
+export const filterAllocatedItems = (equipment, filters) => {
   return equipment.filter((item) => {
     if (item.status !== "in-use") return false;
 

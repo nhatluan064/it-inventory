@@ -14,7 +14,7 @@ const EquipmentTypeModal = ({
   initialData,
 }) => {
   const { currentUser } = useAuth();
-  const { autoAddCategoryIfNotExists } = useDynamicData(currentUser, t);
+  const { autoAddCategoryIfNotExists } = useDynamicData(currentUser);
   const [name, setName] = useState("");
   const [category, setCategory] = useState("pc");
   const [customCategory, setCustomCategory] = useState("");

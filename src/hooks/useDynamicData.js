@@ -11,10 +11,9 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
-import { categoryStructure, departments, positions } from "../constants";
 import toast from "react-hot-toast";
 
-export const useDynamicData = (currentUser, t) => {
+export const useDynamicData = (currentUser) => {
   const [categories, setCategories] = useState([]);
   const [departmentsList, setDepartmentsList] = useState([]);
   const [positionsList, setPositionsList] = useState([]);
@@ -54,14 +53,8 @@ export const useDynamicData = (currentUser, t) => {
           ...doc.data()
         }));
         
-        // Merge with default categories
-        const defaultCategories = categoryStructure.map(cat => ({
-          ...cat,
-          name: t(cat.tKey),
-          isDefault: true
-        }));
-        
-        setCategories([...defaultCategories, ...firebaseCategories]);
+        // Only use Firebase categories (no default categories)
+        setCategories(firebaseCategories);
       });
 
       // Listen to departments
@@ -71,14 +64,8 @@ export const useDynamicData = (currentUser, t) => {
           ...doc.data()
         }));
         
-        // Merge with default departments
-        const defaultDepartments = departments.map(dept => ({
-          ...dept,
-          name: t(dept.tKey),
-          isDefault: true
-        }));
-        
-        setDepartmentsList([...defaultDepartments, ...firebaseDepartments]);
+        // Only use Firebase departments (no default departments)
+        setDepartmentsList(firebaseDepartments);
       });
 
       // Listen to positions
@@ -88,14 +75,8 @@ export const useDynamicData = (currentUser, t) => {
           ...doc.data()
         }));
         
-        // Merge with default positions
-        const defaultPositions = positions.map(pos => ({
-          ...pos,
-          name: t(pos.tKey),
-          isDefault: true
-        }));
-        
-        setPositionsList([...defaultPositions, ...firebasePositions]);
+        // Only use Firebase positions (no default positions)
+        setPositionsList(firebasePositions);
       });
 
       setLoading(false);
@@ -111,7 +92,7 @@ export const useDynamicData = (currentUser, t) => {
       setLoading(false);
       toast.error("Lỗi khi tải dữ liệu");
     }
-  }, [currentUser, t]);
+  }, [currentUser]);
 
   useEffect(() => {
     let cleanup;

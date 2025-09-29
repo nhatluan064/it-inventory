@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { AnimatedForm } from "../components/AnimatedForm";
 import { AnimatedButton } from "../components/AnimatedButton";
 
 const defaultFormState = {
@@ -101,9 +100,9 @@ const AddEditModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4 animate-fadeIn">
-      <div 
+      <div
         className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 w-full max-w-lg animate-scaleIn"
-        style={{ backdropFilter: 'blur(8px)' }}
+        style={{ backdropFilter: "blur(8px)" }}
       >
         <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
           {isEditing

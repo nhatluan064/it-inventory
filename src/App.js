@@ -84,7 +84,7 @@ const App = () => {
   
   const inventory = useInventory(currentUser, t, setActiveTab);
   const modals = useModals();
-  const dynamicData = useDynamicData(currentUser, t);
+  const dynamicData = useDynamicData(currentUser);
 
   // Computed values - StatusLabels first to avoid dependency issue
   const statusLabels = useMemo(
@@ -143,13 +143,13 @@ const App = () => {
   );
 
   const filteredInventory = useMemo(
-    () => filterInventoryItems(inventoryItems, inventoryFilters, t),
-    [inventoryItems, inventoryFilters, t]
+    () => filterInventoryItems(inventoryItems, inventoryFilters),
+    [inventoryItems, inventoryFilters]
   );
 
   const allocatedItems = useMemo(
-    () => filterAllocatedItems(inventory.equipment, allocatedFilters, t),
-    [inventory.equipment, allocatedFilters, t]
+    () => filterAllocatedItems(inventory.equipment, allocatedFilters),
+    [inventory.equipment, allocatedFilters]
   );
 
   const masterItems = useMemo(

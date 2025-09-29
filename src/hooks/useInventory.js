@@ -11,12 +11,16 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import toast from "react-hot-toast";
+import { useDynamicData } from "./useDynamicData";
 
 // THAY ĐỔI #1: Thêm `setActiveTab` vào danh sách tham số
 export const useInventory = (currentUser, t, setActiveTab) => {
   const [equipment, setEquipment] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
+
+  // Get dynamic data functions
+  const { autoAddCategoryIfNotExists } = useDynamicData(currentUser);
 
   const logTransaction = useCallback(
     async (data) => {
@@ -578,7 +582,13 @@ export const useInventory = (currentUser, t, setActiveTab) => {
         toast.error("Không tìm thấy thiết bị để cập nhật.");
         return false;
       }
+      
+      // Check if category is being changed
       if (originalItem.category !== data.category) {
+        // 1. Auto-create category if it doesn't exist
+        await autoAddCategoryIfNotExists(data.category);
+        
+        // 2. Check if master item exists in new category
         const masterExists = equipment.some(
           (e) =>
             e.status === "master" &&
@@ -607,25 +617,55 @@ export const useInventory = (currentUser, t, setActiveTab) => {
             details: { category: data.category, autoCreated: true },
           });
           toast.success(
-            `Đã tự động tạo Mẫu mới: ${data.name} - ${t(data.category)}`
+            `Đã tạo mẫu mới: ${data.name} trong danh mục "${data.category}"`
           );
         }
+
+        // 3. Check if old category becomes empty after this move
+        const remainingItemsInOldCategory = equipment.filter(
+          (e) => e.category === originalItem.category && e.id !== data.id
+        );
+        
+        if (remainingItemsInOldCategory.length === 0) {
+          toast.info(
+            `💡 Danh mục "${originalItem.category}" đã trống. Bạn có thể xóa nó trong Cài đặt nâng cao.`,
+            { duration: 5000 }
+          );
+        } else {
+          const nonMasterItems = remainingItemsInOldCategory.filter(e => e.status !== "master");
+          if (nonMasterItems.length === 0) {
+            toast.info(
+              `💡 Danh mục "${originalItem.category}" chỉ còn mẫu trống. Bạn có thể xóa nó trong Cài đặt nâng cao.`,
+              { duration: 5000 }
+            );
+          }
       }
 
       const docRef = doc(db, "users", currentUser.uid, "equipment", data.id);
       await updateDoc(docRef, data);
-      await fetchData();
+      
+      // Update state immediately instead of fetching all data
+      setEquipment(prevEquipment => {
+        const updated = prevEquipment.map(item => 
+          item.id === data.id ? { ...item, ...data } : item
+        );
+        return updated;
+      });
 
       await logTransaction({
         type: "inventory",
         reason: "update",
         itemName: data.name,
+        details: { 
+          oldCategory: originalItem.category, 
+          newCategory: data.category 
+        },
       });
 
       toast.success(t("toast_info_updated_successfully"));
       return true;
     },
-    [currentUser, equipment, logTransaction, t, fetchData]
+    [currentUser, equipment, logTransaction, t, autoAddCategoryIfNotExists]
   );
 
   const deleteItem = useCallback(

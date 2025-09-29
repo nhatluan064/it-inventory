@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Plus, Edit2, Trash2, Save, X, Settings, AlertCircle } from "lucide-react";
 import { useDynamicData } from "../hooks/useDynamicData";
 
-const DynamicDataManager = ({ currentUser, t }) => {
+const DynamicDataManager = ({ currentUser }) => {
   const [activeTab, setActiveTab] = useState("categories");
   const [editingItem, setEditingItem] = useState(null);
   const [newItemName, setNewItemName] = useState("");
@@ -24,7 +24,7 @@ const DynamicDataManager = ({ currentUser, t }) => {
     addPosition,
     updatePosition,
     deletePosition,
-  } = useDynamicData(currentUser, t);
+  } = useDynamicData(currentUser);
 
   // Add safety check for currentUser after hooks
   if (!currentUser) {
