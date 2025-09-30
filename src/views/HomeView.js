@@ -14,6 +14,7 @@ import { ChartLoadingSkeleton } from "../components/LoadingStates/GlobalLoader";
 const HomeView = React.memo(
   ({
     t,
+    categories,
     equipment,
     chartData, 
     activityLogs, 
@@ -39,6 +40,7 @@ const HomeView = React.memo(
                     component={LazyCategoryDistributionChart}
                     fallback={<ChartLoadingSkeleton />}
                     equipment={equipment}
+                    categories={categories}
                   />
                 </ChartWrapper>
               </div>

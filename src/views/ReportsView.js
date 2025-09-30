@@ -115,7 +115,7 @@ const ReportsView = ({ transactions, t }) => {
     if (details.recalledFrom)
       return `${t("recalled_from_user")}: ${details.recalledFrom}`;
     return Object.entries(details)
-      .map(([key, value]) => `${key}: ${value}`)
+      .map(([key, value]) => `${t(key) || key}: ${value}`)
       .join("; ");
   };
 

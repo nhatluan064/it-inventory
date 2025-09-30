@@ -79,7 +79,11 @@ const MaintenanceView = ({
                     <td className="px-4 align-middle">
                       {formatDate(item.maintenanceDate)}
                     </td>
-                    <td className="px-4 align-middle">{item.condition}</td>
+                    <td className="px-4 align-middle">
+                      {typeof item.condition === 'object' && item.condition?.params?.note
+                        ? item.condition.params.note.value
+                        : item.condition || "---"}
+                    </td>
                     <td className="px-4 font-semibold align-middle">
                       {item.recalledFrom || "---"}
                     </td>

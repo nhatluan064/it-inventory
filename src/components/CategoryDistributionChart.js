@@ -4,7 +4,7 @@ import { Doughnut } from "react-chartjs-2";
 import "../utils/chartSetup"; // Import chart setup
 import AppContext from "../context/AppContext";
 
-const CategoryDistributionChart = ({ equipment }) => {
+const CategoryDistributionChart = ({ equipment, categories }) => {
   const { theme, t } = useContext(AppContext);
 
   // Tạo dữ liệu phân bổ theo danh mục
@@ -21,10 +21,17 @@ const CategoryDistributionChart = ({ equipment }) => {
       return acc;
     }, {});
 
-    // Mapping từ category key sang translation key (chuyển - thành _)
-    const getCategoryTranslationKey = (categoryKey) => {
+    // Mapping từ category key sang tên hiển thị
+    const getCategoryDisplayName = (categoryKey) => {
+      // Tìm trong danh sách categories tùy chỉnh trước
+      const customCategory = categories?.find(cat => cat.id === categoryKey);
+      if (customCategory) {
+        return customCategory.name;
+      }
+      
+      // Nếu không tìm thấy, sử dụng translation key mặc định
       const translationKey = categoryKey.replace(/-/g, '_');
-      return `category_${translationKey}`;
+      return t(`category_${translationKey}`);
     };
 
     // Màu sắc cho từng danh mục (sử dụng key với dấu gạch ngang như trong dữ liệu thực tế)
@@ -44,10 +51,45 @@ const CategoryDistributionChart = ({ equipment }) => {
       'other': '#6B7280'            // gray-500
     };
 
-    const categories = Object.keys(categoryCounts);
-    const labels = categories.map(cat => t(getCategoryTranslationKey(cat)));
-    const data = categories.map(cat => categoryCounts[cat]);
-    const colors = categories.map(cat => categoryColors[cat] || '#6B7280');
+    // Danh sách màu sắc bổ sung cho các danh mục tùy chỉnh
+    const additionalColors = [
+      '#DC2626', // red-600
+      '#EA580C', // orange-600
+      '#CA8A04', // yellow-600
+      '#16A34A', // green-600
+      '#0891B2', // cyan-600
+      '#2563EB', // blue-600
+      '#7C3AED', // violet-600
+      '#C026D3', // fuchsia-600
+      '#BE123C', // rose-600
+      '#9A3412', // amber-900
+      '#365314', // lime-900
+      '#0F766E', // teal-700
+      '#1E3A8A', // blue-800
+      '#581C87', // violet-900
+      '#7F1D1D', // red-900
+      '#92400E', // amber-800
+      '#3F6212', // lime-800
+      '#134E4A', // teal-900
+      '#1E40AF', // blue-700
+      '#6B21A8', // violet-800
+    ];
+
+    const categoriesKeys = Object.keys(categoryCounts);
+    const labels = categoriesKeys.map(cat => getCategoryDisplayName(cat));
+    const data = categoriesKeys.map(cat => categoryCounts[cat]);
+    
+    // Tạo màu sắc cho từng danh mục
+    const colors = categoriesKeys.map((cat, index) => {
+      // Nếu có màu được định nghĩa sẵn, sử dụng nó
+      if (categoryColors[cat]) {
+        return categoryColors[cat];
+      }
+      
+      // Nếu là danh mục tùy chỉnh, tạo màu ngẫu nhiên nhưng nhất quán
+      const colorIndex = index % additionalColors.length;
+      return additionalColors[colorIndex];
+    });
 
     return {
       labels,
@@ -59,7 +101,7 @@ const CategoryDistributionChart = ({ equipment }) => {
         borderWidth: 2,
       }]
     };
-  }, [equipment, theme, t]);
+  }, [equipment, categories, theme, t]);
 
   const options = {
     responsive: true,

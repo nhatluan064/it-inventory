@@ -44,10 +44,10 @@ export const useInventory = (currentUser, t, setActiveTab) => {
         ]);
       } catch (error) {
         console.error("Error logging transaction: ", error);
-        toast.error("Lỗi khi ghi nhận lịch sử.");
+        toast.error(t("toast_error_logging_transaction"));
       }
     },
-    [currentUser]
+    [currentUser, t]
   );
 
   const fetchData = useCallback(async () => {
@@ -238,9 +238,10 @@ export const useInventory = (currentUser, t, setActiveTab) => {
 
       if (isDuplicate) {
         toast.error(
-          `Một mẫu khác có tên '${itemData.name}' và danh mục '${t(
-            itemData.category
-          )}' đã tồn tại.`
+          t("toast_duplicate_model_name_in_category", {
+            itemName: itemData.name,
+            category: t(itemData.category)
+          })
         );
         return false;
       }
@@ -575,255 +576,219 @@ export const useInventory = (currentUser, t, setActiveTab) => {
     [currentUser, equipment, logTransaction, t, fetchData]
   );
 
+  // Helper function to handle category change logic within updateItem
+  const handleCategoryChange = useCallback(
+    async (originalItem, newItemData) => {
+      // 1. Auto-create category if it doesn't exist
+      await autoAddCategoryIfNotExists(newItemData.category);
+
+      // 2. Check if master item exists in new category, if not, create it
+      const masterExists = equipment.some(
+        (e) =>
+          e.status === "master" &&
+          e.name.toLowerCase() === newItemData.name.toLowerCase() &&
+          e.category === newItemData.category
+      );
+
+      if (!masterExists) {
+        const newMasterItem = {
+          name: newItemData.name,
+          category: newItemData.category,
+          status: "master",
+          location: "master-list",
+          quantity: 0,
+          price: 0,
+        };
+        const newMasterDocRef = await addDoc(
+          collection(db, "users", currentUser.uid, "equipment"),
+          newMasterItem
+        );
+        setEquipment((prev) => [
+          ...prev,
+          { ...newMasterItem, id: newMasterDocRef.id },
+        ]);
+        await logTransaction({
+          type: "master-list",
+          reason: "add-auto",
+          itemName: newItemData.name,
+          details: { category: newItemData.category, autoCreated: true },
+        });
+        toast.success(
+          t("toast_master_item_auto_created", {
+            itemName: newItemData.name,
+            category: newItemData.category
+          })
+        );
+      }
+
+      // 3. Check if old category becomes empty after this move and notify user
+      const remainingItemsInOldCategory = equipment.filter(
+        (e) => e.category === originalItem.category && e.id !== originalItem.id
+      );
+
+      if (remainingItemsInOldCategory.length === 0) {
+        toast(
+          t("toast_category_empty_suggestion", { category: originalItem.category }),
+          { duration: 5000 }
+        );
+      } else {
+        const nonMasterItems = remainingItemsInOldCategory.filter(
+          (e) => e.status !== "master"
+        );
+        if (nonMasterItems.length === 0) {
+          toast(
+            t("toast_category_only_masters_suggestion", { category: originalItem.category }),
+            { duration: 5000 }
+          );
+        }
+      }
+    },
+    [
+      currentUser,
+      equipment,
+      logTransaction,
+      autoAddCategoryIfNotExists,
+      setEquipment,
+      t,
+    ]
+  );
+
   const updateItem = useCallback(
     async (data) => {
       const originalItem = equipment.find((e) => e.id === data.id);
       if (!originalItem) {
-        toast.error("Không tìm thấy thiết bị để cập nhật.");
+        toast.error(t("toast_item_not_found_for_update"));
         return false;
       }
-      
-      // Check if category is being changed
+
+      // Handle logic if the category was changed
       if (originalItem.category !== data.category) {
-        // 1. Auto-create category if it doesn't exist
-        await autoAddCategoryIfNotExists(data.category);
-        
-        // 2. Check if master item exists in new category
-        const masterExists = equipment.some(
-          (e) =>
-            e.status === "master" &&
-            e.name.toLowerCase() === data.name.toLowerCase() &&
-            e.category === data.category
-        );
-
-        if (!masterExists) {
-          const newMasterItem = {
-            name: data.name,
-            category: data.category,
-            status: "master",
-            location: "master-list",
-            quantity: 0,
-            price: 0,
-          };
-          await addDoc(
-            collection(db, "users", currentUser.uid, "equipment"),
-            newMasterItem
-          );
-
-          await logTransaction({
-            type: "master-list",
-            reason: "add-auto",
-            itemName: data.name,
-            details: { category: data.category, autoCreated: true },
-          });
-          toast.success(
-            `Đã tạo mẫu mới: ${data.name} trong danh mục "${data.category}"`
-          );
-        }
-
-        // 3. Check if old category becomes empty after this move
-        const remainingItemsInOldCategory = equipment.filter(
-          (e) => e.category === originalItem.category && e.id !== data.id
-        );
-        
-        if (remainingItemsInOldCategory.length === 0) {
-          toast.info(
-            `💡 Danh mục "${originalItem.category}" đã trống. Bạn có thể xóa nó trong Cài đặt nâng cao.`,
-            { duration: 5000 }
-          );
-        } else {
-          const nonMasterItems = remainingItemsInOldCategory.filter(e => e.status !== "master");
-          if (nonMasterItems.length === 0) {
-            toast.info(
-              `💡 Danh mục "${originalItem.category}" chỉ còn mẫu trống. Bạn có thể xóa nó trong Cài đặt nâng cao.`,
-              { duration: 5000 }
-            );
-          }
+        await handleCategoryChange(originalItem, data);
       }
 
       const docRef = doc(db, "users", currentUser.uid, "equipment", data.id);
       await updateDoc(docRef, data);
-      
+
       // Update state immediately instead of fetching all data
-      setEquipment(prevEquipment => {
-        const updated = prevEquipment.map(item => 
+      setEquipment((prevEquipment) => {
+        return prevEquipment.map((item) =>
           item.id === data.id ? { ...item, ...data } : item
         );
-        return updated;
       });
 
       await logTransaction({
         type: "inventory",
         reason: "update",
         itemName: data.name,
-        details: { 
-          oldCategory: originalItem.category, 
-          newCategory: data.category 
+        details: {
+          oldCategory: originalItem.category,
+          newCategory: data.category,
         },
       });
 
       toast.success(t("toast_info_updated_successfully"));
       return true;
     },
-    [currentUser, equipment, logTransaction, t, autoAddCategoryIfNotExists]
+    [
+      currentUser,
+      equipment,
+      logTransaction,
+      t,
+      handleCategoryChange,
+      setEquipment,
+    ]
   );
 
   const deleteItem = useCallback(
-    async (item) => {
-      await deleteDoc(doc(db, "users", currentUser.uid, "equipment", item.id));
-      setEquipment(equipment.filter((e) => e.id !== item.id));
-      await logTransaction({
-        type: "inventory",
-        reason: "delete",
-        itemName: item.name,
-      });
-      toast.success(t("toast_item_deleted_successfully"));
+    async (itemToDelete) => {
+      if (!currentUser) return;
+      try {
+        await deleteDoc(
+          doc(db, "users", currentUser.uid, "equipment", itemToDelete.id)
+        );
+        setEquipment((prev) =>
+          prev.filter((item) => item.id !== itemToDelete.id)
+        );
+        await logTransaction({
+          type: "inventory",
+          reason: "delete",
+          itemName: itemToDelete.name,
+          details: {
+            serialNumber: itemToDelete.serialNumber,
+            from: "Inventory",
+          },
+        });
+        toast.success(
+          t("toast_item_deleted_successfully", { itemName: itemToDelete.name })
+        );
+      } catch (error) {
+        console.error("Error deleting item: ", error);
+        toast.error(t("toast_error_deleting_item"));
+      }
     },
-    [currentUser, equipment, logTransaction, t]
+    [currentUser, logTransaction, t]
   );
 
-  // --- Lifecycle Functions (Allocation, Recall, Maintenance) ---
   const allocateItem = useCallback(
-    async (allocationData) => {
-      const { equipmentId, ...details } = allocationData;
-      const targetItem = equipment.find((item) => item.id === equipmentId);
-
-      if (!targetItem) {
-        toast.error("Không tìm thấy thiết bị để bàn giao.");
-        return;
-      }
-
+    async (item, allocationDetails) => {
       const dataToUpdate = {
         status: "in-use",
-        location: details.department,
-        allocationDetails: { ...details },
+        location: "location_in_use",
+        allocationDetails,
       };
-
       await updateDoc(
-        doc(db, "users", currentUser.uid, "equipment", targetItem.id),
+        doc(db, "users", currentUser.uid, "equipment", item.id),
         dataToUpdate
       );
-
-      setEquipment((prev) =>
-        prev.map((item) =>
-          item.id === targetItem.id ? { ...item, ...dataToUpdate } : item
-        )
+      setEquipment(
+        equipment.map((e) => (e.id === item.id ? { ...e, ...dataToUpdate } : e))
       );
-
       await logTransaction({
-        type: "export",
+        type: "allocation",
         reason: "allocate",
-        itemName: targetItem.name,
-        details: { ...details, serialNumber: targetItem.serialNumber },
+        itemName: item.name,
+        details: {
+          to: allocationDetails.recipientName,
+          department: allocationDetails.department,
+        },
       });
-
       toast.success(
-        t("toast_item_allocated_successfully", {
-          itemName: targetItem.name,
-          recipientName: details.recipientName,
-        })
+        t("toast_item_allocated_successfully", { itemName: item.name })
       );
     },
     [currentUser, equipment, logTransaction, t]
   );
 
   const recallItem = useCallback(
-    async (recalledItemData) => {
-      const { itemToRecall, recallReason } = recalledItemData;
+    async (item, noteValue, isNoteKey) => {
+      const condition = {
+        key: "condition_recalled",
+        params: { note: { value: noteValue, isKey: isNoteKey } },
+      };
       const dataToUpdate = {
         status: "available",
         location: "location_in_stock",
-        condition: { key: recallReason },
-        allocationDetails: null,
-      };
-
-      await updateDoc(
-        doc(db, "users", currentUser.uid, "equipment", itemToRecall.id),
-        dataToUpdate
-      );
-
-      setEquipment((prev) =>
-        prev.map((item) =>
-          item.id === itemToRecall.id ? { ...item, ...dataToUpdate } : item
-        )
-      );
-
-      await logTransaction({
-        type: "import",
-        reason: "recall",
-        itemName: itemToRecall.name,
-        details: {
-          serialNumber: itemToRecall.serialNumber,
-          recalledFrom: itemToRecall.allocationDetails?.recipientName,
-          returnCondition: recallReason,
-        },
-      });
-
-      toast.success(
-        t("toast_recalled_to_stock", {
-          itemName: itemToRecall.name,
-          quantity: 1,
-        })
-      );
-    },
-    [currentUser, logTransaction, t]
-  );
-
-  const markAsDamaged = useCallback(
-    async (item, note) => {
-      if (!item) return;
-      const dataToUpdate = {
-        status: "maintenance",
-        location: "location_maintenance_room",
-        condition: note || t("recalled_from_user"),
-        maintenanceDate: new Date().toISOString(),
-        allocationDetails: null,
         recalledFrom: item.allocationDetails?.recipientName || "N/A",
+        allocationDetails: null,
+        condition,
       };
       await updateDoc(
         doc(db, "users", currentUser.uid, "equipment", item.id),
         dataToUpdate
       );
-      setEquipment((prev) =>
-        prev.map((eq) => (eq.id === item.id ? { ...eq, ...dataToUpdate } : eq))
+      setEquipment(
+        equipment.map((e) => (e.id === item.id ? { ...e, ...dataToUpdate } : e))
       );
       await logTransaction({
-        type: "inventory",
-        reason: "update-note",
+        type: "allocation",
+        reason: "recall",
         itemName: item.name,
-        quantity: 1,
         details: {
-          note: dataToUpdate.condition,
-          recalledFrom: dataToUpdate.recalledFrom,
+          from: item.allocationDetails?.recipientName,
+          note: noteValue,
         },
       });
-      toast.success(
-        t("toast_moved_to_maintenance", {
-          quantity: 1,
-          itemName: item.name,
-        })
-      );
-    },
-    [currentUser, logTransaction, t, equipment]
-  );
-
-  const updateMaintenanceNote = useCallback(
-    async (item, newNote) => {
-      await updateDoc(doc(db, "users", currentUser.uid, "equipment", item.id), {
-        condition: newNote,
-      });
-      setEquipment(
-        equipment.map((e) =>
-          e.id === item.id ? { ...e, condition: newNote } : e
-        )
-      );
-      await logTransaction({
-        type: "inventory",
-        reason: "update-note",
-        itemName: item.name,
-        details: { note: newNote },
-      });
-      toast.success(t("toast_maintenance_note_updated"));
+      toast.success(t("toast_item_recalled_successfully"));
     },
     [currentUser, equipment, logTransaction, t]
   );
@@ -854,6 +819,60 @@ export const useInventory = (currentUser, t, setActiveTab) => {
         details: { note: noteValue },
       });
       toast.success(t("toast_repair_complete", { itemName: item.name }));
+    },
+    [currentUser, equipment, logTransaction, t]
+  );
+
+  const markAsDamaged = useCallback(
+    async (item, noteValue, isNoteKey) => {
+      const condition = {
+        key: "condition_damaged",
+        params: { note: { value: noteValue, isKey: isNoteKey } },
+      };
+      const dataToUpdate = {
+        status: "maintenance",
+        location: "location_maintenance",
+        condition,
+        recalledFrom: item.allocationDetails?.recipientName || "N/A",
+        allocationDetails: null,
+        maintenanceDate: new Date().toISOString(),
+      };
+      await updateDoc(
+        doc(db, "users", currentUser.uid, "equipment", item.id),
+        dataToUpdate
+      );
+      setEquipment(
+        equipment.map((e) => (e.id === item.id ? { ...e, ...dataToUpdate } : e))
+      );
+      await logTransaction({
+        type: "inventory",
+        reason: "damaged",
+        itemName: item.name,
+        details: { note: noteValue },
+      });
+      toast.success(t("toast_moved_to_maintenance", { itemName: item.name }));
+    },
+    [currentUser, equipment, logTransaction, t]
+  );
+
+  const updateMaintenanceNote = useCallback(
+    async (item, noteValue, isNoteKey) => {
+      const condition = {
+        ...item.condition,
+        params: { note: { value: noteValue, isKey: isNoteKey } },
+      };
+      await updateDoc(doc(db, "users", currentUser.uid, "equipment", item.id), {
+        condition,
+      });
+      setEquipment(
+        equipment.map((e) => (e.id === item.id ? { ...e, condition } : e))
+      );
+      await logTransaction({
+        type: "inventory",
+        reason: "update-note",
+        itemName: item.name,
+      });
+      toast.success(t("toast_note_updated_successfully"));
     },
     [currentUser, equipment, logTransaction, t]
   );
@@ -1007,7 +1026,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
       toast.success(t("toast_data_reset_successful"));
     } catch (error) {
       console.error("Error resetting data: ", error);
-      toast.error("Lỗi khi reset dữ liệu.");
+      toast.error(t("toast_error_resetting_data"));
     }
   }, [currentUser, t]);
 
@@ -1046,7 +1065,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
         return true;
       } catch (error) {
         console.error("Batch update failed: ", error);
-        toast.error("Cập nhật hàng loạt thất bại.");
+        toast.error(t("toast_batch_update_failed"));
         return false;
       }
     },

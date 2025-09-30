@@ -12,6 +12,8 @@ export const useViewRendering = ({
   isMobile,
   t,
   categories,
+  departmentsList, // Thêm prop này
+  positionsList, // Thêm prop này
   statusColors,
   statusLabels,
   inventory,
@@ -40,27 +42,53 @@ export const useViewRendering = ({
   passwordReset,
   inventoryStatusChartData,
 }) => {
-  const viewProps = useMemo(() => ({ t, categories, statusColors, statusLabels }), [
-    t, categories, statusColors, statusLabels
-  ]);
+  const viewProps = useMemo(
+    () => ({
+      t,
+      categories,
+      departmentsList,
+      positionsList,
+      statusColors,
+      statusLabels,
+    }),
+    [t, categories, departmentsList, positionsList, statusColors, statusLabels]
+  );
 
-  const mobileViewProps = useMemo(() => ({
-    ...viewProps,
-    onViewItem: (item) => modals.openModal("view", item),
-    onEditItem: (item) => modals.openModal("addEdit", item),
-    onAllocateItem: (item) => modals.openModal("allocation", item),
-    onDeleteItem: (item) =>
-      modals.openModal("delete", item, { deleteType: "inventory" }),
-  }), [viewProps, modals]);
+  const inventoryCategories = useMemo(() => {
+    const allCategory = {
+      id: "all",
+      name: t("category_all"),
+      key: "category_all",
+    };
+    return [allCategory, ...categories];
+  }, [categories, t]);
+
+  const mobileViewProps = useMemo(
+    () => ({
+      ...viewProps,
+      onViewItem: (item) => modals.openModal("view", item),
+      onEditItem: (item) => modals.openModal("addEdit", item),
+      onAllocateItem: (item) => {
+        modals.openModal("allocation", {
+          ...item,
+          departmentsList,
+          positionsList,
+        });
+      },
+      onDeleteItem: (item) =>
+        modals.openModal("delete", item, { deleteType: "inventory" }),
+    }),
+    [viewProps, modals]
+  );
 
   const renderCurrentView = () => {
     const currentTab = activeTab || ROUTE_NAMES.INVENTORY;
-    
+
     // Check if we have a standard view component mapping
     const viewConfig = VIEW_COMPONENTS[currentTab];
     if (viewConfig) {
       const ViewComponent = isMobile ? viewConfig.mobile : viewConfig.desktop;
-      
+
       // Handle specific view cases with their unique props
       switch (currentTab) {
         case ROUTE_NAMES.HOME:
@@ -144,7 +172,7 @@ export const useViewRendering = ({
           if (isMobile) {
             return (
               <ViewComponent
-                {...mobileViewProps}
+                {...{ ...mobileViewProps, categories: inventoryCategories }}
                 equipment={filteredInventory}
                 unfilteredEquipment={inventoryItems}
                 filters={inventoryFilters}
@@ -155,7 +183,7 @@ export const useViewRendering = ({
           }
           return (
             <ViewComponent
-              {...viewProps}
+              {...{ ...viewProps, categories: inventoryCategories }}
               equipment={filteredInventory}
               unfilteredEquipment={inventoryItems}
               filters={inventoryFilters}
@@ -165,7 +193,13 @@ export const useViewRendering = ({
                 modals.openModal("delete", item, { deleteType: "inventory" })
               }
               onViewItem={(item) => modals.openModal("view", item)}
-              onAllocateItem={(item) => modals.openModal("allocation", item)}
+              onAllocateItem={(item) => {
+                modals.openModal("allocation", {
+                  ...item,
+                  departmentsList,
+                  positionsList,
+                });
+              }}
               onAddLegacyItem={() => modals.openModal("addEdit")}
             />
           );
@@ -174,7 +208,7 @@ export const useViewRendering = ({
           if (isMobile) {
             return (
               <ViewComponent
-                {...viewProps}
+                {...mobileViewProps}
                 items={allocatedItems}
                 onRecallItem={(item) => modals.openModal("recall", item)}
                 onMarkDamaged={(item) =>
@@ -187,7 +221,7 @@ export const useViewRendering = ({
           }
           return (
             <ViewComponent
-              {...viewProps}
+              {...viewProps} // Đã bao gồm onAllocateItem từ mobileViewProps nếu cần
               items={allocatedItems}
               unfilteredAllocatedItems={inventory.equipment.filter(
                 (i) => i.status === "in-use"
@@ -236,11 +270,7 @@ export const useViewRendering = ({
           );
 
         case ROUTE_NAMES.SETTINGS:
-          return (
-            <SettingsView
-              {...viewProps}
-            />
-          );
+          return <SettingsView {...viewProps} />;
 
         case ROUTE_NAMES.ADVANCED_SETTINGS:
           return (

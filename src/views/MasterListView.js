@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 
@@ -17,14 +17,39 @@ const MasterListView = ({
   const [animatingRows, setAnimatingRows] = useState({});
   const [subSortConfigs, setSubSortConfigs] = useState({});
 
-  const {
-    items: sortedItems,
-    requestSort: requestMainSort,
-    sortConfig: mainSortConfig,
-  } = useSort(allItems, {
+  // State để quản lý sorting category riêng
+  const [categorySortConfig, setCategorySortConfig] = useState({
     key: "category",
     direction: "ascending",
   });
+
+  const { items: sortedItems } = useSort(allItems, {
+    key: "name",
+    direction: "ascending",
+  });
+
+  // Handler riêng cho category sort
+  const handleCategorySort = () => {
+    setCategorySortConfig((prev) => ({
+      key: "category",
+      direction: prev.direction === "ascending" ? "descending" : "ascending",
+    }));
+  };
+
+  const categoryCounts = useMemo(() => {
+    if (!allItems) return {};
+    return allItems.reduce((acc, item) => {
+      if (item && item.category) {
+        acc[item.category] = (acc[item.category] || 0) + 1;
+      }
+      return acc;
+    }, {});
+  }, [allItems]);
+
+  const categoryOptions = useMemo(() => {
+    const allOption = { id: "all", name: t("all") };
+    return [allOption, ...categories];
+  }, [categories, t]);
 
   const groupedByCategory = useMemo(() => {
     let itemsToGroup = sortedItems;
@@ -39,13 +64,44 @@ const MasterListView = ({
       );
     }
 
-    return itemsToGroup.reduce((acc, item) => {
+    const grouped = itemsToGroup.reduce((acc, item) => {
       const key = item.category || "uncategorized";
       if (!acc[key]) acc[key] = [];
       acc[key].push(item);
       return acc;
     }, {});
-  }, [sortedItems, selectedCategory, searchQuery]);
+
+    // Sắp xếp các categories theo thứ tự A-Z
+    const sortedGrouped = {};
+    const sortedCategoryIds = Object.keys(grouped).sort((a, b) => {
+      const categoryA = categories.find((c) => c.id === a)?.name || a;
+      const categoryB = categories.find((c) => c.id === b)?.name || b;
+
+      // Sử dụng Intl.Collator với cấu hình chuẩn cho sắp xếp A-Z
+      const collator = new Intl.Collator(undefined, {
+        numeric: true,
+        sensitivity: "base",
+      });
+      const comparison = collator.compare(categoryA, categoryB);
+
+      // Áp dụng hướng sắp xếp từ categorySortConfig
+      return categorySortConfig.direction === "ascending"
+        ? comparison
+        : -comparison;
+    });
+
+    sortedCategoryIds.forEach((categoryId) => {
+      sortedGrouped[categoryId] = grouped[categoryId];
+    });
+
+    return sortedGrouped;
+  }, [sortedItems, categories, categorySortConfig, selectedCategory, searchQuery]);
+
+  // Reset expanded rows when category filter changes
+  useEffect(() => {
+    setExpandedRows({});
+    setAnimatingRows({});
+  }, [selectedCategory]);
 
   const toggleExpand = (name) => {
     const isExpanded = expandedRows[name];
@@ -111,9 +167,9 @@ const MasterListView = ({
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
-            {categories.map((cat) => (
+            {categoryOptions.map((cat) => (
               <option key={cat.id} value={cat.id}>
-                {cat.name}
+                {`${cat.name} (${cat.id === "all" ? allItems.length : categoryCounts[cat.id] || 0})`}
               </option>
             ))}
           </select>
@@ -127,11 +183,10 @@ const MasterListView = ({
               <tr>
                 <th
                   className="px-4 py-3.5 text-left font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 cursor-pointer select-none"
-                  onClick={() => requestMainSort("category")}
+                  onClick={handleCategorySort}
                 >
                   {t("category")}
-                  {mainSortConfig.key === "category" &&
-                    (mainSortConfig.direction === "ascending" ? " ▲" : " ▼")}
+                  {categorySortConfig.direction === "ascending" ? " ▲" : " ▼"}
                 </th>
                 <th className="px-4 py-3.5 text-right font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 w-32">
                   {t("quantity")}

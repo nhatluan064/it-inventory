@@ -40,8 +40,12 @@ import {
 const App = () => {
   // Theme and UI state
   const [dashboardScrollPosition, setDashboardScrollPosition] = useState(0);
-  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "system");
-  const [language, setLanguage] = useState(() => localStorage.getItem("language") || "vi");
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("theme") || "system"
+  );
+  const [language, setLanguage] = useState(
+    () => localStorage.getItem("language") || "vi"
+  );
   const [activeTab, setActiveTab] = useState("home");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
@@ -50,8 +54,12 @@ const App = () => {
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Filter states
-  const [inventoryFilters, setInventoryFilters] = useState(DEFAULT_INVENTORY_FILTERS);
-  const [allocatedFilters, setAllocatedFilters] = useState(DEFAULT_ALLOCATED_FILTERS);
+  const [inventoryFilters, setInventoryFilters] = useState(
+    DEFAULT_INVENTORY_FILTERS
+  );
+  const [allocatedFilters, setAllocatedFilters] = useState(
+    DEFAULT_ALLOCATED_FILTERS
+  );
 
   // Translation function
   const t = useCallback(
@@ -81,7 +89,7 @@ const App = () => {
     finishPostLoginLoading,
     setupProfile,
   } = useAuth();
-  
+
   const inventory = useInventory(currentUser, t, setActiveTab);
   const modals = useModals();
   const dynamicData = useDynamicData(currentUser);
@@ -186,12 +194,15 @@ const App = () => {
   );
 
   // Event handlers
-  const handleTabClick = useCallback((tabId) => {
-    setActiveTab(tabId);
-    if (isMobile) {
-      setMobileSidebarOpen(false);
-    }
-  }, [isMobile]);
+  const handleTabClick = useCallback(
+    (tabId) => {
+      setActiveTab(tabId);
+      if (isMobile) {
+        setMobileSidebarOpen(false);
+      }
+    },
+    [isMobile]
+  );
 
   // View rendering hook
   const { renderCurrentView } = useViewRendering({
@@ -199,6 +210,8 @@ const App = () => {
     isMobile,
     t,
     categories,
+    departmentsList: dynamicData.departmentsList,
+    positionsList: dynamicData.positionsList,
     statusColors,
     statusLabels,
     inventory,
@@ -271,7 +284,7 @@ const App = () => {
             IT Inventory
           </h1>
           <p className="text-blue-200 text-lg mb-8 auth-profile-setup">
-            {t('loading_application')}
+            {t("loading_application")}
           </p>
         </div>
 
@@ -290,7 +303,7 @@ const App = () => {
         {/* Loading Status */}
         <div className="mt-6 text-center">
           <p className="text-white text-sm opacity-80 auth-loading-text">
-            {authLoading ? t('authenticating') : t('initializing')}
+            {authLoading ? t("authenticating") : t("initializing")}
           </p>
         </div>
       </div>
@@ -318,7 +331,7 @@ const App = () => {
   if (isPostLoginLoading) {
     return (
       <AppContext.Provider value={appContextValue}>
-        <PostLoginLoader 
+        <PostLoginLoader
           onComplete={finishPostLoginLoading}
           t={t}
           user={currentUser}
@@ -358,7 +371,7 @@ const App = () => {
   if (inventory.dataLoading) {
     return (
       <GlobalErrorBoundary t={t}>
-        <GlobalLoader message={t('loading_inventory')} t={t} />
+        <GlobalLoader message={t("loading_inventory")} t={t} />
       </GlobalErrorBoundary>
     );
   }
@@ -368,44 +381,45 @@ const App = () => {
     <GlobalErrorBoundary t={t}>
       <AppContext.Provider value={appContextValue}>
         <AppLayout
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        currentUser={currentUser}
-        onLogout={logout}
-        onFeedback={() => modals.openModal("feedback")}
-        t={t}
-        isSidebarCollapsed={isSidebarCollapsed}
-        toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-        isMobile={isMobile}
-        isMobileSidebarOpen={isMobileSidebarOpen}
-        setMobileSidebarOpen={setMobileSidebarOpen}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          currentUser={currentUser}
+          onLogout={logout}
+          onFeedback={() => modals.openModal("feedback")}
+          t={t}
+          isSidebarCollapsed={isSidebarCollapsed}
+          toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          isMobile={isMobile}
+          isMobileSidebarOpen={isMobileSidebarOpen}
+          setMobileSidebarOpen={setMobileSidebarOpen}
+          onViewProfile={() => modals.openModal("userInfo", currentUser)}
+          equipment={inventory.equipment}
+          pendingPurchaseCount={pendingPurchaseItems.length}
+          purchasingCount={purchasingItems.length}
+          purchasedCount={purchasedItems.length}
+          masterListCount={uniqueMasterItemsCount}
+          reportsCount={inventory.transactions.length}
+          dashboardScrollPosition={dashboardScrollPosition}
+          setDashboardScrollPosition={setDashboardScrollPosition}
+        >
+          {renderCurrentView()}
+        </AppLayout>
 
-        onViewProfile={() => modals.openModal("userInfo", currentUser)}
-        equipment={inventory.equipment}
-        pendingPurchaseCount={pendingPurchaseItems.length}
-        purchasingCount={purchasingItems.length}
-        purchasedCount={purchasedItems.length}
-        masterListCount={uniqueMasterItemsCount}
-        reportsCount={inventory.transactions.length}
-        dashboardScrollPosition={dashboardScrollPosition}
-        setDashboardScrollPosition={setDashboardScrollPosition}
-      >
-        {renderCurrentView()}
-      </AppLayout>
-
-      <AppModals
-        modals={modals}
-        categories={categories}
-        statusLabels={statusLabels}
-        statusColors={statusColors}
-        masterItems={masterItems}
-        pendingPurchaseItems={pendingPurchaseItems}
-        inventory={inventory}
-        currentUser={currentUser}
-        passwordReset={passwordReset}
-        t={t}
-      />
-    </AppContext.Provider>
+        <AppModals
+          modals={modals}
+          categories={categories}
+          departmentsList={dynamicData.departmentsList}
+          positionsList={dynamicData.positionsList}
+          statusLabels={statusLabels}
+          statusColors={statusColors}
+          masterItems={masterItems}
+          pendingPurchaseItems={pendingPurchaseItems}
+          inventory={inventory}
+          currentUser={currentUser}
+          passwordReset={passwordReset}
+          t={t}
+        />
+      </AppContext.Provider>
     </GlobalErrorBoundary>
   );
 };

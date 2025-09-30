@@ -9,11 +9,8 @@ import {
   Hash,
   Calendar,
 } from "lucide-react";
-import { useDynamicData } from "../hooks/useDynamicData";
 
-const AllocationModal = ({ show, onClose, onSubmit, item, t }) => {
-  const { positionsList, departmentsList } = useDynamicData();
-  
+const AllocationModal = ({ show, onClose, onSubmit, item, departmentsList, positionsList, t }) => {
   const [formData, setFormData] = useState({
     recipientName: "",
     employeeId: "",
@@ -80,12 +77,14 @@ const AllocationModal = ({ show, onClose, onSubmit, item, t }) => {
         : String(item.condition)
       : "condition_new";
 
-    onSubmit({
+    const allocationDetails = {
       ...formData,
       condition: originalConditionKey,
-      serialNumber: item.serialNumber, // SN is now fixed from the item
+      serialNumber: item.serialNumber,
       equipmentId: item.id,
-    });
+    };
+
+    onSubmit(item, allocationDetails);
     onClose();
   };
 

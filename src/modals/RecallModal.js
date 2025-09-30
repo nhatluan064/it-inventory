@@ -23,10 +23,7 @@ const RecallModal = ({ show, onClose, onSubmit, item, t }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({
-      itemToRecall: item,
-      recallReason: reasonKey,
-    });
+    onSubmit(item, reasonKey, true); // reasonKey là translation key
     onClose();
   };
 

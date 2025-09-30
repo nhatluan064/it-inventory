@@ -20,6 +20,8 @@ import FeedbackModal from "../../modals/FeedbackModal";
 const AppModals = ({
   modals,
   categories,
+  departmentsList,
+  positionsList,
   statusLabels,
   statusColors,
   masterItems,
@@ -148,6 +150,8 @@ const AppModals = ({
         onClose={() => modals.closeModal("allocation")}
         onSubmit={inventory.allocateItem}
         item={modals.currentItem}
+        departmentsList={departmentsList}
+        positionsList={positionsList}
         t={t}
       />
 
@@ -204,9 +208,9 @@ const AppModals = ({
         show={modals.modalState.note}
         onClose={() => modals.closeModal("note")}
         onSubmit={(newNote) =>
-          inventory.updateMaintenanceNote(modals.currentItem, newNote)
+          inventory.updateMaintenanceNote(modals.currentItem, newNote, false)
         }
-        initialNote={modals.currentItem?.condition}
+        initialNote={modals.currentItem?.condition?.params?.note?.value || ""}
         title={t("edit_failure_note")}
         t={t}
       />
@@ -225,7 +229,7 @@ const AppModals = ({
         show={modals.modalState.directMaintenanceNote}
         onClose={() => modals.closeModal("directMaintenanceNote")}
         onSubmit={(note) => {
-          inventory.markAsDamaged(modals.currentItem, note);
+          inventory.markAsDamaged(modals.currentItem, note, false);
           modals.closeModal("directMaintenanceNote");
         }}
         initialNote=""

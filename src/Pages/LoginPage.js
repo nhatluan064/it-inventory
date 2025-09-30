@@ -35,19 +35,17 @@ const LoginPage = ({
       console.error('Login error:', error.code, error.message);
       
       if (error.message === "EMAIL_NOT_VERIFIED") {
-        toast.error(
-          "Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email của bạn!"
-        );
+        toast.error(t("toast_email_not_verified"));
       } else if (error.code === "auth/user-not-found") {
-        toast.error("Tài khoản không tồn tại. Vui lòng kiểm tra lại email.");
+        toast.error(t("toast_user_not_found"));
       } else if (error.code === "auth/wrong-password") {
-        toast.error("Mật khẩu không đúng. Vui lòng thử lại.");
+        toast.error(t("toast_wrong_password"));
       } else if (error.code === "auth/invalid-email") {
-        toast.error("Định dạng email không hợp lệ.");
+        toast.error(t("toast_invalid_email"));
       } else if (error.code === "auth/network-request-failed") {
-        toast.error("Lỗi kết nối mạng. Vui lòng kiểm tra internet.");
+        toast.error(t("toast_network_error"));
       } else {
-        toast.error(`Lỗi đăng nhập: ${error.message || t("login_error_credentials")}`);
+        toast.error(`${t("login_error_credentials")}: ${error.message || ""}`);
       }
     } finally {
       setIsLoading(false);

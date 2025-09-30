@@ -1,7 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { RotateCcw, Search, Wrench } from "lucide-react";
 import { useSort } from "../hooks/useSort";
-import { useDynamicData } from "../hooks/useDynamicData";
 
 const AllocatedView = ({
   items,
@@ -9,14 +8,19 @@ const AllocatedView = ({
   onRecallItem,
   onMarkDamaged,
   categories,
+  departmentsList,
   filters,
   setFilters,
   t,
 }) => {
-  const { departmentsList } = useDynamicData();
   const [expandedRows, setExpandedRows] = useState({});
   const [animatingRows, setAnimatingRows] = useState({});
   const [subSortConfigs, setSubSortConfigs] = useState({});
+
+  useEffect(() => {
+    setExpandedRows({});
+    setAnimatingRows({});
+  }, [filters]);
 
   const {
     items: sortedItems,

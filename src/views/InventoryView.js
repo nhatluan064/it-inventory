@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Search, Edit, Trash2, Eye, LogOut, Plus, User } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 import { AnimatedButton } from "../components/AnimatedButton";
@@ -48,18 +48,18 @@ const InventoryView = ({
       return acc;
     }, {});
 
-    // Sắp xếp các categories dựa trên mainSortConfig
+    // Sắp xếp các categories theo thứ tự A-Z
     const sortedGrouped = {};
     const sortedCategoryIds = Object.keys(grouped).sort((a, b) => {
       const categoryA = categories.find((c) => c.id === a)?.name || a;
       const categoryB = categories.find((c) => c.id === b)?.name || b;
 
-      // Sử dụng localeCompare với tiếng Việt và option chuẩn hóa
-      const comparison = categoryA.localeCompare(categoryB, "vi", {
-        sensitivity: "base",
+      // Sử dụng Intl.Collator với cấu hình chuẩn cho sắp xếp A-Z
+      const collator = new Intl.Collator(undefined, {
         numeric: true,
-        ignorePunctuation: true,
+        sensitivity: "base",
       });
+      const comparison = collator.compare(categoryA, categoryB);
 
       // Áp dụng hướng sắp xếp từ categorySortConfig
       return categorySortConfig.direction === "ascending"
@@ -73,6 +73,12 @@ const InventoryView = ({
 
     return sortedGrouped;
   }, [sortedItems, categories, categorySortConfig]);
+
+  // Reset expanded rows when filters change
+  useEffect(() => {
+    setExpandedRows({});
+    setAnimatingRows({});
+  }, [filters]);
 
   const categoryCounts = useMemo(() => {
     if (!unfilteredEquipment) return {};
