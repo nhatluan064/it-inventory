@@ -196,7 +196,7 @@ const DailyActivityChart = ({ activityLogs }) => {
     return (
       <div className="relative h-64 md:h-80 overflow-hidden scrollbar-hide chart-container">
         <Bar 
-          key={`daily-activity-${theme}-${Date.now()}`}
+          key={`daily-activity-${theme}`}
           data={chartData} 
           options={options}
           redraw={true}

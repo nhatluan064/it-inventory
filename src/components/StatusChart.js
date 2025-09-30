@@ -122,7 +122,7 @@ const StatusChart = React.memo(({ chartData }) => {
     return (
       <div className="relative h-64 md:h-80 overflow-hidden scrollbar-hide chart-container">
         <Pie
-          key={`status-chart-${theme}-${Date.now()}`}
+          key={`status-chart-${theme}`}
           data={data}
           options={options}
           redraw={true}

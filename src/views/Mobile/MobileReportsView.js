@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   Search,
   SlidersHorizontal,
@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { CSVLink } from "react-csv";
 
-const MobileReportsView = ({ transactions, t }) => {
+const MobileReportsView = ({ transactions, t, categories }) => {
   // State quản lý bộ lọc và sắp xếp riêng cho mobile
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
@@ -114,7 +114,7 @@ const MobileReportsView = ({ transactions, t }) => {
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const renderDetails = (trans) => {
+  const renderDetails = useCallback((trans) => {
     // ... Tái sử dụng hàm renderDetails từ bản Desktop ...
     if (!trans.details) return null;
     const details = trans.details;
@@ -126,10 +126,28 @@ const MobileReportsView = ({ transactions, t }) => {
       return `${t("condition_on_recall")}: ${t(details.returnCondition)}`;
     if (details.recalledFrom)
       return `${t("recalled_from_user")}: ${details.recalledFrom}`;
+    
+    // Handle allocation details with proper labels
+    const allocationLabels = {
+      to: t("recipient"),
+      department: t("department"),
+      position: t("position"),
+      from: t("from_user"),
+    };
+    
     return Object.entries(details)
-      .map(([key, value]) => `${key}: ${value}`)
+      .map(([key, value]) => {
+        const label = allocationLabels[key] || t(key) || key;
+        // Resolve category ID to name
+        let displayValue = value;
+        if (key === "category" && categories) {
+          const category = categories.find(cat => cat.id === value);
+          displayValue = category ? category.name : value;
+        }
+        return `${label}: ${displayValue}`;
+      })
       .join("; ");
-  };
+  }, [t, categories]);
 
   const filteredTransactions = useMemo(() => {
     // Tái sử dụng logic lọc từ bản Desktop
@@ -170,7 +188,7 @@ const MobileReportsView = ({ transactions, t }) => {
         detailsText: renderDetails(trans) || "---",
       };
     });
-  }, [filteredTransactions, logDetails, t]);
+  }, [filteredTransactions, logDetails, t, renderDetails]);
 
   const csvHeaders = useMemo(
     () => [

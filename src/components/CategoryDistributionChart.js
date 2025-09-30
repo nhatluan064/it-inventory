@@ -185,7 +185,7 @@ const CategoryDistributionChart = ({ equipment, categories }) => {
     return (
       <div className="relative h-64 md:h-80 overflow-hidden scrollbar-hide chart-container">
         <Doughnut 
-          key={`category-distribution-${theme}-${Date.now()}`}
+          key={`category-distribution-${theme}`}
           data={chartData} 
           options={options}
           redraw={true}

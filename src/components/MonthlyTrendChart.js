@@ -213,7 +213,7 @@ const MonthlyTrendChart = ({ activityLogs, equipment }) => {
     return (
       <div className="relative h-64 md:h-80 overflow-hidden scrollbar-hide chart-container">
         <Line 
-          key={`monthly-trend-${theme}-${Date.now()}`}
+          key={`monthly-trend-${theme}`}
           data={chartData} 
           options={options}
           redraw={true}

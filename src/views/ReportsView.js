@@ -16,7 +16,7 @@ import {
 import { useSort } from "../hooks/useSort";
 import { CSVLink } from "react-csv";
 
-const ReportsView = ({ transactions, t }) => {
+const ReportsView = ({ transactions, t, categories }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [actionType, setActionType] = useState("all");
   const [startDate, setStartDate] = useState("");
@@ -126,7 +126,13 @@ const ReportsView = ({ transactions, t }) => {
     return Object.entries(details)
       .map(([key, value]) => {
         const label = allocationLabels[key] || t(key) || key;
-        return `${label}: ${value}`;
+        // Resolve category ID to name
+        let displayValue = value;
+        if (key === "category" && categories) {
+          const category = categories.find(cat => cat.id === value);
+          displayValue = category ? category.name : value;
+        }
+        return `${label}: ${displayValue}`;
       })
       .join("; ");
   };
