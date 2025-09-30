@@ -171,20 +171,28 @@ const App = () => {
 
   // Chart data for dashboard
   const inventoryStatusChartData = useMemo(() => {
-    // Chỉ tính các thiết bị trong kho chính, không tính quy trình mua hàng
-    const mainInventory = inventoryItems;
+    const allEquipment = inventory.equipment;
 
-    const counts = mainInventory.reduce((acc, item) => {
+    const counts = allEquipment.reduce((acc, item) => {
       acc[item.status] = (acc[item.status] || 0) + 1;
       return acc;
     }, {});
 
-    const statusKeys = Object.keys(counts);
-    const labels = statusKeys.map((key) => statusLabels[key] || key);
-    const data = statusKeys.map((key) => counts[key]);
+    const desiredStatusOrder = [
+      "purchasing",
+      "purchased",
+      "available",
+      "in-use",
+      "maintenance",
+      "liquidation",
+    ];
+
+    const statusKeys = desiredStatusOrder.filter(status => counts[status]);
+    const labels = statusKeys.map(key => statusLabels[key] || key);
+    const data = statusKeys.map(key => counts[key]);
 
     return { labels, data, statusKeys };
-  }, [inventoryItems, statusLabels]);
+  }, [inventory.equipment, statusLabels]);
 
   // Context value
   const appContextValue = useMemo(

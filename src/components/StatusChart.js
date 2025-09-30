@@ -9,10 +9,12 @@ const StatusChart = React.memo(({ chartData }) => {
 
   // Ánh xạ màu từ Tailwind sang mã màu thực tế cho biểu đồ
   const statusColorMapping = {
-    available: "#22C55E", // green-500
-    "in-use": "#3B82F6", // blue-500
-    maintenance: "#F59E0B", // yellow-500 / amber-500
-    liquidation: "#EF4444", // red-500
+    purchasing: "#A855F7", // purple-500
+    purchased: "#14B8A6", // teal-500
+    available: "#3B82F6", // blue-500
+    "in-use": "#EAB308", // yellow-500
+    maintenance: "#F97316", // orange-500
+    liquidation: "#64748B", // slate-500
     broken: "#EF4444", // red-500
   };
 
