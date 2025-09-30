@@ -250,7 +250,7 @@ const AllocationModal = ({ show, onClose, onSubmit, item, departmentsList, posit
             </button>
             <button
               type="submit"
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg transition-all duration-200 hover:bg-blue-700 hover:scale-105 focus-ring btn-ripple animate-pulse"
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg transition-all duration-200 hover:bg-blue-700 hover:scale-105 focus-ring btn-ripple"
             >
               {t("confirm_allocation")}
             </button>

@@ -20,7 +20,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
   const [dataLoading, setDataLoading] = useState(true);
 
   // Get dynamic data functions
-  const { autoAddCategoryIfNotExists } = useDynamicData(currentUser);
+  const { autoAddCategoryIfNotExists, departmentsList, positionsList } = useDynamicData(currentUser);
 
   const logTransaction = useCallback(
     async (data) => {
@@ -743,20 +743,26 @@ export const useInventory = (currentUser, t, setActiveTab) => {
       setEquipment(
         equipment.map((e) => (e.id === item.id ? { ...e, ...dataToUpdate } : e))
       );
+      
+      // Find department and position names for logging
+      const departmentName = departmentsList?.find(dept => dept.id === allocationDetails.department)?.name || allocationDetails.department;
+      const positionName = positionsList?.find(pos => pos.id === allocationDetails.position)?.name || allocationDetails.position;
+      
       await logTransaction({
         type: "allocation",
         reason: "allocate",
         itemName: item.name,
         details: {
           to: allocationDetails.recipientName,
-          department: allocationDetails.department,
+          department: departmentName,
+          position: positionName,
         },
       });
       toast.success(
         t("toast_item_allocated_successfully", { itemName: item.name })
       );
     },
-    [currentUser, equipment, logTransaction, t]
+    [currentUser, equipment, logTransaction, t, departmentsList, positionsList]
   );
 
   const recallItem = useCallback(
@@ -977,12 +983,12 @@ export const useInventory = (currentUser, t, setActiveTab) => {
           oldTrans.forEach((doc) => batch.delete(doc.ref));
 
           data.equipment.forEach((item) => {
-            const { id, ...itemData } = item;
+            const { id: _id, ...itemData } = item;
             const newDocRef = doc(equipColRef);
             batch.set(newDocRef, itemData);
           });
           data.transactions.forEach((item) => {
-            const { id, ...itemData } = item;
+            const { id: _id, ...itemData } = item;
             const newDocRef = doc(transColRef);
             batch.set(newDocRef, itemData);
           });

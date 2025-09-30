@@ -92,7 +92,7 @@ const App = () => {
 
   const inventory = useInventory(currentUser, t, setActiveTab);
   const modals = useModals();
-  const dynamicData = useDynamicData(currentUser);
+  const dynamicData = useDynamicData(currentUser, inventory.equipment);
 
   // Computed values - StatusLabels first to avoid dependency issue
   const statusLabels = useMemo(

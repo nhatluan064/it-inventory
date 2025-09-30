@@ -13,7 +13,7 @@ import {
 import { db } from "../firebaseConfig";
 import toast from "react-hot-toast";
 
-export const useDynamicData = (currentUser) => {
+export const useDynamicData = (currentUser, equipment = []) => {
   const [categories, setCategories] = useState([]);
   const [departmentsList, setDepartmentsList] = useState([]);
   const [positionsList, setPositionsList] = useState([]);
@@ -105,6 +105,12 @@ export const useDynamicData = (currentUser) => {
     };
   }, [initializeData]);
 
+  // Helper function để kiểm tra category có đang được sử dụng không
+  const isCategoryInUse = useCallback((categoryId) => {
+    if (!equipment || equipment.length === 0) return false;
+    return equipment.some(item => item.category === categoryId);
+  }, [equipment]);
+
   // Categories functions
   const addCategory = useCallback(async (categoryData) => {
     if (!currentUser) return;
@@ -142,6 +148,12 @@ export const useDynamicData = (currentUser) => {
   const updateCategory = useCallback(async (categoryId, categoryData) => {
     if (!currentUser) return;
     
+    // Check if category is in use
+    if (isCategoryInUse(categoryId)) {
+      toast.error("Không thể cập nhật danh mục đang được sử dụng trong danh sách thiết bị");
+      return false;
+    }
+    
     try {
       const categoryRef = doc(db, "users", currentUser.uid, "categories", categoryId);
       await updateDoc(categoryRef, {
@@ -157,10 +169,16 @@ export const useDynamicData = (currentUser) => {
       toast.error("Lỗi khi cập nhật danh mục");
       return false;
     }
-  }, [currentUser]);
+  }, [currentUser, isCategoryInUse]);
 
   const deleteCategory = useCallback(async (categoryId) => {
     if (!currentUser) return;
+    
+    // Check if category is in use
+    if (isCategoryInUse(categoryId)) {
+      toast.error("Không thể xóa danh mục đang được sử dụng trong danh sách thiết bị");
+      return false;
+    }
     
     try {
       await deleteDoc(doc(db, "users", currentUser.uid, "categories", categoryId));
@@ -171,7 +189,7 @@ export const useDynamicData = (currentUser) => {
       toast.error("Lỗi khi xóa danh mục");
       return false;
     }
-  }, [currentUser]);
+  }, [currentUser, isCategoryInUse]);
 
   // Departments functions
   const addDepartment = useCallback(async (departmentData) => {

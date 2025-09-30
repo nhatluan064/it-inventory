@@ -114,8 +114,20 @@ const ReportsView = ({ transactions, t }) => {
       return `${t("condition_on_recall")}: ${t(details.returnCondition)}`;
     if (details.recalledFrom)
       return `${t("recalled_from_user")}: ${details.recalledFrom}`;
+    
+    // Handle allocation details with proper labels
+    const allocationLabels = {
+      to: t("recipient"),
+      department: t("department"),
+      position: t("position"),
+      from: t("from_user"),
+    };
+    
     return Object.entries(details)
-      .map(([key, value]) => `${t(key) || key}: ${value}`)
+      .map(([key, value]) => {
+        const label = allocationLabels[key] || t(key) || key;
+        return `${label}: ${value}`;
+      })
       .join("; ");
   };
 

@@ -80,6 +80,12 @@ const InventoryView = ({
     setAnimatingRows({});
   }, [filters]);
 
+  // Reset expanded rows when category filter changes specifically
+  useEffect(() => {
+    setExpandedRows({});
+    setAnimatingRows({});
+  }, [filters.category]);
+
   const categoryCounts = useMemo(() => {
     if (!unfilteredEquipment) return {};
     return unfilteredEquipment.reduce((acc, item) => {
