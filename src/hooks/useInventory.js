@@ -1,5 +1,5 @@
 // src/hooks/useInventory.js
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { db } from "../firebaseConfig";
 import {
   collection,
@@ -1078,10 +1078,17 @@ export const useInventory = (currentUser, t, setActiveTab) => {
     [currentUser, fetchData, t]
   );
 
+  // Memoized computed values for performance
+  const inventoryItems = useMemo(
+    () => equipment.filter(item => item.status !== 'master'),
+    [equipment]
+  );
+
   return {
     equipment,
     transactions,
     dataLoading,
+    inventoryItems, // Add memoized inventoryItems
     addEquipmentType,
     deleteMasterItem,
     updateMasterItem,

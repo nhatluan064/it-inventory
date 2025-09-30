@@ -253,7 +253,7 @@ const Sidebar = ({
   };
 
   const desktopClasses = `relative hidden lg:flex flex-col h-full bg-white dark:bg-gray-800 shadow-lg border-r dark:border-gray-700 transition-all duration-300 ease-in-out hide-scrollbar ${
-    isCollapsed ? "w-20" : "w-52"
+    isCollapsed ? "w-20" : "w-60"
   }`;
   const mobileClasses = `fixed inset-y-0 right-0 z-50 transform flex flex-col h-full bg-white dark:bg-gray-800 shadow-lg border-l dark:border-gray-700 transition-transform duration-300 ease-in-out w-64 hide-scrollbar ${
     isMobileOpen ? "translate-x-0" : "translate-x-full"

@@ -3,6 +3,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore"; // Thêm dòng này
+import { getFunctions } from "firebase/functions";
 
 // Cấu hình Firebase cho ứng dụng web của bạn
 // Thông tin này được lấy từ environment variables để bảo mật
@@ -47,3 +48,4 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 export const db = getFirestore(app); // Thêm dòng này và export
+export const functions = getFunctions(app);

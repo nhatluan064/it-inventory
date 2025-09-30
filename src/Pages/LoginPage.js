@@ -36,16 +36,14 @@ const LoginPage = ({
       
       if (error.message === "EMAIL_NOT_VERIFIED") {
         toast.error(t("toast_email_not_verified"));
-      } else if (error.code === "auth/user-not-found") {
-        toast.error(t("toast_user_not_found"));
-      } else if (error.code === "auth/wrong-password") {
-        toast.error(t("toast_wrong_password"));
+      } else if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+        toast.error(t("login_error_credentials"));
       } else if (error.code === "auth/invalid-email") {
         toast.error(t("toast_invalid_email"));
       } else if (error.code === "auth/network-request-failed") {
         toast.error(t("toast_network_error"));
       } else {
-        toast.error(`${t("login_error_credentials")}: ${error.message || ""}`);
+        toast.error(t("login_error_credentials"));
       }
     } finally {
       setIsLoading(false);

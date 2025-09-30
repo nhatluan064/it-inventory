@@ -32,7 +32,6 @@ import {
   filterInventoryItems,
   filterAllocatedItems,
   getItemsByStatus,
-  getInventoryItems,
   DEFAULT_INVENTORY_FILTERS,
   DEFAULT_ALLOCATED_FILTERS,
 } from "./utils/filterUtils";
@@ -96,18 +95,21 @@ const App = () => {
 
   // Computed values - StatusLabels first to avoid dependency issue
   const statusLabels = useMemo(
-    () => ({
-      available: t("available"),
-      "in-use": t("in_use"),
-      maintenance: t("maintenance"),
-      liquidation: t("pending_liquidation"),
-      broken: t("broken"),
-      "out-of-stock": t("out_of_stock"),
-      "pending-purchase": t("pending_purchase"),
-      purchasing: t("purchasing"),
-      purchased: t("purchased"),
-    }),
-    [t]
+    () => {
+      const trans = translations[language] || {};
+      return {
+        available: trans.available || "available",
+        "in-use": trans.in_use || "in-use",
+        maintenance: trans.maintenance || "maintenance",
+        liquidation: trans.pending_liquidation || "pending_liquidation",
+        broken: trans.broken || "broken",
+        "out-of-stock": trans.out_of_stock || "out_of_stock",
+        "pending-purchase": trans.pending_purchase || "pending_purchase",
+        purchasing: trans.purchasing || "purchasing",
+        purchased: trans.purchased || "purchased",
+      };
+    },
+    [language] // Stable dependency
   );
 
   // Use dynamic categories instead of hardcoded ones
@@ -145,10 +147,7 @@ const App = () => {
     [inventory.equipment]
   );
 
-  const inventoryItems = useMemo(
-    () => getInventoryItems(inventory.equipment),
-    [inventory.equipment]
-  );
+  const inventoryItems = inventory.inventoryItems;
 
   const filteredInventory = useMemo(
     () => filterInventoryItems(inventoryItems, inventoryFilters),

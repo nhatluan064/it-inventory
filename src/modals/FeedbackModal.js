@@ -9,8 +9,10 @@ import {
   MessageCircle,
   Send,
   Heart,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
+import emailjs from "@emailjs/browser";
+import toast from "react-hot-toast";
 
 const FeedbackModal = ({ isOpen, onClose, t, user: _user }) => {
   const [rating, setRating] = useState(0);
@@ -28,7 +30,7 @@ const FeedbackModal = ({ isOpen, onClose, t, user: _user }) => {
       label: t("feedback_bug"),
       color: "text-red-500",
       bgColor: "bg-red-50 dark:bg-red-900/20",
-      borderColor: "border-red-200 dark:border-red-800"
+      borderColor: "border-red-200 dark:border-red-800",
     },
     {
       id: "suggestion",
@@ -36,7 +38,7 @@ const FeedbackModal = ({ isOpen, onClose, t, user: _user }) => {
       label: t("feedback_suggestion"),
       color: "text-yellow-500",
       bgColor: "bg-yellow-50 dark:bg-yellow-900/20",
-      borderColor: "border-yellow-200 dark:border-yellow-800"
+      borderColor: "border-yellow-200 dark:border-yellow-800",
     },
     {
       id: "improvement",
@@ -44,7 +46,7 @@ const FeedbackModal = ({ isOpen, onClose, t, user: _user }) => {
       label: t("feedback_improvement"),
       color: "text-blue-500",
       bgColor: "bg-blue-50 dark:bg-blue-900/20",
-      borderColor: "border-blue-200 dark:border-blue-800"
+      borderColor: "border-blue-200 dark:border-blue-800",
     },
     {
       id: "other",
@@ -52,38 +54,48 @@ const FeedbackModal = ({ isOpen, onClose, t, user: _user }) => {
       label: t("feedback_other"),
       color: "text-green-500",
       bgColor: "bg-green-50 dark:bg-green-900/20",
-      borderColor: "border-green-200 dark:border-green-800"
-    }
+      borderColor: "border-green-200 dark:border-green-800",
+    },
   ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      // EmailJS configuration
+      const serviceId = "service_ws5imwo"; // You'll need to create this in EmailJS dashboard
+      const templateId = "template_jvsrdms"; // Template ID for feedback emails
+      const publicKey = "ECFdf3n-EdfGnTObK"; // Public key from EmailJS
 
-    // Here you would normally send data to your backend
-    // const feedbackData = {
-    //   user: user?.email || 'anonymous',
-    //   rating,
-    //   category,
-    //   title,
-    //   description,
-    //   timestamp: new Date().toISOString(),
-    //   userAgent: navigator.userAgent
-    // };
+      const templateParams = {
+        user_name: _user?.displayName || _user?.email || "Anonymous User",
+        user_email: _user?.email || "anonymous@example.com",
+        rating: rating,
+        category: category,
+        title: title,
+        description: description,
+        timestamp: new Date().toISOString(),
+        date: new Date().toLocaleDateString('vi-VN'), // Ngày theo định dạng Việt Nam
+        time: new Date().toLocaleTimeString('vi-VN'), // Giờ theo định dạng Việt Nam
+        user_agent: navigator.userAgent,
+      };
 
-    // TODO: Send feedbackData to backend API
-    
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+      await emailjs.send(serviceId, templateId, templateParams, publicKey);
 
-    // Auto close after success
-    setTimeout(() => {
-      onClose();
-      resetForm();
-    }, 2000);
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+
+      // Auto close after success
+      setTimeout(() => {
+        onClose();
+        resetForm();
+      }, 2000);
+    } catch (error) {
+      console.error("Error sending feedback:", error);
+      setIsSubmitting(false);
+      toast.error("Failed to send feedback. Please try again.");
+    }
   };
 
   const resetForm = () => {
@@ -105,19 +117,18 @@ const FeedbackModal = ({ isOpen, onClose, t, user: _user }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto animate-slideIn">
-        
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-sm w-full mx-4 max-h-[85vh] overflow-y-auto animate-slideIn">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
-              <Heart className="w-5 h-5 text-white" />
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
+              <Heart className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 {t("feedback_title")}
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 {t("feedback_subtitle")}
               </p>
             </div>
@@ -132,42 +143,45 @@ const FeedbackModal = ({ isOpen, onClose, t, user: _user }) => {
 
         {isSubmitted ? (
           // Success State
-          <div className="p-8 text-center">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-              <Sparkles className="w-8 h-8 text-green-600 dark:text-green-400" />
+          <div className="p-6 text-center">
+            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3 animate-bounce">
+              <Sparkles className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
               {t("feedback_success_title")}
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
               {t("feedback_success_message")}
             </p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            
+          <form onSubmit={handleSubmit} className="p-4 space-y-4">
             {/* Rating Section */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t("feedback_rating")}
               </label>
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-1 mb-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
                     type="button"
                     className={`transition-all duration-200 transform hover:scale-110 ${
                       star <= (hoverRating || rating)
-                        ? 'text-yellow-400 animate-pulse'
-                        : 'text-gray-300 dark:text-gray-600'
+                        ? "text-yellow-400 animate-pulse"
+                        : "text-gray-300 dark:text-gray-600"
                     }`}
                     onClick={() => setRating(star)}
                     onMouseEnter={() => setHoverRating(star)}
                     onMouseLeave={() => setHoverRating(0)}
                   >
-                    <Star 
-                      className="w-8 h-8" 
-                      fill={star <= (hoverRating || rating) ? 'currentColor' : 'none'}
+                    <Star
+                      className="w-6 h-6"
+                      fill={
+                        star <= (hoverRating || rating)
+                          ? "currentColor"
+                          : "none"
+                      }
                     />
                   </button>
                 ))}
@@ -187,10 +201,10 @@ const FeedbackModal = ({ isOpen, onClose, t, user: _user }) => {
 
             {/* Category Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t("feedback_category")}
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-1.5">
                 {categories.map((cat) => {
                   const Icon = cat.icon;
                   const isSelected = category === cat.id;
@@ -199,16 +213,24 @@ const FeedbackModal = ({ isOpen, onClose, t, user: _user }) => {
                       key={cat.id}
                       type="button"
                       onClick={() => setCategory(cat.id)}
-                      className={`p-3 border rounded-lg transition-all duration-200 transform hover:scale-105 ${
+                      className={`p-2 border rounded-lg transition-all duration-200 transform hover:scale-105 ${
                         isSelected
                           ? `${cat.bgColor} ${cat.borderColor} shadow-md`
-                          : 'border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          : "border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                       }`}
                     >
-                      <Icon className={`w-5 h-5 mb-1 mx-auto ${isSelected ? cat.color : 'text-gray-400'}`} />
-                      <span className={`text-sm font-medium ${
-                        isSelected ? cat.color : 'text-gray-600 dark:text-gray-300'
-                      }`}>
+                      <Icon
+                        className={`w-4 h-4 mb-0.5 mx-auto ${
+                          isSelected ? cat.color : "text-gray-400"
+                        }`}
+                      />
+                      <span
+                        className={`text-xs font-medium ${
+                          isSelected
+                            ? cat.color
+                            : "text-gray-600 dark:text-gray-300"
+                        }`}
+                      >
                         {cat.label}
                       </span>
                     </button>
@@ -219,7 +241,7 @@ const FeedbackModal = ({ isOpen, onClose, t, user: _user }) => {
 
             {/* Title Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t("feedback_title")}
               </label>
               <input
@@ -227,50 +249,52 @@ const FeedbackModal = ({ isOpen, onClose, t, user: _user }) => {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={t("feedback_title_placeholder")}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-200"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-200 text-sm"
                 required
               />
             </div>
 
             {/* Description Textarea */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t("feedback_description")}
               </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder={t("feedback_description_placeholder")}
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-200 resize-none"
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-200 resize-none text-sm"
                 required
               />
             </div>
 
             {/* Submit Button */}
-            <div className="flex gap-3 pt-4">
+            <div className="flex gap-2 pt-3">
               <button
                 type="button"
                 onClick={handleClose}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm"
               >
                 {t("cancel")}
               </button>
               <button
                 type="submit"
-                disabled={isSubmitting || !title || !description || rating === 0}
-                className={`flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium transition-all duration-200 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${
-                  isSubmitting ? 'animate-pulse' : ''
+                disabled={
+                  isSubmitting || !title || !description || rating === 0
+                }
+                className={`flex-1 px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium transition-all duration-200 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${
+                  isSubmitting ? "animate-pulse" : ""
                 }`}
               >
                 {isSubmitting ? (
                   <div className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     {t("submitting")}
                   </div>
                 ) : (
                   <div className="flex items-center justify-center gap-2">
-                    <Send className="w-4 h-4" />
+                    <Send className="w-3 h-3" />
                     {t("submit_feedback")}
                   </div>
                 )}
