@@ -171,28 +171,52 @@ const App = () => {
 
   // Chart data for dashboard
   const inventoryStatusChartData = useMemo(() => {
+    // Đếm tất cả các trạng thái theo yêu cầu
     const allEquipment = inventory.equipment;
-
-    const counts = allEquipment.reduce((acc, item) => {
-      acc[item.status] = (acc[item.status] || 0) + 1;
-      return acc;
-    }, {});
-
-    const desiredStatusOrder = [
-      "purchasing",
-      "purchased",
+    const pendingPurchase = allEquipment.filter((e) => e.status === "pending-purchase").length;
+    const purchasing = allEquipment.filter((e) => e.status === "purchasing").length;
+    const purchased = allEquipment.filter((e) => e.status === "purchased").length;
+    const totalInventory = allEquipment.filter((e) => [
       "available",
       "in-use",
       "maintenance",
       "liquidation",
+    ].includes(e.status)).length;
+    const inUse = allEquipment.filter((e) => e.status === "in-use").length;
+    const maintenance = allEquipment.filter((e) => e.status === "maintenance").length;
+    const liquidation = allEquipment.filter((e) => e.status === "liquidation").length;
+
+    // Tạo dữ liệu cho biểu đồ với 7 trạng thái
+    const statusKeys = [
+      "pending-purchase",
+      "purchasing",
+      "purchased",
+      "total-inventory",
+      "in-use",
+      "maintenance",
+      "liquidation",
+    ];
+    const labels = [
+      t("pending_purchase_requests") || "Yêu cầu mua",
+      t("in_purchasing_process") || "Đang mua",
+      t("purchased_waiting_import") || "Đã mua",
+      t("total_inventory") || "Tổng kho",
+      t("in_use") || "Đã xuất",
+      t("in_maintenance") || "Bảo trì",
+      t("pending_liquidation") || "Thanh lý",
+    ];
+    const data = [
+      pendingPurchase,
+      purchasing,
+      purchased,
+      totalInventory,
+      inUse,
+      maintenance,
+      liquidation,
     ];
 
-    const statusKeys = desiredStatusOrder.filter(status => counts[status]);
-    const labels = statusKeys.map(key => statusLabels[key] || key);
-    const data = statusKeys.map(key => counts[key]);
-
     return { labels, data, statusKeys };
-  }, [inventory.equipment, statusLabels]);
+  }, [inventory.equipment, t]);
 
   // Context value
   const appContextValue = useMemo(

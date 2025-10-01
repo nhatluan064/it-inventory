@@ -7,15 +7,15 @@ import AppContext from "../context/AppContext";
 const StatusChart = React.memo(({ chartData }) => {
   const { theme, t } = useContext(AppContext);
 
-  // Ánh xạ màu từ Tailwind sang mã màu thực tế cho biểu đồ
+  // Ánh xạ màu từ Tailwind sang mã màu thực tế cho biểu đồ (7 trạng thái)
   const statusColorMapping = {
-    purchasing: "#A855F7", // purple-500
-    purchased: "#14B8A6", // teal-500
-    available: "#3B82F6", // blue-500
-    "in-use": "#EAB308", // yellow-500
-    maintenance: "#F97316", // orange-500
-    liquidation: "#64748B", // slate-500
-    broken: "#EF4444", // red-500
+    "pending-purchase": "#9CA3AF", // gray-400 - Yêu cầu mua
+    "purchasing": "#A855F7", // purple-500 - Đang mua
+    "purchased": "#14B8A6", // teal-500 - Đã mua
+    "total-inventory": "#3B82F6", // blue-500 - Tổng kho
+    "in-use": "#EAB308", // yellow-500 - Đã xuất
+    "maintenance": "#F97316", // orange-500 - Bảo trì
+    "liquidation": "#64748B", // slate-500 - Thanh lý
   };
 
   const data = {

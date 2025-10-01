@@ -4,6 +4,7 @@ export const translations = {
   vi: {
     location_in_use: "Đang sử dụng",
     info_chart_title: "Tình trạng Kho hiện tại",
+    inventory_status_chart_title: "Tình trạng kho hiện tại",
     daily_activity_chart_title: "Hoạt động 7 ngày gần nhất",
     monthly_trend_chart_title: "Xu hướng hoạt động 30 ngày",
     chart_import_label: "Nhập kho",

@@ -148,6 +148,16 @@ export const useDynamicData = (currentUser, equipment = []) => {
   const updateCategory = useCallback(async (categoryId, categoryData) => {
     if (!currentUser) return;
     
+    // Check for duplicate name (excluding current item)
+    const existing = (categories || []).some(cat => 
+      cat.id !== categoryId && cat.name.toLowerCase() === categoryData.name.toLowerCase()
+    );
+    
+    if (existing) {
+      toast.error("Tên danh mục đã tồn tại");
+      return false;
+    }
+    
     // Check if category is in use
     if (isCategoryInUse(categoryId)) {
       toast.error("Không thể cập nhật danh mục đang được sử dụng trong danh sách thiết bị");
@@ -169,7 +179,7 @@ export const useDynamicData = (currentUser, equipment = []) => {
       toast.error("Lỗi khi cập nhật danh mục");
       return false;
     }
-  }, [currentUser, isCategoryInUse]);
+  }, [currentUser, categories, isCategoryInUse]);
 
   const deleteCategory = useCallback(async (categoryId) => {
     if (!currentUser) return;
@@ -228,6 +238,16 @@ export const useDynamicData = (currentUser, equipment = []) => {
   const updateDepartment = useCallback(async (departmentId, departmentData) => {
     if (!currentUser) return;
     
+    // Check for duplicate name (excluding current item)
+    const existing = (departmentsList || []).some(dept => 
+      dept.id !== departmentId && dept.name.toLowerCase() === departmentData.name.toLowerCase()
+    );
+    
+    if (existing) {
+      toast.error("Tên phòng ban đã tồn tại");
+      return false;
+    }
+    
     try {
       const departmentRef = doc(db, "users", currentUser.uid, "departments", departmentId);
       await updateDoc(departmentRef, {
@@ -243,7 +263,7 @@ export const useDynamicData = (currentUser, equipment = []) => {
       toast.error("Lỗi khi cập nhật phòng ban");
       return false;
     }
-  }, [currentUser]);
+  }, [currentUser, departmentsList]);
 
   const deleteDepartment = useCallback(async (departmentId) => {
     if (!currentUser) return;
@@ -296,6 +316,16 @@ export const useDynamicData = (currentUser, equipment = []) => {
   const updatePosition = useCallback(async (positionId, positionData) => {
     if (!currentUser) return;
     
+    // Check for duplicate name (excluding current item)
+    const existing = (positionsList || []).some(pos => 
+      pos.id !== positionId && pos.name.toLowerCase() === positionData.name.toLowerCase()
+    );
+    
+    if (existing) {
+      toast.error("Tên chức danh đã tồn tại");
+      return false;
+    }
+    
     try {
       const positionRef = doc(db, "users", currentUser.uid, "positions", positionId);
       await updateDoc(positionRef, {
@@ -311,7 +341,7 @@ export const useDynamicData = (currentUser, equipment = []) => {
       toast.error("Lỗi khi cập nhật chức danh");
       return false;
     }
-  }, [currentUser]);
+  }, [currentUser, positionsList]);
 
   const deletePosition = useCallback(async (positionId) => {
     if (!currentUser) return;
