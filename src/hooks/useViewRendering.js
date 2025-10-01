@@ -117,6 +117,7 @@ export const useViewRendering = ({
               fullEquipmentList={inventory.equipment}
               onAddType={() => modals.openModal("type")}
               onEditItem={(item) => modals.openModal("type", item)}
+              onQuickUpdateMasterCategory={(payload) => inventory.updateMasterItem(payload)}
               onDeleteItem={(item) =>
                 modals.openModal("delete", item, { deleteType: "master" })
               }

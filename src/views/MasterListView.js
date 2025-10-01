@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Plus, Search, Edit2, Trash2 } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, Check, X } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 
 const MasterListView = ({
   allItems,
   onAddType,
   onEditItem,
+  onQuickUpdateMasterCategory,
   onDeleteItem,
   categories,
   t,
@@ -16,6 +17,8 @@ const MasterListView = ({
   const [expandedRows, setExpandedRows] = useState({});
   const [animatingRows, setAnimatingRows] = useState({});
   const [subSortConfigs, setSubSortConfigs] = useState({});
+  const [editingCategoryId, setEditingCategoryId] = useState(null);
+  const [editingCategoryValue, setEditingCategoryValue] = useState("");
 
   // State để quản lý sorting category riêng
   const [categorySortConfig, setCategorySortConfig] = useState({
@@ -283,8 +286,58 @@ const MasterListView = ({
                                     className="grid grid-cols-12 gap-x-4 items-center py-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 animate-slideInLeft transition-all duration-300"
                                     style={{ animationDelay: `${itemIndex * 0.05}s` }}
                                   >
-                                    <div className="col-span-6 truncate font-semibold flex items-center">
-                                      {item.name}
+                                    <div className="col-span-6 truncate font-semibold flex items-center gap-3">
+                                      <span>{item.name}</span>
+                                      {editingCategoryId === item.id ? (
+                                        <div className="flex items-center gap-2">
+                                          <select
+                                            className="px-2 py-1 text-xs border rounded dark:bg-gray-700 dark:border-gray-600"
+                                            value={editingCategoryValue}
+                                            onChange={(e) => setEditingCategoryValue(e.target.value)}
+                                          >
+                                            {(categories || [])
+                                              .filter((c) => c.id !== "all")
+                                              .map((c) => (
+                                                <option key={c.id} value={c.id}>
+                                                  {c.name}
+                                                </option>
+                                              ))}
+                                          </select>
+                                          <button
+                                            className="p-1 rounded text-green-600 hover:bg-green-100 dark:hover:bg-green-900/40"
+                                            onClick={() => {
+                                              if (!editingCategoryValue) return;
+                                              onQuickUpdateMasterCategory?.({
+                                                id: item.id,
+                                                name: item.name,
+                                                category: editingCategoryValue,
+                                              });
+                                              setEditingCategoryId(null);
+                                            }}
+                                            title={t("save")}
+                                          >
+                                            <Check className="w-4 h-4" />
+                                          </button>
+                                          <button
+                                            className="p-1 rounded text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700/40"
+                                            onClick={() => setEditingCategoryId(null)}
+                                            title={t("cancel")}
+                                          >
+                                            <X className="w-4 h-4" />
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <button
+                                          className="px-2 py-1 text-xs rounded border border-amber-300 text-amber-600 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-900/20"
+                                          onClick={() => {
+                                            setEditingCategoryId(item.id);
+                                            setEditingCategoryValue(item.category);
+                                          }}
+                                          title={t("category")}
+                                        >
+                                          {t("change")} {t("category")}
+                                        </button>
+                                      )}
                                     </div>
                                     <div
                                       className={`col-span-4 truncate ${statusColor} flex items-center`}
