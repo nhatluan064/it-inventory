@@ -9,6 +9,8 @@ import {
   onSnapshot,
   query,
   orderBy,
+  getDocs,
+  where,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import toast from "react-hot-toast";
@@ -184,9 +186,25 @@ export const useDynamicData = (currentUser, equipment = []) => {
   const deleteCategory = useCallback(async (categoryId) => {
     if (!currentUser) return;
     
-    // Check if category is in use
+    // Local check: if equipment state shows usage, block
     if (isCategoryInUse(categoryId)) {
       toast.error("Không thể xóa danh mục đang được sử dụng trong danh sách thiết bị");
+      return false;
+    }
+
+    // Server-side check: query Firestore to be absolutely sure
+    try {
+      const equipRef = collection(db, "users", currentUser.uid, "equipment");
+      const q = query(equipRef, where("category", "==", categoryId));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        toast.error("Danh mục đang được sử dụng trong thiết bị. Không thể xóa.");
+        return false;
+      }
+    } catch (checkErr) {
+      console.error("Error checking category usage:", checkErr);
+      // If we cannot verify safely, do not delete
+      toast.error("Không thể kiểm tra trạng thái sử dụng của danh mục. Thao tác bị hủy.");
       return false;
     }
     
@@ -358,28 +376,34 @@ export const useDynamicData = (currentUser, equipment = []) => {
   }, [currentUser]);
 
   // Auto-add functions cho tự động tạo mới
-  const autoAddCategoryIfNotExists = useCallback(async (categoryName) => {
-    if (!currentUser || !categoryName) return null;
-    
-    // Check if category exists
-    const existing = (categories || []).find(cat => 
-      cat.name.toLowerCase() === categoryName.toLowerCase()
-    );
-    
-    if (existing) {
-      return existing.id || existing.key; // return id for custom, key for default
+  const autoAddCategoryIfNotExists = useCallback(async (categoryIdentifier) => {
+    // Accept either a category ID or a category NAME
+    if (!currentUser || !categoryIdentifier) return null;
+
+    // 1) Try by ID first
+    const byId = (categories || []).find((cat) => cat.id === categoryIdentifier);
+    if (byId) {
+      return byId.id;
     }
 
-    // Auto-create new category
-    const success = await addCategory({ name: categoryName });
-    if (success) {
-      // Find the newly created category
-      const newCategory = (categories || []).find(cat => 
-        cat.name.toLowerCase() === categoryName.toLowerCase()
-      );
-      return newCategory?.id;
+    // 2) Try by NAME (case-insensitive)
+    const nameStr = String(categoryIdentifier);
+    const byName = (categories || []).find(
+      (cat) => cat.name.toLowerCase() === nameStr.toLowerCase()
+    );
+    if (byName) {
+      return byName.id;
     }
-    
+
+    // 3) Auto-create as a NEW category using the provided name
+    const success = await addCategory({ name: nameStr });
+    if (success) {
+      // Wait for onSnapshot to update state may be async; attempt a best-effort lookup
+      const created = (categories || []).find(
+        (cat) => cat.name.toLowerCase() === nameStr.toLowerCase()
+      );
+      return created?.id || null;
+    }
     return null;
   }, [currentUser, categories, addCategory]);
 

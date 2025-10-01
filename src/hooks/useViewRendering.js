@@ -78,7 +78,7 @@ export const useViewRendering = ({
       onDeleteItem: (item) =>
         modals.openModal("delete", item, { deleteType: "inventory" }),
     }),
-    [viewProps, modals]
+    [viewProps, modals, departmentsList, positionsList]
   );
 
   const renderCurrentView = () => {
@@ -118,6 +118,7 @@ export const useViewRendering = ({
               onAddType={() => modals.openModal("type")}
               onEditItem={(item) => modals.openModal("type", item)}
               onQuickUpdateMasterCategory={(payload) => inventory.updateMasterItem(payload)}
+              onBulkMoveCategory={(payload) => inventory.bulkMoveCategory(payload)}
               onDeleteItem={(item) =>
                 modals.openModal("delete", item, { deleteType: "master" })
               }

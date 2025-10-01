@@ -228,6 +228,12 @@ export const useInventory = (currentUser, t, setActiveTab) => {
 
   const updateMasterItem = useCallback(
     async (itemData) => {
+      // Find the original master item to compare old values
+      const original = equipment.find((e) => e.id === itemData.id);
+      if (!original) {
+        toast.error(t("toast_item_not_found_for_update"));
+        return false;
+      }
       const isDuplicate = equipment.some(
         (e) =>
           e.id !== itemData.id &&
@@ -261,11 +267,58 @@ export const useInventory = (currentUser, t, setActiveTab) => {
 
       await updateDoc(docRef, dataToUpdate);
 
-      setEquipment(
-        equipment.map((e) =>
-          e.id === itemData.id ? { ...e, ...dataToUpdate } : e
-        )
-      );
+      // If category changed, propagate to child inventory items of the same model
+      if (original.category !== itemData.category) {
+        try {
+          const batch = writeBatch(db);
+          const affectedChildren = equipment.filter((e) => {
+            const baseItemName = e.name.split(" (User:")[0].trim();
+            return (
+              e.status !== "master" &&
+              baseItemName === original.name &&
+              e.category === original.category
+            );
+          });
+
+          for (const child of affectedChildren) {
+            const childRef = doc(
+              db,
+              "users",
+              currentUser.uid,
+              "equipment",
+              child.id
+            );
+            batch.update(childRef, { category: itemData.category });
+          }
+          if (affectedChildren.length > 0) {
+            await batch.commit();
+          }
+
+          // Update local state (master + children) using functional set
+          setEquipment((prev) =>
+            prev.map((e) => {
+              if (e.id === itemData.id) return { ...e, ...dataToUpdate };
+              if (
+                affectedChildren.findIndex((c) => c.id === e.id) !== -1
+              ) {
+                return { ...e, category: itemData.category };
+              }
+              return e;
+            })
+          );
+        } catch (propErr) {
+          console.error("Error propagating category to child items:", propErr);
+          // Fallback: still update master locally
+          setEquipment((prev) =>
+            prev.map((e) => (e.id === itemData.id ? { ...e, ...dataToUpdate } : e))
+          );
+        }
+      } else {
+        // Only update master locally if no category change
+        setEquipment((prev) =>
+          prev.map((e) => (e.id === itemData.id ? { ...e, ...dataToUpdate } : e))
+        );
+      }
 
       await logTransaction({
         type: "inventory",
@@ -514,20 +567,21 @@ export const useInventory = (currentUser, t, setActiveTab) => {
       const newItems = [];
       const importDate = new Date().toISOString();
 
-      // Auto-create category if it doesn't exist (fix for Pc issue)
-      await autoAddCategoryIfNotExists(data.category);
+      // Ensure category exists and resolve to a valid category ID
+      const ensuredCategory =
+        (await autoAddCategoryIfNotExists(data.category)) || data.category;
 
       const masterExists = equipment.some(
         (item) =>
           item.name.toLowerCase() === data.name.toLowerCase() &&
-          item.category === data.category &&
+          item.category === ensuredCategory &&
           item.status === "master"
       );
 
       if (!masterExists) {
         const newMasterItem = {
           name: data.name,
-          category: data.category,
+          category: ensuredCategory,
           status: "master",
           location: "master-list",
           quantity: 0,
@@ -541,13 +595,14 @@ export const useInventory = (currentUser, t, setActiveTab) => {
           type: "master-list",
           reason: "add-legacy",
           itemName: data.name,
-          details: { category: data.category, autoCreated: true },
+          details: { category: ensuredCategory, autoCreated: true },
         });
       }
 
       for (const sn of serials) {
         const newItemData = {
           ...data,
+          category: ensuredCategory,
           serialNumber: sn,
           quantity: 1,
           purchaseQuantity: data.quantity,
@@ -832,6 +887,61 @@ export const useInventory = (currentUser, t, setActiveTab) => {
     [currentUser, equipment, logTransaction, t]
   );
 
+  // Bulk move all items (masters and children) from one category to another
+  const bulkMoveCategory = useCallback(
+    async ({ fromCategoryId, toCategoryId }) => {
+      if (!currentUser) return false;
+      if (!fromCategoryId || !toCategoryId) return false;
+      if (fromCategoryId === toCategoryId) {
+        toast(t("no_changes"));
+        return false;
+      }
+
+      // Collect all affected items (both master and non-master) currently in fromCategoryId
+      const affected = equipment.filter((e) => e.category === fromCategoryId);
+      if (affected.length === 0) {
+        toast(t("no_data_available"));
+        return false;
+      }
+
+      try {
+        // Firestore batch limit ~500 operations; use chunks safely below that
+        const chunkSize = 450;
+        for (let i = 0; i < affected.length; i += chunkSize) {
+          const slice = affected.slice(i, i + chunkSize);
+          const batch = writeBatch(db);
+          for (const item of slice) {
+            const ref = doc(db, "users", currentUser.uid, "equipment", item.id);
+            batch.update(ref, { category: toCategoryId });
+          }
+          await batch.commit();
+        }
+
+        // Update local state to reflect changes immediately
+        setEquipment((prev) =>
+          prev.map((e) =>
+            e.category === fromCategoryId ? { ...e, category: toCategoryId } : e
+          )
+        );
+
+        await logTransaction({
+          type: "inventory",
+          reason: "bulk-category-move",
+          itemName: "*",
+          details: { fromCategoryId, toCategoryId, count: affected.length },
+        });
+
+        toast.success(t("toast_info_updated_successfully"));
+        return true;
+      } catch (err) {
+        console.error("Bulk move category error:", err);
+        toast.error(t("error_occurred"));
+        return false;
+      }
+    },
+    [currentUser, equipment, t, setEquipment, logTransaction]
+  );
+
   const markAsDamaged = useCallback(
     async (item, noteValue, isNoteKey) => {
       const condition = {
@@ -986,12 +1096,14 @@ export const useInventory = (currentUser, t, setActiveTab) => {
           oldTrans.forEach((doc) => batch.delete(doc.ref));
 
           data.equipment.forEach((item) => {
-            const { id: _id, ...itemData } = item;
+            const itemData = { ...item };
+            delete itemData.id;
             const newDocRef = doc(equipColRef);
             batch.set(newDocRef, itemData);
           });
           data.transactions.forEach((item) => {
-            const { id: _id, ...itemData } = item;
+            const itemData = { ...item };
+            delete itemData.id;
             const newDocRef = doc(transColRef);
             batch.set(newDocRef, itemData);
           });
@@ -1109,6 +1221,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
     markAsDamaged,
     updateMaintenanceNote,
     completeRepair,
+  bulkMoveCategory,
     markUnrepairable,
     liquidateItem,
     backupData,

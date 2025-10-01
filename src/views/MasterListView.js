@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Plus, Search, Edit2, Trash2, Check, X } from "lucide-react";
+import toast from "react-hot-toast";
 import { useSort } from "../hooks/useSort";
 
 const MasterListView = ({
@@ -7,6 +8,7 @@ const MasterListView = ({
   onAddType,
   onEditItem,
   onQuickUpdateMasterCategory,
+  onBulkMoveCategory,
   onDeleteItem,
   categories,
   t,
@@ -244,6 +246,62 @@ const MasterListView = ({
                           } ${isClosing ? "animate-slideUp" : ""}`}
                         >
                           <div className="p-2 text-xs">
+                            <div className="flex items-center justify-between p-2 mb-2 rounded-md bg-gray-50 dark:bg-gray-700/30" onClick={(e) => e.stopPropagation()}>
+                              <div className="text-xs font-semibold text-gray-600 dark:text-gray-300">
+                                {t("bulk_actions")} — {t("move_all_items_in_category")}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <select
+                                  className="px-2 py-1 text-xs border rounded dark:bg-gray-700 dark:border-gray-600"
+                                  value={categoryId}
+                                  disabled
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {(categories || [])
+                                    .filter((c) => c.id !== "all")
+                                    .map((c) => (
+                                      <option key={c.id} value={c.id}>
+                                        {c.name}
+                                      </option>
+                                    ))}
+                                </select>
+                                <select
+                                  className="px-2 py-1 text-xs border rounded dark:bg-gray-700 dark:border-gray-600"
+                                  defaultValue={categoryId}
+                                  onClick={(e) => e.stopPropagation()}
+                                  onChange={(e) => {
+                                    const toCategoryId = e.target.value;
+                                    if (toCategoryId === categoryId) {
+                                      toast(t("no_changes"));
+                                      return;
+                                    }
+                                    // eslint-disable-next-line no-alert
+                                    const ok = window.confirm(
+                                      t("confirm_bulk_move_category")
+                                    );
+                                    if (!ok) return;
+                                    onBulkMoveCategory?.({ fromCategoryId: categoryId, toCategoryId })
+                                      .then((res) => {
+                                        if (res) {
+                                          const toName = (categories || []).find((c) => c.id === toCategoryId)?.name || toCategoryId;
+                                          toast.success(
+                                            t("toast_info_updated_successfully", { category: toName })
+                                          );
+                                        }
+                                      })
+                                      .catch(() => toast.error(t("error_occurred")));
+                                  }}
+                                >
+                                  {(categories || [])
+                                    .filter((c) => c.id !== "all")
+                                    .map((c) => (
+                                      <option key={c.id} value={c.id}>
+                                        {c.name}
+                                      </option>
+                                    ))}
+                                </select>
+                              </div>
+                            </div>
                             <div className="grid grid-cols-12 gap-x-4 items-center p-2 rounded-t-md font-bold italic text-gray-600 dark:text-gray-400">
                               <div
                                 className="col-span-6 cursor-pointer"
@@ -286,7 +344,7 @@ const MasterListView = ({
                                     className="grid grid-cols-12 gap-x-4 items-center py-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 animate-slideInLeft transition-all duration-300"
                                     style={{ animationDelay: `${itemIndex * 0.05}s` }}
                                   >
-                                    <div className="col-span-6 truncate font-semibold flex items-center gap-3">
+                                    <div className="col-span-6 truncate font-semibold flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
                                       <span>{item.name}</span>
                                       {editingCategoryId === item.id ? (
                                         <div className="flex items-center gap-2">
@@ -305,14 +363,26 @@ const MasterListView = ({
                                           </select>
                                           <button
                                             className="p-1 rounded text-green-600 hover:bg-green-100 dark:hover:bg-green-900/40"
-                                            onClick={() => {
+                                            onClick={async (e) => {
+                                              e.stopPropagation();
                                               if (!editingCategoryValue) return;
-                                              onQuickUpdateMasterCategory?.({
+                                              if (editingCategoryValue === item.category) {
+                                                toast(t("no_changes"));
+                                                return;
+                                              }
+                                              const ok = await onQuickUpdateMasterCategory?.({
                                                 id: item.id,
                                                 name: item.name,
                                                 category: editingCategoryValue,
                                               });
-                                              setEditingCategoryId(null);
+                                              if (ok) {
+                                                const newName = (categories || []).find(c => c.id === editingCategoryValue)?.name || editingCategoryValue;
+                                                toast.success(t("toast_info_updated_successfully", { category: newName }));
+                                                setEditingCategoryId(null);
+                                              } else {
+                                                // Keep editor open to let user choose another value
+                                                toast.error(t("error_occurred"));
+                                              }
                                             }}
                                             title={t("save")}
                                           >
@@ -320,7 +390,7 @@ const MasterListView = ({
                                           </button>
                                           <button
                                             className="p-1 rounded text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700/40"
-                                            onClick={() => setEditingCategoryId(null)}
+                                            onClick={(e) => { e.stopPropagation(); setEditingCategoryId(null); }}
                                             title={t("cancel")}
                                           >
                                             <X className="w-4 h-4" />
@@ -329,7 +399,8 @@ const MasterListView = ({
                                       ) : (
                                         <button
                                           className="px-2 py-1 text-xs rounded border border-amber-300 text-amber-600 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-900/20"
-                                          onClick={() => {
+                                          onClick={(e) => {
+                                            e.stopPropagation();
                                             setEditingCategoryId(item.id);
                                             setEditingCategoryValue(item.category);
                                           }}
