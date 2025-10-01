@@ -4,7 +4,7 @@ import { AnimatedButton } from "../components/AnimatedButton";
 
 const defaultFormState = {
   name: "",
-  category: "pc",
+  category: "",
   status: "available",
   location: "location_in_stock",
   condition: "condition_legacy_import",
@@ -50,13 +50,16 @@ const AddEditModal = ({
         };
         setFormData(formattedData);
       } else {
+        // When adding new item, auto-select first category if available
+        const firstCategoryId = categories.find((c) => c.id !== "all")?.id || "";
         setFormData({
           ...defaultFormState,
+          category: firstCategoryId,
           importDate: toInputDate(new Date().toISOString()),
         });
       }
     }
-  }, [initialData, show, isEditing]);
+  }, [initialData, show, isEditing, categories]);
 
   if (!show) {
     return null;

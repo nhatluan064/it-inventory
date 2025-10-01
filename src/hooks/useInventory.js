@@ -514,6 +514,9 @@ export const useInventory = (currentUser, t, setActiveTab) => {
       const newItems = [];
       const importDate = new Date().toISOString();
 
+      // Auto-create category if it doesn't exist (fix for Pc issue)
+      await autoAddCategoryIfNotExists(data.category);
+
       const masterExists = equipment.some(
         (item) =>
           item.name.toLowerCase() === data.name.toLowerCase() &&
@@ -573,7 +576,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
       toast.success(t("toast_legacy_item_imported"));
       return true;
     },
-    [currentUser, equipment, logTransaction, t, fetchData]
+    [currentUser, equipment, logTransaction, t, fetchData, autoAddCategoryIfNotExists]
   );
 
   // Helper function to handle category change logic within updateItem
