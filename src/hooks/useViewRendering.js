@@ -63,6 +63,15 @@ export const useViewRendering = ({
     return [allCategory, ...categories];
   }, [categories, t]);
 
+  const allocatedCategories = useMemo(() => {
+    const allCategory = {
+      id: "all",
+      name: t("category_all"),
+      key: "category_all",
+    };
+    return [allCategory, ...categories];
+  }, [categories, t]);
+
   const mobileViewProps = useMemo(
     () => ({
       ...viewProps,
@@ -212,7 +221,11 @@ export const useViewRendering = ({
             return (
               <ViewComponent
                 {...mobileViewProps}
+                categories={allocatedCategories}
                 items={allocatedItems}
+                onEditAllocation={(item) =>
+                  modals.openModal("editAllocation", item)
+                }
                 onRecallItem={(item) => modals.openModal("recall", item)}
                 onMarkDamaged={(item) =>
                   modals.openModal("directMaintenanceNote", item)
@@ -224,11 +237,14 @@ export const useViewRendering = ({
           }
           return (
             <ViewComponent
-              {...viewProps} // Đã bao gồm onAllocateItem từ mobileViewProps nếu cần
+              {...{ ...viewProps, categories: allocatedCategories }}
               items={allocatedItems}
               unfilteredAllocatedItems={inventory.equipment.filter(
                 (i) => i.status === "in-use"
               )}
+              onEditAllocation={(item) =>
+                modals.openModal("editAllocation", item)
+              }
               onRecallItem={(item) => modals.openModal("recall", item)}
               onMarkDamaged={(item) =>
                 modals.openModal("directMaintenanceNote", item)

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { RotateCcw, Search, Wrench } from "lucide-react";
+import { RotateCcw, Search, Wrench, Edit, ChevronDown, ChevronRight, Package, User } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 
 const AllocatedView = ({
@@ -7,6 +7,7 @@ const AllocatedView = ({
   unfilteredAllocatedItems,
   onRecallItem,
   onMarkDamaged,
+  onEditAllocation,
   categories,
   departmentsList,
   filters,
@@ -16,7 +17,7 @@ const AllocatedView = ({
   const [expandedRows, setExpandedRows] = useState({});
   const [animatingRows, setAnimatingRows] = useState({});
   const [subSortConfigs, setSubSortConfigs] = useState({});
-  
+
   // State để quản lý sorting category riêng
   const [categorySortConfig, setCategorySortConfig] = useState({
     key: "category",
@@ -36,9 +37,7 @@ const AllocatedView = ({
     setAnimatingRows({});
   }, [filters]);
 
-  const {
-    items: sortedItems,
-  } = useSort(items, {
+  const { items: sortedItems } = useSort(items, {
     key: "category",
     direction: "ascending",
   });
@@ -54,13 +53,15 @@ const AllocatedView = ({
     // Sắp xếp các categories theo thứ tự
     const sortedGrouped = {};
     const sortedCategories = Object.keys(grouped).sort((a, b) => {
-      const aName = (categories.find(c => c.id === a)?.name || a);
-      const bName = (categories.find(c => c.id === b)?.name || b);
+      const aName = categories.find((c) => c.id === a)?.name || a;
+      const bName = categories.find((c) => c.id === b)?.name || b;
       const comparison = aName.localeCompare(bName);
-      return categorySortConfig.direction === "ascending" ? comparison : -comparison;
+      return categorySortConfig.direction === "ascending"
+        ? comparison
+        : -comparison;
     });
 
-    sortedCategories.forEach(categoryId => {
+    sortedCategories.forEach((categoryId) => {
       sortedGrouped[categoryId] = grouped[categoryId];
     });
 
@@ -123,7 +124,7 @@ const AllocatedView = ({
         {/* Filter section animation */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-600 bg-clip-text text-transparent">
               {t("allocated_list")}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -199,30 +200,11 @@ const AllocatedView = ({
         </div>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">{/* Table container animation */}
-        <div className="flex-grow overflow-y-auto hide-scrollbar">
-          <table className="w-full text-xs table-fixed">
-            <thead className="bg-white dark:bg-gray-800 sticky top-0 z-10">
-              <tr>
-                <th
-                  className="px-4 py-3.5 text-left font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 cursor-pointer select-none w-1/3"
-                  onClick={handleCategorySort}
-                >
-                  {t("category")}
-                  {categorySortConfig.direction === "ascending" ? " ▲" : " ▼"}
-                </th>
-                <th className="px-4 py-3.5 text-center font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 w-24">
-                  {t("quantity")}
-                </th>
-                <th className="px-4 py-3.5 text-center font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 w-32">
-                  {t("actions")}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-              {Object.entries(groupedByCategory).map(([categoryId, items]) => {
-                const isOpening = animatingRows[categoryId] === "opening";
-                const isClosing = animatingRows[categoryId] === "closing";
+      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp p-6">
+        {/* Card-based container */}
+        <div className="flex-grow overflow-y-auto hide-scrollbar space-y-3">
+              {Object.entries(groupedByCategory).map(([categoryId, items], catIndex) => {
+                const isExpanded = expandedRows[categoryId];
                 const category = categories.find((c) => c.id === categoryId);
                 const subSortConfig = subSortConfigs[categoryId] || {
                   key: "name",
@@ -247,166 +229,131 @@ const AllocatedView = ({
                     ? comparison
                     : -comparison;
                 });
-
+                
                 return (
-                  <React.Fragment key={categoryId}>
-                    <tr
-                      className="bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer animate-fadeInUp transition-all duration-300"
-                      style={{
-                        animationDelay: `${
-                          Object.keys(groupedByCategory).indexOf(categoryId) *
-                          0.1
-                        }s`,
-                      }}
+                  <div
+                    key={categoryId}
+                    className="border-2 border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden animate-fadeIn"
+                    style={{ animationDelay: `${catIndex * 0.05}s` }}
+                  >
+                    {/* Category Header with Yellow Gradient */}
+                    <div
                       onClick={() => toggleExpand(categoryId)}
+                      className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 hover:from-yellow-100 hover:to-amber-100 dark:hover:from-yellow-800/40 dark:hover:to-amber-800/40 cursor-pointer transition-all duration-200"
                     >
-                      <td className="px-4 py-3 font-semibold capitalize">
-                        <span>{category?.name || categoryId}</span>
-                      </td>
-                      <td className="px-4 py-3 text-center font-semibold">
-                        <div className="flex flex-col items-center">
-                          <span>{items.length}</span>
-                          <span className="text-gray-400 dark:text-gray-500 text-[9px]">
-                            {t('label_devices')}
-                          </span>
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="w-8 h-8 bg-gradient-to-br from-yellow-500 to-yellow-600 dark:from-yellow-400 dark:to-yellow-500 rounded-lg flex items-center justify-center shadow-md">
+                          {isExpanded ? (
+                            <ChevronDown className="w-5 h-5 text-white" />
+                          ) : (
+                            <ChevronRight className="w-5 h-5 text-white" />
+                          )}
                         </div>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <div className="text-xs text-gray-500">
-                          {expandedRows[categoryId] ? '−' : '+'}
+                        <div>
+                          <h3 className="font-bold text-gray-900 dark:text-white">
+                            {category?.name || categoryId}
+                          </h3>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            {items.length} {t("label_devices")}
+                          </p>
                         </div>
-                      </td>
-                    </tr>
-                    {(expandedRows[categoryId] || isClosing) && (
-                      <tr>
-                        <td
-                          colSpan={3}
-                          className={`p-0 overflow-hidden ${
-                            isOpening ? "animate-slideDown" : ""
-                          } ${isClosing ? "animate-slideUp" : ""}`}
-                        >
-                          <div className="bg-gray-50 dark:bg-gray-800/50 border-l-4 border-blue-200 dark:border-blue-700">
-                            <div className="px-8 py-4">
-                              <div className="grid grid-cols-12 gap-x-4 items-center p-2 rounded-t-md font-bold italic text-gray-600 dark:text-gray-400 text-xs border-b border-gray-200 dark:border-gray-700">
-                                <div
-                                  className="col-span-3 cursor-pointer flex items-center"
-                                  onClick={() =>
-                                    requestSubSort(categoryId, "name")
-                                  }
-                                >
-                                  <span className="ml-4">📦 {t("device_name")}</span>
+                      </div>
+                      <div className="text-sm font-medium text-yellow-600 dark:text-yellow-400">
+                        {isExpanded ? t("collapse") : t("expand")}
+                      </div>
+                    </div>
+
+                    {/* Category Items */}
+                    {isExpanded && (
+                      <div className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+                        {sortedSubItems.map((item, itemIndex) => (
+                          <div
+                            key={item.id}
+                            className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 animate-slideInLeft border-l-4 border-transparent hover:border-yellow-400 dark:hover:border-yellow-500"
+                            style={{
+                              animationDelay: `${itemIndex * 0.03}s`,
+                            }}
+                          >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <div className="w-2 h-2 bg-yellow-400 dark:bg-yellow-500 rounded-full flex-shrink-0"></div>
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-amber-400 dark:from-orange-500 dark:to-amber-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow">
+                                  <Package className="w-4 h-4 text-white" />
                                 </div>
-                                <div
-                                  className="col-span-2 cursor-pointer"
-                                  onClick={() =>
-                                    requestSubSort(categoryId, "serialNumber")
-                                  }
-                                >
-                                  {t("serial_number_sn")}
-                                </div>
-                                <div
-                                  className="col-span-2 cursor-pointer"
-                                  onClick={() =>
-                                    requestSubSort(
-                                      categoryId,
-                                      "allocationDetails.recipientName"
-                                    )
-                                  }
-                                >
-                                  {t("recipient")}
-                                </div>
-                                <div
-                                  className="col-span-2 cursor-pointer"
-                                  onClick={() =>
-                                    requestSubSort(
-                                      categoryId,
-                                      "allocationDetails.department"
-                                    )
-                                  }
-                                >
-                                  {t("department")}
-                                </div>
-                                <div
-                                  className="col-span-1 cursor-pointer"
-                                  onClick={() =>
-                                    requestSubSort(
-                                      categoryId,
-                                      "allocationDetails.handoverDate"
-                                    )
-                                  }
-                                >
-                                  {t("handover_date")}
-                                </div>
-                                <div className="col-span-2 text-center">
-                                  {t("actions")}
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-gray-900 dark:text-white truncate">
+                                    {item.name}
+                                  </p>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate font-mono">
+                                    SN: {item.serialNumber || "N/A"}
+                                  </p>
                                 </div>
                               </div>
-                            <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                              {sortedSubItems.map((item, itemIndex) => (
-                                <div
-                                  key={item.id}
-                                  className="grid grid-cols-12 gap-x-4 items-center py-3 hover:bg-gray-100 dark:hover:bg-gray-700/30 animate-slideInLeft transition-all duration-300 border-l-2 border-transparent hover:border-blue-300"
-                                  style={{
-                                    animationDelay: `${itemIndex * 0.05}s`,
-                                  }}
-                                >
-                                  <div className="col-span-3 flex items-center gap-3">
-                                    <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0 ml-4"></div>
-                                    <span className="font-medium text-gray-800 dark:text-gray-200 truncate">
-                                      {item.name}
-                                    </span>
-                                  </div>
-                                  <div className="col-span-2 text-left truncate font-mono">
-                                    {item.serialNumber || "N/A"}
-                                  </div>
-                                  <div className="col-span-2 text-left truncate">
-                                    {item.allocationDetails?.recipientName ||
-                                      "N/A"}
-                                  </div>
-                                  <div className="col-span-2 text-left truncate">
-                                    {item.allocationDetails?.department
-                                      ? departmentsList.find(
-                                          (dept) =>
-                                            dept.id ===
-                                            item.allocationDetails.department
-                                        )?.name ||
-                                        item.allocationDetails.department
+                            </div>
+                            
+                            {/* User Info */}
+                            <div className="flex items-center gap-2 ml-4 min-w-0 flex-1">
+                              <div className="flex items-center gap-2 text-yellow-600 dark:text-yellow-400">
+                                <User className="w-4 h-4 flex-shrink-0" />
+                                <div className="min-w-0">
+                                  <p className="text-sm font-medium truncate">
+                                    {item.allocationDetails?.recipientName || "N/A"}
+                                  </p>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                    {item.allocationDetails?.position
+                                      ? t(item.allocationDetails.position)
                                       : "N/A"}
-                                  </div>
-                                  <div className="col-span-1 text-left truncate">
-                                    {formatDate(
-                                      item.allocationDetails?.handoverDate
-                                    )}
-                                  </div>
-                                  <div className="col-span-2 flex items-center justify-center space-x-1">
-                                    <button
-                                      onClick={() => onRecallItem(item)}
-                                      className="p-2 rounded-lg text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 animate-hoverScale transition-all duration-200"
-                                      title={t("recall_device")}
-                                    >
-                                      <RotateCcw className="w-4 h-4" />
-                                    </button>
-                                    <button
-                                      onClick={() => onMarkDamaged(item)}
-                                      className="p-2 rounded-lg text-orange-500 hover:bg-orange-100 dark:hover:bg-orange-900/30 animate-hoverScale transition-all duration-200"
-                                      title={t("maintenance")}
-                                    >
-                                      <Wrench className="w-4 h-4" />
-                                    </button>
-                                  </div>
+                                  </p>
                                 </div>
-                              ))}
+                              </div>
+                            </div>
+
+                            {/* Department */}
+                            <div className="text-xs text-gray-600 dark:text-gray-300 ml-4 min-w-0">
+                              🏢 {item.allocationDetails?.department
+                                ? departmentsList.find(
+                                    (dept) =>
+                                      dept.id === item.allocationDetails.department
+                                  )?.name || item.allocationDetails.department
+                                : "N/A"}
+                            </div>
+
+                            {/* Handover Date */}
+                            <div className="text-xs text-gray-500 dark:text-gray-400 ml-4 min-w-0">
+                              🤝 {formatDate(item.allocationDetails?.handoverDate)}
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex items-center gap-2 ml-4">
+                              <button
+                                onClick={() => onEditAllocation(item)}
+                                className="p-2 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200"
+                                title={t("edit_recipient")}
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => onRecallItem(item)}
+                                className="p-2 text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all duration-200"
+                                title={t("recall_device")}
+                              >
+                                <RotateCcw className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => onMarkDamaged(item)}
+                                className="p-2 text-yellow-500 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 rounded-lg transition-all duration-200"
+                                title={t("maintenance")}
+                              >
+                                <Wrench className="w-4 h-4" />
+                              </button>
                             </div>
                           </div>
-                        </div>
-                        </td>
-                      </tr>
+                        ))}
+                      </div>
                     )}
-                  </React.Fragment>
+                  </div>
                 );
               })}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>

@@ -8,6 +8,7 @@ import {
   User,
   Building,
   Calendar,
+  Edit,
 } from "lucide-react";
 import { useDynamicData } from "../../hooks/useDynamicData";
 
@@ -15,6 +16,7 @@ const MobileAllocatedView = ({
   items,
   onRecallItem,
   onMarkDamaged,
+  onEditAllocation,
   categories,
   t,
   filters,
@@ -196,7 +198,10 @@ const MobileAllocatedView = ({
                   <Building className="w-4 h-4 text-gray-400" />
                   <span className="font-medium">
                     {item.allocationDetails?.department
-                      ? (departmentsList.find(dept => dept.id === item.allocationDetails.department)?.name || item.allocationDetails.department)
+                      ? departmentsList.find(
+                          (dept) =>
+                            dept.id === item.allocationDetails.department
+                        )?.name || item.allocationDetails.department
                       : "N/A"}
                   </span>
                 </div>
@@ -212,6 +217,13 @@ const MobileAllocatedView = ({
               </div>
             </div>
             <div className="border-t dark:border-gray-600 pt-3 flex justify-end space-x-2">
+              <button
+                onClick={() => onEditAllocation(item)}
+                className="mobile-btn-icon mobile-optimized"
+                title={t("edit_recipient")}
+              >
+                <Edit className="w-5 h-5 text-blue-500" />
+              </button>
               <button
                 onClick={() => onRecallItem(item)}
                 className="mobile-btn-icon mobile-optimized"

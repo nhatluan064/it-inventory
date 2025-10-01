@@ -864,6 +864,52 @@ export const useInventory = (currentUser, t, setActiveTab) => {
     [currentUser, equipment, logTransaction, t, departmentsList, positionsList]
   );
 
+  const updateAllocationDetails = useCallback(
+    async (item, updatedDetails) => {
+      const dataToUpdate = {
+        allocationDetails: {
+          ...item.allocationDetails,
+          ...updatedDetails,
+          handoverDate: item.allocationDetails.handoverDate, // Keep original handover date
+          condition: item.allocationDetails.condition, // Keep original condition
+        },
+      };
+
+      await updateDoc(
+        doc(db, "users", currentUser.uid, "equipment", item.id),
+        dataToUpdate
+      );
+
+      setEquipment(
+        equipment.map((e) => (e.id === item.id ? { ...e, ...dataToUpdate } : e))
+      );
+
+      // Find department and position names for logging
+      const departmentName =
+        departmentsList?.find((dept) => dept.id === updatedDetails.department)
+          ?.name || updatedDetails.department;
+      const positionName =
+        positionsList?.find((pos) => pos.id === updatedDetails.position)
+          ?.name || updatedDetails.position;
+
+      await logTransaction({
+        type: "allocation",
+        reason: "update",
+        itemName: item.name,
+        details: {
+          to: updatedDetails.recipientName,
+          department: departmentName,
+          position: positionName,
+        },
+      });
+
+      toast.success(
+        t("toast_allocation_updated_successfully", { itemName: item.name })
+      );
+    },
+    [currentUser, equipment, logTransaction, t, departmentsList, positionsList]
+  );
+
   const recallItem = useCallback(
     async (item, noteValue, isNoteKey) => {
       const condition = {
@@ -1258,6 +1304,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
     updateItem,
     deleteItem,
     allocateItem,
+    updateAllocationDetails,
     recallItem,
     markAsDamaged,
     updateMaintenanceNote,

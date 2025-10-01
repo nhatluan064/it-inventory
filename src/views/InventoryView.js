@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { Search, Edit, Trash2, Eye, LogOut, Plus, User } from "lucide-react";
+import { Search, Edit, Trash2, Eye, LogOut, Plus, User, ChevronDown, ChevronRight, Package } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 import { AnimatedButton } from "../components/AnimatedButton";
 
@@ -221,248 +221,170 @@ const InventoryView = ({
         </div>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">{/* Table container animation */}
-        <div className="flex-grow overflow-y-auto hide-scrollbar">
-          <table className="w-full text-xs table-fixed">
-            <thead className="bg-white dark:bg-gray-800 sticky top-0 z-10">
-              <tr>
-                <th
-                  className="px-4 py-3.5 text-left font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 cursor-pointer select-none w-1/3"
-                  onClick={handleCategorySort}
-                >
-                  {t("category")}
-                  {categorySortConfig.direction === "ascending" ? " ▲" : " ▼"}
-                </th>
-                <th className="px-4 py-3.5 text-center font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 w-24">
-                  {t("quantity")}
-                </th>
-                <th className="px-4 py-3.5 text-center font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 w-32">
-                  {t("actions")}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-              {Object.entries(groupedByCategory).map(
-                ([categoryId, items], categoryIndex) => {
-                  const isOpening = animatingRows[categoryId] === "opening";
-                  const isClosing = animatingRows[categoryId] === "closing";
-                  const category = categories.find((c) => c.id === categoryId);
-                  const subSortConfig = subSortConfigs[categoryId] || {
-                    key: "name",
-                    direction: "ascending",
-                  };
-                  const sortedSubItems = [...items].sort((a, b) => {
-                    const aValue = a[subSortConfig.key] || "";
-                    const bValue = b[subSortConfig.key] || "";
-                    const collator = new Intl.Collator(undefined, {
-                      numeric: true,
-                      sensitivity: "base",
-                    });
-                    const comparison = collator.compare(
-                      aValue.toString(),
-                      bValue.toString()
-                    );
-                    return subSortConfig.direction === "ascending"
-                      ? comparison
-                      : -comparison;
+      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp p-6">
+        {/* Card-based container */}
+        <div className="flex-grow overflow-y-auto hide-scrollbar space-y-3">
+              {Object.entries(groupedByCategory).map(([categoryId, items], catIndex) => {
+                const isExpanded = expandedRows[categoryId];
+                const category = categories.find((c) => c.id === categoryId);
+                const subSortConfig = subSortConfigs[categoryId] || {
+                  key: "name",
+                  direction: "ascending",
+                };
+                const sortedSubItems = [...items].sort((a, b) => {
+                  const aValue = a[subSortConfig.key] || "";
+                  const bValue = b[subSortConfig.key] || "";
+                  const collator = new Intl.Collator(undefined, {
+                    numeric: true,
+                    sensitivity: "base",
                   });
-                  return (
-                    <React.Fragment key={categoryId}>
-                      <tr
-                        className="bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer animate-fadeInUp transition-all duration-300"
-                        style={{ animationDelay: `${categoryIndex * 0.1}s` }}
-                        onClick={() => toggleExpand(categoryId)}
-                      >
-                        <td className="px-4 py-3 font-semibold capitalize">
-                          <span>{category?.name || categoryId}</span>
-                        </td>
-                        <td className="px-4 py-3 text-center font-semibold">
-                          <div className="flex flex-col items-center">
-                            <span>{items.length}</span>
-                            <span className="text-gray-400 dark:text-gray-500 text-[9px]">
-                              {t('label_devices')}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <div className="text-xs text-gray-500">
-                            {expandedRows[categoryId] ? '−' : '+'}
-                          </div>
-                        </td>
-                      </tr>
-                      {(expandedRows[categoryId] || isClosing) && (
-                        <tr>
-                          <td
-                            colSpan={3}
-                            className={`p-0 overflow-hidden ${
-                              isOpening ? "animate-slideDown" : ""
-                            } ${isClosing ? "animate-slideUp" : ""}`}
-                          >
-                            <div className="bg-gray-50 dark:bg-gray-800/50 border-l-4 border-blue-200 dark:border-blue-700">
-                              <div className="px-8 py-4">
-                                <div className="grid grid-cols-12 gap-x-4 items-center p-2 rounded-t-md font-bold italic text-gray-600 dark:text-gray-400 text-xs border-b border-gray-200 dark:border-gray-700">
-                                  <div
-                                    className="col-span-2 cursor-pointer flex items-center"
-                                    onClick={() =>
-                                      requestSubSort(categoryId, "name")
-                                    }
-                                  >
-                                    <span className="ml-4">📦 {t("device_name")}</span>
+                  const comparison = collator.compare(
+                    aValue.toString(),
+                    bValue.toString()
+                  );
+                  return subSortConfig.direction === "ascending"
+                    ? comparison
+                    : -comparison;
+                });
+                
+                return (
+                  <div
+                    key={categoryId}
+                    className="border-2 border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden animate-fadeIn"
+                    style={{ animationDelay: `${catIndex * 0.05}s` }}
+                  >
+                    {/* Category Header with Blue Gradient */}
+                    <div
+                      onClick={() => toggleExpand(categoryId)}
+                      className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-800/40 dark:hover:to-indigo-800/40 cursor-pointer transition-all duration-200"
+                    >
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 rounded-lg flex items-center justify-center shadow-md">
+                          {isExpanded ? (
+                            <ChevronDown className="w-5 h-5 text-white" />
+                          ) : (
+                            <ChevronRight className="w-5 h-5 text-white" />
+                          )}
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-gray-900 dark:text-white">
+                            {category?.name || categoryId}
+                          </h3>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            {items.length} {t("label_devices")}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                        {isExpanded ? t("collapse") : t("expand")}
+                      </div>
+                    </div>
+
+                    {/* Category Items */}
+                    {isExpanded && (
+                      <div className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+                        {sortedSubItems.map((item, itemIndex) => {
+                          const isInUse = item.status === "in-use";
+                          return (
+                            <div
+                              key={item.id}
+                              className={`flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 animate-slideInLeft border-l-4 border-transparent hover:border-blue-400 dark:hover:border-blue-500 ${
+                                isInUse ? "bg-blue-50 dark:bg-blue-900/20" : ""
+                              }`}
+                              style={{
+                                animationDelay: `${itemIndex * 0.03}s`,
+                              }}
+                            >
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <div className="w-2 h-2 bg-blue-400 dark:bg-blue-500 rounded-full flex-shrink-0"></div>
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                  <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-indigo-400 dark:from-blue-500 dark:to-indigo-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow">
+                                    <Package className="w-4 h-4 text-white" />
                                   </div>
-                                <div
-                                  className="col-span-2 cursor-pointer"
-                                  onClick={() =>
-                                    requestSubSort(categoryId, "serialNumber")
-                                  }
-                                >
-                                  SN
-                                </div>
-                                <div
-                                  className="col-span-2 cursor-pointer"
-                                  onClick={() =>
-                                    requestSubSort(
-                                      categoryId,
-                                      "allocationDetails.recipientName"
-                                    )
-                                  }
-                                >
-                                  {t("user_in_use")}
-                                </div>
-                                <div
-                                  className="col-span-2 cursor-pointer"
-                                  onClick={() =>
-                                    requestSubSort(categoryId, "importDate")
-                                  }
-                                >
-                                  {t("import_date")}
-                                </div>
-                                <div
-                                  className="col-span-1 cursor-pointer"
-                                  onClick={() =>
-                                    requestSubSort(
-                                      categoryId,
-                                      "allocationDetails.handoverDate"
-                                    )
-                                  }
-                                >
-                                  {t("handover_date")}
-                                </div>
-                                <div
-                                  className="col-span-1 cursor-pointer"
-                                  onClick={() =>
-                                    requestSubSort(categoryId, "location")
-                                  }
-                                >
-                                  {t("location")}
-                                </div>
-                                <div className="col-span-2 text-center">
-                                  {t("actions")}
+                                  <div className="flex-1 min-w-0">
+                                    <p className={`font-medium truncate ${
+                                      isInUse
+                                        ? "text-blue-600 dark:text-blue-400"
+                                        : "text-gray-900 dark:text-white"
+                                    }`}>
+                                      {item.name}
+                                    </p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate font-mono">
+                                      SN: {item.serialNumber || "N/A"}
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
-                              <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                                {sortedSubItems.map((item, itemIndex) => {
-                                  const isInUse = item.status === "in-use";
-                                  return (
-                                    <div
-                                      key={item.id}
-                                      className={`grid grid-cols-12 gap-x-4 items-center py-3 hover:bg-gray-100 dark:hover:bg-gray-700/30 animate-slideInLeft transition-all duration-300 border-l-2 border-transparent hover:border-blue-300 ${
-                                        isInUse
-                                          ? "bg-blue-50 dark:bg-blue-900/20"
-                                          : ""
-                                      }`}
-                                      style={{
-                                        animationDelay: `${itemIndex * 0.05}s`,
-                                      }}
-                                    >
-                                      <div
-                                        className={`col-span-2 flex items-center gap-3 ${
-                                          isInUse
-                                            ? "text-blue-600 dark:text-blue-400"
-                                            : ""
-                                        }`}
-                                      >
-                                        <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0 ml-4"></div>
-                                        <span className="font-medium text-gray-800 dark:text-gray-200 truncate">
-                                          {item.name}
-                                        </span>
-                                      </div>
-                                      <div className="col-span-2 truncate font-mono">
-                                        {item.serialNumber || "N/A"}
-                                      </div>
-                                      <div className="col-span-2 truncate">
-                                        {isInUse ? (
-                                          <div className="flex items-center gap-2">
-                                            <User className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                                            <span className="truncate">
-                                              {
-                                                item.allocationDetails
-                                                  ?.recipientName
-                                              }
-                                            </span>
-                                          </div>
-                                        ) : (
-                                          <span className="text-gray-500 italic">
-                                            {t("user_not_use")}
-                                          </span>
-                                        )}
-                                      </div>
-                                      <div className="col-span-2 truncate">
-                                        {formatDate(item.importDate)}
-                                      </div>
-                                      <div className="col-span-1 truncate">
-                                        {formatDate(
-                                          item.allocationDetails?.handoverDate
-                                        )}
-                                      </div>
-                                      <div className="col-span-1 truncate">
-                                        {t(item.location) || item.location}
-                                      </div>
-                                      <div className="col-span-2 flex items-center justify-center">
-                                        <div className="flex items-center justify-center space-x-1">
-                                          <button
-                                            onClick={() => onAllocateItem(item)}
-                                            disabled={
-                                              item.status !== "available"
-                                            }
-                                            className="p-2 rounded-lg text-blue-500 hover:bg-blue-100 disabled:opacity-30 animate-hoverScale transition-all duration-200"
-                                          >
-                                            <LogOut className="w-4 h-4" />
-                                          </button>
-                                          <button
-                                            onClick={() => onViewItem(item)}
-                                            className="p-2 rounded-lg text-emerald-500 hover:bg-emerald-100 animate-hoverScale transition-all duration-200"
-                                          >
-                                            <Eye className="w-4 h-4" />
-                                          </button>
-                                          <button
-                                            onClick={() => onEditItem(item)}
-                                            className="p-2 rounded-lg text-amber-500 hover:bg-amber-100 animate-hoverScale transition-all duration-200"
-                                          >
-                                            <Edit className="w-4 h-4" />
-                                          </button>
-                                          <button
-                                            onClick={() => onDeleteItem(item)}
-                                            className="p-2 rounded-lg text-red-500 hover:bg-red-100 animate-hoverScale transition-all duration-200"
-                                          >
-                                            <Trash2 className="w-4 h-4" />
-                                          </button>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
+                              
+                              {/* User Info */}
+                              <div className="flex items-center gap-2 ml-4 min-w-0 flex-1">
+                                {isInUse ? (
+                                  <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+                                    <User className="w-4 h-4 flex-shrink-0" />
+                                    <span className="text-sm truncate">
+                                      {item.allocationDetails?.recipientName}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <span className="text-sm text-gray-500 italic">
+                                    {t("user_not_use")}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Dates */}
+                              <div className="flex flex-col text-xs text-gray-500 dark:text-gray-400 ml-4 min-w-0">
+                                <span>📅 {formatDate(item.importDate)}</span>
+                                {isInUse && (
+                                  <span>🤝 {formatDate(item.allocationDetails?.handoverDate)}</span>
+                                )}
+                              </div>
+
+                              {/* Location */}
+                              <div className="text-xs text-gray-600 dark:text-gray-300 ml-4 min-w-0">
+                                📍 {t(item.location) || item.location}
+                              </div>
+
+                              {/* Actions */}
+                              <div className="flex items-center gap-2 ml-4">
+                                <button
+                                  onClick={() => onAllocateItem(item)}
+                                  disabled={item.status !== "available"}
+                                  className="p-2 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200 disabled:opacity-30"
+                                  title={t("allocate")}
+                                >
+                                  <LogOut className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => onViewItem(item)}
+                                  className="p-2 text-emerald-500 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-lg transition-all duration-200"
+                                  title={t("view")}
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => onEditItem(item)}
+                                  className="p-2 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-lg transition-all duration-200"
+                                  title={t("edit")}
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => onDeleteItem(item)}
+                                  className="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all duration-200"
+                                  title={t("delete")}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
                               </div>
                             </div>
-                          </div>
-                          </td>
-                        </tr>
-                      )}
-                    </React.Fragment>
-                  );
-                }
-              )}
-            </tbody>
-          </table>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
         </div>
       </div>
     </div>

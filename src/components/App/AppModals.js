@@ -189,6 +189,7 @@ const AppModals = ({
         masterItems={masterItems}
         pendingItems={pendingPurchaseItems}
         onAddItem={inventory.requestFromMaster}
+        categories={categories}
         t={t}
       />
 
