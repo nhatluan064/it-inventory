@@ -294,13 +294,8 @@ const MasterListView = ({
                                     <div className="col-span-2 flex items-center justify-center gap-2">
                                       <button
                                         onClick={() => onEditItem(item)}
-                                        disabled={isModelInUse}
-                                        className="p-2 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-lg disabled:opacity-40 animate-hoverScale transition-all duration-200"
-                                        title={
-                                          isModelInUse
-                                            ? t("cannot_edit_used_model")
-                                            : t("edit")
-                                        }
+                                        className="p-2 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-lg animate-hoverScale transition-all duration-200"
+                                        title={t("edit")}
                                       >
                                         <Edit2 className="w-4 h-4" />
                                       </button>
