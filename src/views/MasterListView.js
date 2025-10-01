@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Plus, Search, Edit2, Trash2, Check, X } from "lucide-react";
+import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useSort } from "../hooks/useSort";
 
@@ -7,7 +7,6 @@ const MasterListView = ({
   allItems,
   onAddType,
   onEditItem,
-  onQuickUpdateMasterCategory,
   onBulkMoveCategory,
   onDeleteItem,
   categories,
@@ -19,8 +18,7 @@ const MasterListView = ({
   const [expandedRows, setExpandedRows] = useState({});
   const [animatingRows, setAnimatingRows] = useState({});
   const [subSortConfigs, setSubSortConfigs] = useState({});
-  const [editingCategoryId, setEditingCategoryId] = useState(null);
-  const [editingCategoryValue, setEditingCategoryValue] = useState("");
+  const [bulkTargets, setBulkTargets] = useState({});
 
   // State để quản lý sorting category riêng
   const [categorySortConfig, setCategorySortConfig] = useState({
@@ -100,7 +98,13 @@ const MasterListView = ({
     });
 
     return sortedGrouped;
-  }, [sortedItems, categories, categorySortConfig, selectedCategory, searchQuery]);
+  }, [
+    sortedItems,
+    categories,
+    categorySortConfig,
+    selectedCategory,
+    searchQuery,
+  ]);
 
   // Reset expanded rows when category filter changes
   useEffect(() => {
@@ -137,8 +141,10 @@ const MasterListView = ({
   };
 
   return (
-    <div className="h-full flex flex-col gap-6 animate-fadeIn">{/* Page transition */}
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">{/* Header animation */}
+    <div className="h-full flex flex-col gap-6 animate-fadeIn">
+      {/* Page transition */}
+      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">
+        {/* Header animation */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
@@ -174,27 +180,35 @@ const MasterListView = ({
           >
             {categoryOptions.map((cat) => (
               <option key={cat.id} value={cat.id}>
-                {`${cat.name} (${cat.id === "all" ? allItems.length : categoryCounts[cat.id] || 0})`}
+                {`${cat.name} (${
+                  cat.id === "all"
+                    ? allItems.length
+                    : categoryCounts[cat.id] || 0
+                })`}
               </option>
             ))}
           </select>
         </div>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">{/* Table container animation */}
+      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">
+        {/* Table container animation */}
         <div className="flex-grow overflow-y-auto hide-scrollbar">
           <table className="w-full text-xs table-fixed">
             <thead className="bg-white dark:bg-gray-800 sticky top-0 z-10">
               <tr>
                 <th
-                  className="px-4 py-3.5 text-left font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 cursor-pointer select-none"
+                  className="px-4 py-3.5 text-left font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 cursor-pointer select-none w-1/2"
                   onClick={handleCategorySort}
                 >
                   {t("category")}
                   {categorySortConfig.direction === "ascending" ? " ▲" : " ▼"}
                 </th>
-                <th className="px-4 py-3.5 text-right font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 w-32">
+                <th className="px-4 py-3.5 text-center font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 w-24">
                   {t("quantity")}
+                </th>
+                <th className="px-4 py-3.5 text-center font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 w-32">
+                  {t("actions")}
                 </th>
               </tr>
             </thead>
@@ -227,213 +241,233 @@ const MasterListView = ({
                   <React.Fragment key={categoryId}>
                     <tr
                       className="bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer animate-fadeInUp transition-all duration-300"
-                      style={{ animationDelay: `${Object.keys(groupedByCategory).indexOf(categoryId) * 0.1}s` }}
+                      style={{
+                        animationDelay: `${
+                          Object.keys(groupedByCategory).indexOf(categoryId) *
+                          0.1
+                        }s`,
+                      }}
                       onClick={() => toggleExpand(categoryId)}
                     >
                       <td className="px-4 py-3 font-semibold capitalize">
-                        {category?.name || categoryId}
+                        <span>{category?.name || categoryId}</span>
                       </td>
-                      <td className="px-4 py-3 text-right font-semibold">
-                        {items.length}
+                      <td className="px-4 py-3 text-center font-semibold">
+                        <div className="flex flex-col items-center">
+                          <span>{items.length}</span>
+                          <span className="text-gray-400 dark:text-gray-500 text-[9px]">
+                            {(() => {
+                              const all = (fullEquipmentList || []).filter(
+                                (it) => it.category === categoryId
+                              );
+                              const d = all.filter(
+                                (it) => it.status !== "master"
+                              ).length;
+                              const m = all.length - d;
+                              return `${d} ${t("label_devices")} + ${m} ${t(
+                                "label_masters"
+                              )}`;
+                            })()}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        {/* Bulk Actions */}
+                        <div
+                          className="flex items-center justify-center gap-2"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                            {t("from_category")}:
+                          </div>
+                          <select
+                            className="px-2 py-1 text-[10px] border rounded dark:bg-gray-700 dark:border-gray-600"
+                            value={bulkTargets[categoryId] ?? ""}
+                            onChange={(e) => {
+                              setBulkTargets((prev) => ({
+                                ...prev,
+                                [categoryId]: e.target.value,
+                              }));
+                            }}
+                          >
+                            <option value="" disabled>
+                              {t("select_target_category")}
+                            </option>
+                            {(categories || [])
+                              .filter((c) => c.id !== "all")
+                              .map((c) => (
+                                <option key={c.id} value={c.id}>
+                                  {c.name}
+                                </option>
+                              ))}
+                          </select>
+                          <button
+                            className="px-2 py-1 text-[10px] rounded border border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-700 dark:text-blue-300 dark:hover:bg-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={
+                              !bulkTargets[categoryId] ||
+                              bulkTargets[categoryId] === categoryId
+                            }
+                            onClick={() => {
+                              const toCategoryId = bulkTargets[categoryId];
+                              if (toCategoryId === categoryId) return;
+                              const allAffected = (
+                                fullEquipmentList || []
+                              ).filter((it) => it.category === categoryId);
+                              const deviceCount = allAffected.filter(
+                                (it) => it.status !== "master"
+                              ).length;
+                              const masterCount =
+                                allAffected.length - deviceCount;
+                              const affectedCount = allAffected.length;
+                              const fromName =
+                                (categories || []).find(
+                                  (c) => c.id === categoryId
+                                )?.name || categoryId;
+                              const toName =
+                                (categories || []).find(
+                                  (c) => c.id === toCategoryId
+                                )?.name || toCategoryId;
+                              // eslint-disable-next-line no-alert
+                              const ok = window.confirm(
+                                `${t("confirm_bulk_move_category_breakdown", {
+                                  deviceCount,
+                                  masterCount,
+                                  from: fromName,
+                                  to: toName,
+                                })}\n(${t("confirm_bulk_move_category", {
+                                  count: affectedCount,
+                                  from: fromName,
+                                  to: toName,
+                                })})`
+                              );
+                              if (!ok) return;
+                              onBulkMoveCategory?.({
+                                fromCategoryId: categoryId,
+                                toCategoryId,
+                              })
+                                .then((res) => {
+                                  if (res) {
+                                    toast.success(
+                                      t("toast_bulk_move_success", {
+                                        deviceCount,
+                                        masterCount,
+                                        from: fromName,
+                                        to: toName,
+                                      })
+                                    );
+                                    setBulkTargets((prev) => ({
+                                      ...prev,
+                                      [categoryId]: toCategoryId,
+                                    }));
+                                  }
+                                })
+                                .catch(() => toast.error(t("error_occurred")));
+                            }}
+                          >
+                            {t("confirm")}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                     {(expandedRows[categoryId] || isClosing) && (
                       <tr>
                         <td
-                          colSpan={2}
+                          colSpan={3}
                           className={`p-0 overflow-hidden ${
                             isOpening ? "animate-slideDown" : ""
                           } ${isClosing ? "animate-slideUp" : ""}`}
                         >
-                          <div className="p-2 text-xs">
-                            <div className="flex items-center justify-between p-2 mb-2 rounded-md bg-gray-50 dark:bg-gray-700/30" onClick={(e) => e.stopPropagation()}>
-                              <div className="text-xs font-semibold text-gray-600 dark:text-gray-300">
-                                {t("bulk_actions")} — {t("move_all_items_in_category")}
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <select
-                                  className="px-2 py-1 text-xs border rounded dark:bg-gray-700 dark:border-gray-600"
-                                  value={categoryId}
-                                  disabled
-                                  onClick={(e) => e.stopPropagation()}
+                          <div className="bg-gray-50 dark:bg-gray-800/50 border-l-4 border-blue-200 dark:border-blue-700">
+                            <div className="px-8 py-4">
+                              <div className="grid grid-cols-12 gap-x-4 items-center p-2 rounded-t-md font-bold italic text-gray-600 dark:text-gray-400 text-xs border-b border-gray-200 dark:border-gray-700">
+                                <div
+                                  className="col-span-6 cursor-pointer flex items-center"
+                                  onClick={() =>
+                                    requestSubSort(categoryId, "name")
+                                  }
                                 >
-                                  {(categories || [])
-                                    .filter((c) => c.id !== "all")
-                                    .map((c) => (
-                                      <option key={c.id} value={c.id}>
-                                        {c.name}
-                                      </option>
-                                    ))}
-                                </select>
-                                <select
-                                  className="px-2 py-1 text-xs border rounded dark:bg-gray-700 dark:border-gray-600"
-                                  defaultValue={categoryId}
-                                  onClick={(e) => e.stopPropagation()}
-                                  onChange={(e) => {
-                                    const toCategoryId = e.target.value;
-                                    if (toCategoryId === categoryId) {
-                                      toast(t("no_changes"));
-                                      return;
-                                    }
-                                    // eslint-disable-next-line no-alert
-                                    const ok = window.confirm(
-                                      t("confirm_bulk_move_category")
-                                    );
-                                    if (!ok) return;
-                                    onBulkMoveCategory?.({ fromCategoryId: categoryId, toCategoryId })
-                                      .then((res) => {
-                                        if (res) {
-                                          const toName = (categories || []).find((c) => c.id === toCategoryId)?.name || toCategoryId;
-                                          toast.success(
-                                            t("toast_info_updated_successfully", { category: toName })
-                                          );
-                                        }
-                                      })
-                                      .catch(() => toast.error(t("error_occurred")));
-                                  }}
+                                  <span className="ml-4">
+                                    📋 {t("master_item_name")}
+                                  </span>
+                                </div>
+                                <div
+                                  className="col-span-2 cursor-pointer text-center pl-16"
+                                  onClick={() =>
+                                    requestSubSort(categoryId, "usage_status")
+                                  }
                                 >
-                                  {(categories || [])
-                                    .filter((c) => c.id !== "all")
-                                    .map((c) => (
-                                      <option key={c.id} value={c.id}>
-                                        {c.name}
-                                      </option>
-                                    ))}
-                                </select>
+                                  {t("usage_status")}
+                                </div>
+                                <div className="col-span-4 pl-16 text-center">
+                                  {t("actions")}
+                                </div>
                               </div>
-                            </div>
-                            <div className="grid grid-cols-12 gap-x-4 items-center p-2 rounded-t-md font-bold italic text-gray-600 dark:text-gray-400">
-                              <div
-                                className="col-span-6 cursor-pointer"
-                                onClick={() =>
-                                  requestSubSort(categoryId, "name")
-                                }
-                              >
-                                {t("master_item_name")}
-                              </div>
-                              <div
-                                className="col-span-4 cursor-pointer"
-                                onClick={() =>
-                                  requestSubSort(categoryId, "usage_status")
-                                }
-                              >
-                                {t("usage_status")}
-                              </div>
-                              <div className="col-span-2 text-center">
-                                {t("actions")}
-                              </div>
-                            </div>
-                            <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                              {sortedSubItems.map((item, itemIndex) => {
-                                const isModelInUse = fullEquipmentList.some(
-                                  (e) =>
-                                    e.name.split(" (User:")[0].trim() ===
-                                      item.name &&
-                                    e.category === item.category &&
-                                    e.status !== "master"
-                                );
-                                const statusText = isModelInUse
-                                  ? t("has_been_used")
-                                  : t("never_used");
-                                const statusColor = isModelInUse
-                                  ? "text-green-600 dark:text-green-400 font-semibold"
-                                  : "text-gray-500 dark:text-gray-400";
-                                return (
-                                  <div
-                                    key={item.id}
-                                    className="grid grid-cols-12 gap-x-4 items-center py-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 animate-slideInLeft transition-all duration-300"
-                                    style={{ animationDelay: `${itemIndex * 0.05}s` }}
-                                  >
-                                    <div className="col-span-6 truncate font-semibold flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
-                                      <span>{item.name}</span>
-                                      {editingCategoryId === item.id ? (
-                                        <div className="flex items-center gap-2">
-                                          <select
-                                            className="px-2 py-1 text-xs border rounded dark:bg-gray-700 dark:border-gray-600"
-                                            value={editingCategoryValue}
-                                            onChange={(e) => setEditingCategoryValue(e.target.value)}
-                                          >
-                                            {(categories || [])
-                                              .filter((c) => c.id !== "all")
-                                              .map((c) => (
-                                                <option key={c.id} value={c.id}>
-                                                  {c.name}
-                                                </option>
-                                              ))}
-                                          </select>
-                                          <button
-                                            className="p-1 rounded text-green-600 hover:bg-green-100 dark:hover:bg-green-900/40"
-                                            onClick={async (e) => {
-                                              e.stopPropagation();
-                                              if (!editingCategoryValue) return;
-                                              if (editingCategoryValue === item.category) {
-                                                toast(t("no_changes"));
-                                                return;
-                                              }
-                                              const ok = await onQuickUpdateMasterCategory?.({
-                                                id: item.id,
-                                                name: item.name,
-                                                category: editingCategoryValue,
-                                              });
-                                              if (ok) {
-                                                const newName = (categories || []).find(c => c.id === editingCategoryValue)?.name || editingCategoryValue;
-                                                toast.success(t("toast_info_updated_successfully", { category: newName }));
-                                                setEditingCategoryId(null);
-                                              } else {
-                                                // Keep editor open to let user choose another value
-                                                toast.error(t("error_occurred"));
-                                              }
-                                            }}
-                                            title={t("save")}
-                                          >
-                                            <Check className="w-4 h-4" />
-                                          </button>
-                                          <button
-                                            className="p-1 rounded text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700/40"
-                                            onClick={(e) => { e.stopPropagation(); setEditingCategoryId(null); }}
-                                            title={t("cancel")}
-                                          >
-                                            <X className="w-4 h-4" />
-                                          </button>
-                                        </div>
-                                      ) : (
-                                        <button
-                                          className="px-2 py-1 text-xs rounded border border-amber-300 text-amber-600 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-900/20"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setEditingCategoryId(item.id);
-                                            setEditingCategoryValue(item.category);
-                                          }}
-                                          title={t("category")}
-                                        >
-                                          {t("change")} {t("category")}
-                                        </button>
-                                      )}
-                                    </div>
+                              <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                                {sortedSubItems.map((item, itemIndex) => {
+                                  const isModelInUse = fullEquipmentList.some(
+                                    (e) =>
+                                      e.name.split(" (User:")[0].trim() ===
+                                        item.name &&
+                                      e.category === item.category &&
+                                      e.status !== "master"
+                                  );
+                                  const statusText = isModelInUse
+                                    ? t("has_been_used")
+                                    : t("never_used");
+                                  const statusColor = isModelInUse
+                                    ? "text-green-600 dark:text-green-400 font-semibold"
+                                    : "text-gray-500 dark:text-gray-400";
+                                  return (
                                     <div
-                                      className={`col-span-4 truncate ${statusColor} flex items-center`}
+                                      key={item.id}
+                                      className="grid grid-cols-12 gap-x-4 items-center py-3 hover:bg-gray-100 dark:hover:bg-gray-700/30 animate-slideInLeft transition-all duration-300 border-l-2 border-transparent hover:border-blue-300"
+                                      style={{
+                                        animationDelay: `${itemIndex * 0.05}s`,
+                                      }}
                                     >
-                                      {statusText}
-                                    </div>
-                                    <div className="col-span-2 flex items-center justify-center gap-2">
-                                      <button
-                                        onClick={() => onEditItem(item)}
-                                        className="p-2 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-lg animate-hoverScale transition-all duration-200"
-                                        title={t("edit")}
+                                      <div
+                                        className="col-span-6 flex items-center gap-3"
+                                        onClick={(e) => e.stopPropagation()}
                                       >
-                                        <Edit2 className="w-4 h-4" />
-                                      </button>
-                                      <button
-                                        onClick={() => onDeleteItem(item)}
-                                        className="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg animate-hoverScale transition-all duration-200"
-                                        title={t("delete")}
+                                        <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0 ml-4"></div>
+                                        <div className="flex-1">
+                                          <span className="font-medium text-gray-800 dark:text-gray-200">
+                                            {item.name}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <div
+                                        className={`col-span-2 ${statusColor} flex items-center text-sm justify-center pl-16`}
                                       >
-                                        <Trash2 className="w-4 h-4" />
-                                      </button>
+                                        <div
+                                          className={`w-2 h-2 rounded-full mr-2 ${
+                                            isModelInUse
+                                              ? "bg-green-400"
+                                              : "bg-gray-400"
+                                          }`}
+                                        ></div>
+                                        {statusText}
+                                      </div>
+                                      <div className="col-span-4 flex items-center justify-center gap-4 pl-16">
+                                        <button
+                                          onClick={() => onEditItem(item)}
+                                          className="p-2 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-lg animate-hoverScale transition-all duration-200 border border-transparent hover:border-amber-300"
+                                          title={t("edit")}
+                                        >
+                                          <Edit2 className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                          onClick={() => onDeleteItem(item)}
+                                          className="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg animate-hoverScale transition-all duration-200 border-transparent hover:border-red-300"
+                                          title={t("delete")}
+                                        >
+                                          <Trash2 className="w-4 h-4" />
+                                        </button>
+                                      </div>
                                     </div>
-                                  </div>
-                                );
-                              })}
+                                  );
+                                })}
+                              </div>
                             </div>
                           </div>
                         </td>

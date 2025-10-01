@@ -114,40 +114,43 @@ const MobileReportsView = ({ transactions, t, categories }) => {
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const renderDetails = useCallback((trans) => {
-    // ... Tái sử dụng hàm renderDetails từ bản Desktop ...
-    if (!trans.details) return null;
-    const details = trans.details;
-    if (details.note) return `Note: ${details.note}`;
-    if (details.serials) return `SNs: ${details.serials.join(", ")}`;
-    if (details.recipientName)
-      return `${t("recipient")}: ${details.recipientName}`;
-    if (details.returnCondition)
-      return `${t("condition_on_recall")}: ${t(details.returnCondition)}`;
-    if (details.recalledFrom)
-      return `${t("recalled_from_user")}: ${details.recalledFrom}`;
-    
-    // Handle allocation details with proper labels
-    const allocationLabels = {
-      to: t("recipient"),
-      department: t("department"),
-      position: t("position"),
-      from: t("from_user"),
-    };
-    
-    return Object.entries(details)
-      .map(([key, value]) => {
-        const label = allocationLabels[key] || t(key) || key;
-        // Resolve category ID to name
-        let displayValue = value;
-        if (key === "category" && categories) {
-          const category = categories.find(cat => cat.id === value);
-          displayValue = category ? category.name : value;
-        }
-        return `${label}: ${displayValue}`;
-      })
-      .join("; ");
-  }, [t, categories]);
+  const renderDetails = useCallback(
+    (trans) => {
+      // ... Tái sử dụng hàm renderDetails từ bản Desktop ...
+      if (!trans.details) return null;
+      const details = trans.details;
+      if (details.note) return `Note: ${details.note}`;
+      if (details.serials) return `SNs: ${details.serials.join(", ")}`;
+      if (details.recipientName)
+        return `${t("recipient")}: ${details.recipientName}`;
+      if (details.returnCondition)
+        return `${t("condition_on_recall")}: ${t(details.returnCondition)}`;
+      if (details.recalledFrom)
+        return `${t("recalled_from_user")}: ${details.recalledFrom}`;
+
+      // Handle allocation details with proper labels
+      const allocationLabels = {
+        to: t("recipient"),
+        department: t("department"),
+        position: t("position"),
+        from: t("from_user"),
+      };
+
+      return Object.entries(details)
+        .map(([key, value]) => {
+          const label = allocationLabels[key] || t(key) || key;
+          // Resolve category ID to name
+          let displayValue = value;
+          if (key === "category" && categories) {
+            const category = categories.find((cat) => cat.id === value);
+            displayValue = category ? category.name : value;
+          }
+          return `${label}: ${displayValue}`;
+        })
+        .join("; ");
+    },
+    [t, categories]
+  );
 
   const filteredTransactions = useMemo(() => {
     // Tái sử dụng logic lọc từ bản Desktop

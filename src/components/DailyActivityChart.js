@@ -12,18 +12,18 @@ const DailyActivityChart = ({ activityLogs }) => {
     try {
       const last7Days = [];
       const today = new Date();
-      
+
       // Tạo mảng 7 ngày gần nhất
       for (let i = 6; i >= 0; i--) {
         const date = new Date(today);
         date.setDate(date.getDate() - i);
         last7Days.push({
-          date: date.toISOString().split('T')[0],
-          label: date.toLocaleDateString('vi-VN', { 
-            weekday: 'short', 
-            day: '2-digit',
-            month: '2-digit' 
-          })
+          date: date.toISOString().split("T")[0],
+          label: date.toLocaleDateString("vi-VN", {
+            weekday: "short",
+            day: "2-digit",
+            month: "2-digit",
+          }),
         });
       }
 
@@ -31,33 +31,33 @@ const DailyActivityChart = ({ activityLogs }) => {
       const validLogs = Array.isArray(activityLogs) ? activityLogs : [];
 
       // Đếm số hoạt động theo ngày và loại
-      const dailyActivity = last7Days.map(day => {
-        const dayLogs = validLogs.filter(log => 
-          log && 
-          log.timestamp && 
-          typeof log.timestamp === 'string' &&
-          log.timestamp.split('T')[0] === day.date
+      const dailyActivity = last7Days.map((day) => {
+        const dayLogs = validLogs.filter(
+          (log) =>
+            log &&
+            log.timestamp &&
+            typeof log.timestamp === "string" &&
+            log.timestamp.split("T")[0] === day.date
         );
 
-        const importCount = dayLogs.filter(log => 
-          log.action && (
-            log.action.includes('import') || 
-            log.action === 'procurement-purchased'
-          )
+        const importCount = dayLogs.filter(
+          (log) =>
+            log.action &&
+            (log.action.includes("import") ||
+              log.action === "procurement-purchased")
         ).length;
 
-        const exportCount = dayLogs.filter(log => 
-          log.action && (
-            log.action.includes('export') || 
-            log.action.includes('allocate')
-          )
+        const exportCount = dayLogs.filter(
+          (log) =>
+            log.action &&
+            (log.action.includes("export") || log.action.includes("allocate"))
         ).length;
 
-        const maintenanceCount = dayLogs.filter(log => 
-          log.action && (
-            log.action.includes('repair') || 
-            log.action.includes('maintenance')
-          )
+        const maintenanceCount = dayLogs.filter(
+          (log) =>
+            log.action &&
+            (log.action.includes("repair") ||
+              log.action.includes("maintenance"))
         ).length;
 
         const totalCount = dayLogs.length;
@@ -67,48 +67,48 @@ const DailyActivityChart = ({ activityLogs }) => {
           import: importCount || 0,
           export: exportCount || 0,
           maintenance: maintenanceCount || 0,
-          total: totalCount || 0
+          total: totalCount || 0,
         };
       });
 
       return {
-        labels: dailyActivity.map(day => day.label),
+        labels: dailyActivity.map((day) => day.label),
         datasets: [
           {
-            label: t('chart_import_label') || 'Import',
-            data: dailyActivity.map(day => day.import),
-            backgroundColor: '#22C55E',
-            borderColor: '#16A34A',
+            label: t("chart_import_label") || "Import",
+            data: dailyActivity.map((day) => day.import),
+            backgroundColor: "#22C55E",
+            borderColor: "#16A34A",
             borderWidth: 1,
           },
           {
-            label: t('chart_export_label') || 'Export',
-            data: dailyActivity.map(day => day.export),
-            backgroundColor: '#3B82F6',
-            borderColor: '#2563EB',
+            label: t("chart_export_label") || "Export",
+            data: dailyActivity.map((day) => day.export),
+            backgroundColor: "#3B82F6",
+            borderColor: "#2563EB",
             borderWidth: 1,
           },
           {
-            label: t('chart_maintenance_label') || 'Maintenance',
-            data: dailyActivity.map(day => day.maintenance),
-            backgroundColor: '#F59E0B',
-            borderColor: '#D97706',
+            label: t("chart_maintenance_label") || "Maintenance",
+            data: dailyActivity.map((day) => day.maintenance),
+            backgroundColor: "#F59E0B",
+            borderColor: "#D97706",
             borderWidth: 1,
           },
           {
-            label: t('chart_total_activity_label') || 'Total Activity',
-            data: dailyActivity.map(day => day.total),
-            backgroundColor: '#8B5CF6',
-            borderColor: '#7C3AED',
+            label: t("chart_total_activity_label") || "Total Activity",
+            data: dailyActivity.map((day) => day.total),
+            backgroundColor: "#8B5CF6",
+            borderColor: "#7C3AED",
             borderWidth: 1,
-          }
-        ]
+          },
+        ],
       };
     } catch (error) {
-      console.error('Error creating daily activity chart data:', error);
+      console.error("Error creating daily activity chart data:", error);
       return {
         labels: [],
-        datasets: []
+        datasets: [],
       };
     }
   }, [activityLogs, t]);
@@ -118,7 +118,7 @@ const DailyActivityChart = ({ activityLogs }) => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
         labels: {
           color: theme === "dark" ? "#E5E7EB" : "#374151",
           font: {
@@ -130,19 +130,19 @@ const DailyActivityChart = ({ activityLogs }) => {
       },
       title: {
         display: true,
-        text: t('daily_activity_chart_title') || 'Hoạt động 7 ngày gần nhất',
+        text: t("daily_activity_chart_title") || "Hoạt động 7 ngày gần nhất",
         color: theme === "dark" ? "#E5E7EB" : "#374151",
         font: {
           size: 14,
-          weight: 'bold',
+          weight: "bold",
         },
         padding: {
           top: 10,
-          bottom: 20
-        }
+          bottom: 20,
+        },
       },
       datalabels: {
-        display: false // Tắt datalabels để tránh lỗi
+        display: false, // Tắt datalabels để tránh lỗi
       },
       tooltip: {
         backgroundColor: theme === "dark" ? "#374151" : "#FFFFFF",
@@ -186,7 +186,7 @@ const DailyActivityChart = ({ activityLogs }) => {
     return (
       <div className="relative h-64 md:h-80 flex items-center justify-center">
         <p className="text-gray-500 dark:text-gray-400">
-          {t('no_data_available') || 'Không có dữ liệu'}
+          {t("no_data_available") || "Không có dữ liệu"}
         </p>
       </div>
     );
@@ -195,16 +195,16 @@ const DailyActivityChart = ({ activityLogs }) => {
   try {
     return (
       <div className="relative h-64 md:h-80 overflow-hidden scrollbar-hide chart-container">
-        <Bar 
+        <Bar
           key={`daily-activity-${theme}`}
-          data={chartData} 
+          data={chartData}
           options={options}
           redraw={true}
         />
       </div>
     );
   } catch (error) {
-    console.error('DailyActivityChart render error:', error);
+    console.error("DailyActivityChart render error:", error);
     return (
       <div className="relative h-64 md:h-80 flex items-center justify-center">
         <p className="text-red-500 dark:text-red-400">

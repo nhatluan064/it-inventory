@@ -51,7 +51,8 @@ const AddEditModal = ({
         setFormData(formattedData);
       } else {
         // When adding new item, auto-select first category if available
-        const firstCategoryId = categories.find((c) => c.id !== "all")?.id || "";
+        const firstCategoryId =
+          categories.find((c) => c.id !== "all")?.id || "";
         setFormData({
           ...defaultFormState,
           category: firstCategoryId,

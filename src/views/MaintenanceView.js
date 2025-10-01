@@ -33,8 +33,10 @@ const MaintenanceView = ({
     new Date(dateString).toLocaleString(t("locale_string"));
 
   return (
-    <div className="h-full flex flex-col gap-6 animate-fadeIn">{/* Page transition */}
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">{/* Header animation */}
+    <div className="h-full flex flex-col gap-6 animate-fadeIn">
+      {/* Page transition */}
+      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">
+        {/* Header animation */}
         <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
           {t("maintenance_management")}
         </h2>
@@ -43,7 +45,8 @@ const MaintenanceView = ({
         </p>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">{/* Table container animation */}
+      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">
+        {/* Table container animation */}
         <div className="flex-grow overflow-y-auto hide-scrollbar">
           {sortedItems.length > 0 ? (
             <table className="w-full text-xs table-fixed">
@@ -80,7 +83,8 @@ const MaintenanceView = ({
                       {formatDate(item.maintenanceDate)}
                     </td>
                     <td className="px-4 align-middle">
-                      {typeof item.condition === 'object' && item.condition?.params?.note
+                      {typeof item.condition === "object" &&
+                      item.condition?.params?.note
                         ? item.condition.params.note.value
                         : item.condition || "---"}
                     </td>

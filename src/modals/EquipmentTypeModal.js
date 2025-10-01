@@ -10,6 +10,7 @@ const EquipmentTypeModal = ({
   onClose,
   onSubmit,
   categories,
+  fullEquipmentList,
   t,
   initialData,
 }) => {
@@ -22,6 +23,20 @@ const EquipmentTypeModal = ({
 
   const isEditing = !!initialData;
 
+  // Check if master item is in use (disable name editing if so)
+  const isItemInUse =
+    isEditing &&
+    fullEquipmentList &&
+    fullEquipmentList.some((e) => {
+      const baseItemName = e.name.split(" (User:")[0].trim();
+      return (
+        baseItemName === initialData.name &&
+        e.category === initialData.category &&
+        e.status !== "master" &&
+        e.status !== "pending-purchase"
+      );
+    });
+
   useEffect(() => {
     if (!show) return;
     if (isEditing) {
@@ -31,7 +46,8 @@ const EquipmentTypeModal = ({
       setCustomCategory("");
     } else {
       // Thêm mới: chọn category hợp lệ đầu tiên (bỏ id 'all') nếu có
-      const firstCategoryId = (categories || []).find((c) => c.id !== "all")?.id || "";
+      const firstCategoryId =
+        (categories || []).find((c) => c.id !== "all")?.id || "";
       setName("");
       setCategory(firstCategoryId);
       setShowCustomCategory(false);
@@ -45,22 +61,24 @@ const EquipmentTypeModal = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     let finalCategory = category;
-    
+
     // Handle custom category
     if (showCustomCategory && customCategory.trim()) {
-      const newCategoryId = await autoAddCategoryIfNotExists(customCategory.trim());
+      const newCategoryId = await autoAddCategoryIfNotExists(
+        customCategory.trim()
+      );
       if (newCategoryId) {
         finalCategory = newCategoryId;
       }
     }
-    
+
     if (!name || !finalCategory) {
       toast.error(t("please_fill_all_fields"));
       return;
     }
-    
+
     // Nếu là chế độ sửa, gửi cả ID
     const dataToSend = isEditing
       ? { ...initialData, name, category: finalCategory }
@@ -86,14 +104,24 @@ const EquipmentTypeModal = ({
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {t("master_item_name")}
             </label>
+            {isItemInUse && (
+              <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 mb-2">
+                ⚠️ {t("cannot_edit_name_item_in_use")}
+              </p>
+            )}
             <input
               type="text"
               placeholder={t("master_item_name_placeholder")}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-blue-500"
+              className={`mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-blue-500 ${
+                isItemInUse
+                  ? "bg-gray-100 dark:bg-gray-600 cursor-not-allowed opacity-60"
+                  : ""
+              }`}
               required
-              autoFocus
+              disabled={isItemInUse}
+              autoFocus={!isItemInUse}
             />
           </div>
           <div>
@@ -124,7 +152,7 @@ const EquipmentTypeModal = ({
                   + Thêm danh mục mới...
                 </option>
               </select>
-              
+
               {showCustomCategory && (
                 <div className="relative">
                   <Plus className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />

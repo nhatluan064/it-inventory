@@ -179,15 +179,21 @@ export const translations = {
     toast_moved_to_liquidation:
       "Đã chuyển {itemName} vào danh sách chờ thanh lý.",
     toast_error_logging_transaction: "Lỗi khi ghi nhận lịch sử.",
-    toast_duplicate_model_name_in_category: "Một mẫu khác có tên '{itemName}' và danh mục '{category}' đã tồn tại.",
-    toast_master_item_auto_created: "Đã tạo mẫu mới: {itemName} trong danh mục '{category}'",
-    toast_category_empty_suggestion: "💡 Danh mục '{category}' đã trống. Bạn có thể xóa nó trong Cài đặt.",
-    toast_category_only_masters_suggestion: "💡 Danh mục '{category}' chỉ còn mẫu trống. Bạn có thể xóa nó trong Cài đặt.",
+    toast_duplicate_model_name_in_category:
+      "Một mẫu khác có tên '{itemName}' và danh mục '{category}' đã tồn tại.",
+    toast_master_item_auto_created:
+      "Đã tạo mẫu mới: {itemName} trong danh mục '{category}'",
+    toast_category_empty_suggestion:
+      "💡 Danh mục '{category}' đã trống. Bạn có thể xóa nó trong Cài đặt.",
+    toast_category_only_masters_suggestion:
+      "💡 Danh mục '{category}' chỉ còn mẫu trống. Bạn có thể xóa nó trong Cài đặt.",
     toast_item_not_found_for_update: "Không tìm thấy thiết bị để cập nhật.",
     toast_error_resetting_data: "Lỗi khi reset dữ liệu.",
     toast_batch_update_failed: "Cập nhật hàng loạt thất bại.",
-    toast_email_not_verified: "Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email của bạn!",
-    toast_user_not_found: "Tài khoản không tồn tại. Vui lòng kiểm tra lại email.",
+    toast_email_not_verified:
+      "Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email của bạn!",
+    toast_user_not_found:
+      "Tài khoản không tồn tại. Vui lòng kiểm tra lại email.",
     toast_wrong_password: "Mật khẩu không đúng. Vui lòng thử lại.",
     toast_invalid_email: "Định dạng email không hợp lệ.",
     toast_network_error: "Lỗi kết nối mạng. Vui lòng kiểm tra internet.",
@@ -443,6 +449,28 @@ export const translations = {
     serials: "Số serial",
     returnCondition: "Tình trạng trả về",
     recalledFrom: "Thu hồi từ",
+    // --- BULK CATEGORY MOVE ---
+    bulk_actions: "Thao tác hàng loạt",
+    move_all_items_in_category: "Chuyển toàn bộ trong Danh mục",
+    no_changes: "Không có thay đổi",
+    confirm_bulk_move_category:
+      "Bạn có chắc muốn chuyển toàn bộ {count} thiết bị từ '{from}' sang '{to}'?",
+    confirm_bulk_move_category_breakdown:
+      "Bạn có chắc muốn chuyển {deviceCount} thiết bị và {masterCount} mẫu từ '{from}' sang '{to}'?",
+    label_devices: "thiết bị",
+    label_masters: "mẫu",
+    from_category: "Từ",
+    to_category: "Sang",
+    select_target_category: "Chọn danh mục đích",
+    toast_bulk_move_success:
+      "Đã chuyển {deviceCount} thiết bị và {masterCount} mẫu từ '{from}' sang '{to}' thành công.",
+    change: "Thay đổi",
+    confirm_override_duplicate_master:
+      "Mẫu '{itemName}' đã tồn tại trong danh mục '{category}'. Bạn có muốn xóa mẫu cũ và chuyển mẫu này qua không?",
+    override_and_move: "Xóa và Chuyển",
+    keep_both: "Giữ Cả Hai",
+    cannot_edit_name_item_in_use:
+      "Không thể thay đổi tên vì mẫu này đang được sử dụng trong hệ thống",
   },
   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   en: {
@@ -614,10 +642,14 @@ export const translations = {
     toast_repair_complete: "Returned {itemName} to stock after repair.",
     toast_moved_to_liquidation: "Moved {itemName} to the liquidation list.",
     toast_error_logging_transaction: "Error logging transaction.",
-    toast_duplicate_model_name_in_category: "Another model with name '{itemName}' and category '{category}' already exists.",
-    toast_master_item_auto_created: "Created new master item: {itemName} in category '{category}'",
-    toast_category_empty_suggestion: "💡 Category '{category}' is now empty. You can delete it in Settings.",
-    toast_category_only_masters_suggestion: "💡 Category '{category}' only has empty masters. You can delete it in Settings.",
+    toast_duplicate_model_name_in_category:
+      "Another model with name '{itemName}' and category '{category}' already exists.",
+    toast_master_item_auto_created:
+      "Created new master item: {itemName} in category '{category}'",
+    toast_category_empty_suggestion:
+      "💡 Category '{category}' is now empty. You can delete it in Settings.",
+    toast_category_only_masters_suggestion:
+      "💡 Category '{category}' only has empty masters. You can delete it in Settings.",
     toast_item_not_found_for_update: "Item not found for update.",
     toast_error_resetting_data: "Error resetting data.",
     toast_batch_update_failed: "Batch update failed.",
@@ -625,7 +657,8 @@ export const translations = {
     toast_user_not_found: "Account does not exist. Please check your email.",
     toast_wrong_password: "Incorrect password. Please try again.",
     toast_invalid_email: "Invalid email format.",
-    toast_network_error: "Network connection error. Please check your internet.",
+    toast_network_error:
+      "Network connection error. Please check your internet.",
     locale_string: "en-US",
     it_inventory: "IT Inventory",
     search: "Search",
@@ -843,6 +876,28 @@ export const translations = {
     serials: "Serial Numbers",
     returnCondition: "Return Condition",
     recalledFrom: "Recalled From",
+    // --- BULK CATEGORY MOVE ---
+    bulk_actions: "Bulk actions",
+    move_all_items_in_category: "Move all items in category",
+    no_changes: "No changes",
+    confirm_bulk_move_category:
+      "Are you sure you want to move all {count} items from '{from}' to '{to}'?",
+    confirm_bulk_move_category_breakdown:
+      "Are you sure you want to move {deviceCount} devices and {masterCount} masters from '{from}' to '{to}'?",
+    label_devices: "devices",
+    label_masters: "masters",
+    from_category: "From",
+    to_category: "To",
+    select_target_category: "Select target category",
+    toast_bulk_move_success:
+      "Successfully moved {deviceCount} devices and {masterCount} masters from '{from}' to '{to}'.",
+    change: "Change",
+    confirm_override_duplicate_master:
+      "Master '{itemName}' already exists in category '{category}'. Do you want to delete the old master and move this one?",
+    override_and_move: "Delete and Move",
+    keep_both: "Keep Both",
+    cannot_edit_name_item_in_use:
+      "Cannot edit name because this master is currently in use in the system",
   },
   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   zh: {
@@ -997,10 +1052,14 @@ export const translations = {
     toast_repair_complete: "维修后已将 {itemName} 退回库存。",
     toast_moved_to_liquidation: "已将 {itemName} 移至清算列表。",
     toast_error_logging_transaction: "记录事务时出错。",
-    toast_duplicate_model_name_in_category: "另一个型号名称为 '{itemName}' 且类别为 '{category}' 的型号已存在。",
-    toast_master_item_auto_created: "创建了新主项目：类别 '{category}' 中的 {itemName}",
-    toast_category_empty_suggestion: "💡 类别 '{category}' 现在为空。您可以在设置中删除它。",
-    toast_category_only_masters_suggestion: "💡 类别 '{category}' 仅包含空的主项目。您可以在设置中删除它。",
+    toast_duplicate_model_name_in_category:
+      "另一个型号名称为 '{itemName}' 且类别为 '{category}' 的型号已存在。",
+    toast_master_item_auto_created:
+      "创建了新主项目：类别 '{category}' 中的 {itemName}",
+    toast_category_empty_suggestion:
+      "💡 类别 '{category}' 现在为空。您可以在设置中删除它。",
+    toast_category_only_masters_suggestion:
+      "💡 类别 '{category}' 仅包含空的主项目。您可以在设置中删除它。",
     toast_item_not_found_for_update: "未找到要更新的项目。",
     toast_error_resetting_data: "重置数据时出错。",
     toast_batch_update_failed: "批量更新失败。",
@@ -1184,6 +1243,27 @@ export const translations = {
     serials: "序列号",
     returnCondition: "退回状况",
     recalledFrom: "收回自",
+    // --- BULK CATEGORY MOVE ---
+    bulk_actions: "批量操作",
+    move_all_items_in_category: "移动该类别的所有项目",
+    no_changes: "没有更改",
+    confirm_bulk_move_category:
+      "您确定要将所有 {count} 个项目从“{from}”移动到“{to}”吗？",
+    confirm_bulk_move_category_breakdown:
+      "您确定要将 {deviceCount} 个设备和 {masterCount} 个模板从“{from}”移动到“{to}”吗？",
+    label_devices: "设备",
+    label_masters: "模板",
+    from_category: "从",
+    to_category: "到",
+    select_target_category: "选择目标类别",
+    toast_bulk_move_success:
+      "已成功将 {deviceCount} 个设备和 {masterCount} 个模板从“{from}”移动到“{to}”。",
+    change: "更改",
+    confirm_override_duplicate_master:
+      "模板 '{itemName}' 已存在于类别 '{category}' 中。您要删除旧模板并移动此模板吗？",
+    override_and_move: "删除并移动",
+    keep_both: "保留两者",
+    cannot_edit_name_item_in_use: "无法编辑名称，因为此模板当前正在系统中使用",
   },
   //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 };

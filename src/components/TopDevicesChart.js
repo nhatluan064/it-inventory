@@ -8,107 +8,114 @@ const TopDevicesChart = ({ equipment }) => {
   const { theme, t } = useContext(AppContext);
 
   // Debug: log data (development only)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('TopDevicesChart equipment:', equipment);
+  if (process.env.NODE_ENV === "development") {
+    console.log("TopDevicesChart equipment:", equipment);
   }
 
   // Tạo dữ liệu Top 5 thiết bị được sử dụng nhiều nhất
   const chartData = useMemo(() => {
     try {
       // Lọc các thiết bị có trong hệ thống (không tính master và quy trình mua hàng)
-      const activeDevices = equipment.filter(item => 
-        item && 
-        item.status && 
-        !['master', 'pending-purchase', 'purchasing', 'purchased'].includes(item.status)
+      const activeDevices = equipment.filter(
+        (item) =>
+          item &&
+          item.status &&
+          !["master", "pending-purchase", "purchasing", "purchased"].includes(
+            item.status
+          )
       );
 
       // Nhóm theo tên thiết bị và đếm số lượng
       const deviceCounts = activeDevices.reduce((acc, item) => {
-        const deviceName = item.name || 'Unnamed Device';
+        const deviceName = item.name || "Unnamed Device";
         if (!acc[deviceName]) {
           acc[deviceName] = {
             total: 0,
             inUse: 0,
             available: 0,
             maintenance: 0,
-            liquidation: 0
+            liquidation: 0,
           };
         }
-        
+
         acc[deviceName].total += 1;
-        
+
         switch (item.status) {
-          case 'in-use':
+          case "in-use":
             acc[deviceName].inUse += 1;
             break;
-          case 'available':
+          case "available":
             acc[deviceName].available += 1;
             break;
-          case 'maintenance':
+          case "maintenance":
             acc[deviceName].maintenance += 1;
             break;
-          case 'liquidation':
+          case "liquidation":
             acc[deviceName].liquidation += 1;
             break;
           default:
             break;
         }
-        
+
         return acc;
       }, {});
 
       // Sắp xếp theo tổng số lượng và lấy Top 5
       const sortedDevices = Object.entries(deviceCounts)
         .filter(([, counts]) => counts.total > 0)
-        .sort(([,a], [,b]) => (b?.total || 0) - (a?.total || 0))
+        .sort(([, a], [, b]) => (b?.total || 0) - (a?.total || 0))
         .slice(0, 5);
 
       if (sortedDevices.length === 0) {
         return {
           labels: [],
-          datasets: []
+          datasets: [],
         };
       }
 
-      const labels = sortedDevices.map(([name]) => 
-        name && name.length > 20 ? name.substring(0, 20) + '...' : name || 'Unknown'
+      const labels = sortedDevices.map(([name]) =>
+        name && name.length > 20
+          ? name.substring(0, 20) + "..."
+          : name || "Unknown"
       );
-      
-      const totalData = sortedDevices.map(([,counts]) => counts?.total || 0);
-      const inUseData = sortedDevices.map(([,counts]) => counts?.inUse || 0);
-      const availableData = sortedDevices.map(([,counts]) => counts?.available || 0);
+
+      const totalData = sortedDevices.map(([, counts]) => counts?.total || 0);
+      const inUseData = sortedDevices.map(([, counts]) => counts?.inUse || 0);
+      const availableData = sortedDevices.map(
+        ([, counts]) => counts?.available || 0
+      );
 
       return {
         labels,
         datasets: [
           {
-            label: t('available'),
+            label: t("available"),
             data: availableData,
-            backgroundColor: '#22C55E',
-            borderColor: '#16A34A',
+            backgroundColor: "#22C55E",
+            borderColor: "#16A34A",
             borderWidth: 1,
           },
           {
-            label: t('in_use'),
+            label: t("in_use"),
             data: inUseData,
-            backgroundColor: '#3B82F6',
-            borderColor: '#2563EB',
+            backgroundColor: "#3B82F6",
+            borderColor: "#2563EB",
             borderWidth: 1,
           },
           {
-            label: t('total') || 'Tổng',
+            label: t("total") || "Tổng",
             data: totalData,
-            backgroundColor: '#8B5CF6',
-            borderColor: '#7C3AED',
+            backgroundColor: "#8B5CF6",
+            borderColor: "#7C3AED",
             borderWidth: 1,
-          }
-        ]
+          },
+        ],
       };
     } catch (error) {
-      console.error('Error creating chart data:', error);
+      console.error("Error creating chart data:", error);
       return {
         labels: [],
-        datasets: []
+        datasets: [],
       };
     }
   }, [equipment, t]);
@@ -117,12 +124,12 @@ const TopDevicesChart = ({ equipment }) => {
     responsive: true,
     maintainAspectRatio: false,
     interaction: {
-      mode: 'index',
+      mode: "index",
       intersect: false,
     },
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
         labels: {
           color: theme === "dark" ? "#E5E7EB" : "#374151",
           font: {
@@ -134,16 +141,16 @@ const TopDevicesChart = ({ equipment }) => {
       },
       title: {
         display: true,
-        text: t('top_devices_title') || 'Top 5 thiết bị phổ biến nhất',
+        text: t("top_devices_title") || "Top 5 thiết bị phổ biến nhất",
         color: theme === "dark" ? "#E5E7EB" : "#374151",
         font: {
           size: 14,
-          weight: 'bold',
+          weight: "bold",
         },
         padding: {
           top: 10,
-          bottom: 20
-        }
+          bottom: 20,
+        },
       },
       tooltip: {
         backgroundColor: theme === "dark" ? "#374151" : "#FFFFFF",
@@ -154,7 +161,7 @@ const TopDevicesChart = ({ equipment }) => {
         cornerRadius: 8,
       },
       datalabels: {
-        display: false // Tắt datalabels để tránh lỗi
+        display: false, // Tắt datalabels để tránh lỗi
       },
     },
     scales: {
@@ -171,9 +178,9 @@ const TopDevicesChart = ({ equipment }) => {
         },
       },
       y: {
-        type: 'linear',
+        type: "linear",
         display: true,
-        position: 'left',
+        position: "left",
         beginAtZero: true,
         grid: {
           color: theme === "dark" ? "#374151" : "#E5E7EB",
@@ -187,11 +194,10 @@ const TopDevicesChart = ({ equipment }) => {
         },
         title: {
           display: true,
-          text: t('quantity') || 'Số lượng',
+          text: t("quantity") || "Số lượng",
           color: theme === "dark" ? "#9CA3AF" : "#6B7280",
-        }
+        },
       },
-
     },
   };
 
@@ -201,10 +207,12 @@ const TopDevicesChart = ({ equipment }) => {
       <div className="relative h-64 md:h-80 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-500 dark:text-gray-400 mb-2">
-            {t('no_data_available') || 'Không có dữ liệu'}
+            {t("no_data_available") || "Không có dữ liệu"}
           </p>
           <p className="text-xs text-gray-400">
-            Type: {typeof equipment}, IsArray: {Array.isArray(equipment).toString()}, Length: {equipment?.length || 0}
+            Type: {typeof equipment}, IsArray:{" "}
+            {Array.isArray(equipment).toString()}, Length:{" "}
+            {equipment?.length || 0}
           </p>
         </div>
       </div>
@@ -214,21 +222,19 @@ const TopDevicesChart = ({ equipment }) => {
   try {
     return (
       <div className="relative h-64 md:h-80 overflow-hidden scrollbar-hide chart-container">
-        <Bar 
+        <Bar
           key={`top-devices-${theme}`}
-          data={chartData} 
+          data={chartData}
           options={options}
           redraw={true}
         />
       </div>
     );
   } catch (error) {
-    console.error('TopDevicesChart render error:', error);
+    console.error("TopDevicesChart render error:", error);
     return (
       <div className="relative h-64 md:h-80 flex items-center justify-center">
-        <p className="text-red-500 dark:text-red-400">
-          Lỗi hiển thị biểu đồ
-        </p>
+        <p className="text-red-500 dark:text-red-400">Lỗi hiển thị biểu đồ</p>
       </div>
     );
   }

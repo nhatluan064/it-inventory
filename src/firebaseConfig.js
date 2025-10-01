@@ -19,19 +19,19 @@ const firebaseConfig = {
 
 // Debug: Log configuration in production
 // eslint-disable-next-line no-console
-console.log('Environment:', process.env.NODE_ENV);
+console.log("Environment:", process.env.NODE_ENV);
 // eslint-disable-next-line no-console
-console.log('Firebase Config Keys:', Object.keys(firebaseConfig));
+console.log("Firebase Config Keys:", Object.keys(firebaseConfig));
 // eslint-disable-next-line no-console
-console.log('API Key exists:', !!firebaseConfig.apiKey);
+console.log("API Key exists:", !!firebaseConfig.apiKey);
 // eslint-disable-next-line no-console
-console.log('Auth Domain:', firebaseConfig.authDomain);
+console.log("Auth Domain:", firebaseConfig.authDomain);
 // eslint-disable-next-line no-console
-console.log('Project ID:', firebaseConfig.projectId);
+console.log("Project ID:", firebaseConfig.projectId);
 
 // Validate configuration in production
-if (process.env.NODE_ENV === 'production') {
-  const requiredKeys = ['apiKey', 'authDomain', 'projectId'];
+if (process.env.NODE_ENV === "production") {
+  const requiredKeys = ["apiKey", "authDomain", "projectId"];
   for (const key of requiredKeys) {
     if (!firebaseConfig[key]) {
       // eslint-disable-next-line no-console

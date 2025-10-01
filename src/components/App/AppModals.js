@@ -107,6 +107,7 @@ const AppModals = ({
             : inventory.addEquipmentType
         }
         categories={categories}
+        fullEquipmentList={inventory.equipment}
         t={t}
         initialData={modals.currentItem}
       />

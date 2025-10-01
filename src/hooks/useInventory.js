@@ -20,7 +20,8 @@ export const useInventory = (currentUser, t, setActiveTab) => {
   const [dataLoading, setDataLoading] = useState(true);
 
   // Get dynamic data functions
-  const { autoAddCategoryIfNotExists, departmentsList, positionsList } = useDynamicData(currentUser);
+  const { autoAddCategoryIfNotExists, departmentsList, positionsList } =
+    useDynamicData(currentUser);
 
   const logTransaction = useCallback(
     async (data) => {
@@ -234,7 +235,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
         toast.error(t("toast_item_not_found_for_update"));
         return false;
       }
-      const isDuplicate = equipment.some(
+      const duplicateItem = equipment.find(
         (e) =>
           e.id !== itemData.id &&
           e.name.toLowerCase() === itemData.name.toLowerCase() &&
@@ -242,14 +243,36 @@ export const useInventory = (currentUser, t, setActiveTab) => {
           e.status === "master"
       );
 
-      if (isDuplicate) {
-        toast.error(
-          t("toast_duplicate_model_name_in_category", {
+      if (duplicateItem) {
+        // eslint-disable-next-line no-alert
+        const userChoice = window.confirm(
+          t("confirm_override_duplicate_master", {
             itemName: itemData.name,
-            category: t(itemData.category)
+            category: itemData.category,
           })
         );
-        return false;
+
+        if (!userChoice) {
+          return false; // User chose to keep both/cancel
+        }
+
+        // User chose to override - delete the duplicate
+        try {
+          await deleteDoc(
+            doc(db, "users", currentUser.uid, "equipment", duplicateItem.id)
+          );
+          setEquipment((prev) => prev.filter((e) => e.id !== duplicateItem.id));
+          await logTransaction({
+            type: "master-list",
+            reason: "delete-override",
+            itemName: duplicateItem.name,
+            details: { replacedBy: itemData.id, category: itemData.category },
+          });
+        } catch (deleteErr) {
+          console.error("Error deleting duplicate master:", deleteErr);
+          toast.error(t("error_occurred"));
+          return false;
+        }
       }
 
       const docRef = doc(
@@ -298,9 +321,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
           setEquipment((prev) =>
             prev.map((e) => {
               if (e.id === itemData.id) return { ...e, ...dataToUpdate };
-              if (
-                affectedChildren.findIndex((c) => c.id === e.id) !== -1
-              ) {
+              if (affectedChildren.findIndex((c) => c.id === e.id) !== -1) {
                 return { ...e, category: itemData.category };
               }
               return e;
@@ -310,13 +331,17 @@ export const useInventory = (currentUser, t, setActiveTab) => {
           console.error("Error propagating category to child items:", propErr);
           // Fallback: still update master locally
           setEquipment((prev) =>
-            prev.map((e) => (e.id === itemData.id ? { ...e, ...dataToUpdate } : e))
+            prev.map((e) =>
+              e.id === itemData.id ? { ...e, ...dataToUpdate } : e
+            )
           );
         }
       } else {
         // Only update master locally if no category change
         setEquipment((prev) =>
-          prev.map((e) => (e.id === itemData.id ? { ...e, ...dataToUpdate } : e))
+          prev.map((e) =>
+            e.id === itemData.id ? { ...e, ...dataToUpdate } : e
+          )
         );
       }
 
@@ -631,7 +656,14 @@ export const useInventory = (currentUser, t, setActiveTab) => {
       toast.success(t("toast_legacy_item_imported"));
       return true;
     },
-    [currentUser, equipment, logTransaction, t, fetchData, autoAddCategoryIfNotExists]
+    [
+      currentUser,
+      equipment,
+      logTransaction,
+      t,
+      fetchData,
+      autoAddCategoryIfNotExists,
+    ]
   );
 
   // Helper function to handle category change logic within updateItem
@@ -674,7 +706,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
         toast.success(
           t("toast_master_item_auto_created", {
             itemName: newItemData.name,
-            category: newItemData.category
+            category: newItemData.category,
           })
         );
       }
@@ -686,7 +718,9 @@ export const useInventory = (currentUser, t, setActiveTab) => {
 
       if (remainingItemsInOldCategory.length === 0) {
         toast(
-          t("toast_category_empty_suggestion", { category: originalItem.category }),
+          t("toast_category_empty_suggestion", {
+            category: originalItem.category,
+          }),
           { duration: 5000 }
         );
       } else {
@@ -695,7 +729,9 @@ export const useInventory = (currentUser, t, setActiveTab) => {
         );
         if (nonMasterItems.length === 0) {
           toast(
-            t("toast_category_only_masters_suggestion", { category: originalItem.category }),
+            t("toast_category_only_masters_suggestion", {
+              category: originalItem.category,
+            }),
             { duration: 5000 }
           );
         }
@@ -801,11 +837,16 @@ export const useInventory = (currentUser, t, setActiveTab) => {
       setEquipment(
         equipment.map((e) => (e.id === item.id ? { ...e, ...dataToUpdate } : e))
       );
-      
+
       // Find department and position names for logging
-      const departmentName = departmentsList?.find(dept => dept.id === allocationDetails.department)?.name || allocationDetails.department;
-      const positionName = positionsList?.find(pos => pos.id === allocationDetails.position)?.name || allocationDetails.position;
-      
+      const departmentName =
+        departmentsList?.find(
+          (dept) => dept.id === allocationDetails.department
+        )?.name || allocationDetails.department;
+      const positionName =
+        positionsList?.find((pos) => pos.id === allocationDetails.position)
+          ?.name || allocationDetails.position;
+
       await logTransaction({
         type: "allocation",
         reason: "allocate",
@@ -1195,7 +1236,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
 
   // Memoized computed values for performance
   const inventoryItems = useMemo(
-    () => equipment.filter(item => item.status !== 'master'),
+    () => equipment.filter((item) => item.status !== "master"),
     [equipment]
   );
 
@@ -1221,7 +1262,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
     markAsDamaged,
     updateMaintenanceNote,
     completeRepair,
-  bulkMoveCategory,
+    bulkMoveCategory,
     markUnrepairable,
     liquidateItem,
     backupData,

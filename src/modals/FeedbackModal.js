@@ -76,8 +76,8 @@ const FeedbackModal = ({ isOpen, onClose, t, user: _user }) => {
         title: title,
         description: description,
         timestamp: new Date().toISOString(),
-        date: new Date().toLocaleDateString('vi-VN'), // Ngày theo định dạng Việt Nam
-        time: new Date().toLocaleTimeString('vi-VN'), // Giờ theo định dạng Việt Nam
+        date: new Date().toLocaleDateString("vi-VN"), // Ngày theo định dạng Việt Nam
+        time: new Date().toLocaleTimeString("vi-VN"), // Giờ theo định dạng Việt Nam
         user_agent: navigator.userAgent,
       };
 

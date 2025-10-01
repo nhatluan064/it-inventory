@@ -73,13 +73,11 @@ const NavigationTabs = ({ activeTab, setActiveTab, t, isCollapsed }) => {
             )}
 
             {!isCollapsed && (
-              <h3
-                className="px-4 mb-1 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400"
-              >
+              <h3 className="px-4 mb-1 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 {t(group.titleKey)}
               </h3>
             )}
-            
+
             <div
               className={`flex flex-col items-center space-y-0.5 ${
                 isCollapsed ? "" : "pl-4 items-stretch"
@@ -107,23 +105,28 @@ const NavigationTabs = ({ activeTab, setActiveTab, t, isCollapsed }) => {
                       }
                     `}
                     style={{
-                      boxShadow: isActive 
-                        ? '0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.2)' 
+                      boxShadow: isActive
+                        ? "0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.2)"
                         : undefined,
-                      transition: 'box-shadow 0.3s ease'
+                      transition: "box-shadow 0.3s ease",
                     }}
                     onMouseEnter={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.boxShadow = '0 0 20px rgba(59, 130, 246, 0.5), 0 0 40px rgba(59, 130, 246, 0.3)';
+                        e.currentTarget.style.boxShadow =
+                          "0 0 20px rgba(59, 130, 246, 0.5), 0 0 40px rgba(59, 130, 246, 0.3)";
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.boxShadow = 'none';
+                        e.currentTarget.style.boxShadow = "none";
                       }
                     }}
                   >
-                    <Icon className={`w-4 h-4 flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300 ${isCollapsed && !isActive ? 'group-hover:rotate-12' : ''}`} />
+                    <Icon
+                      className={`w-4 h-4 flex-shrink-0 transform group-hover:scale-110 transition-transform duration-300 ${
+                        isCollapsed && !isActive ? "group-hover:rotate-12" : ""
+                      }`}
+                    />
                     <span
                       // ---- DÒNG ĐÃ THAY ĐỔI: Thêm class "hidden" vào trạng thái thu gọn ----
                       className={`transition-all duration-300 ease-out transform group-hover:translate-x-1 ${

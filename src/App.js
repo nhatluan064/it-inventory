@@ -173,18 +173,25 @@ const App = () => {
   const inventoryStatusChartData = useMemo(() => {
     // Đếm tất cả các trạng thái theo yêu cầu
     const allEquipment = inventory.equipment;
-    const pendingPurchase = allEquipment.filter((e) => e.status === "pending-purchase").length;
-    const purchasing = allEquipment.filter((e) => e.status === "purchasing").length;
-    const purchased = allEquipment.filter((e) => e.status === "purchased").length;
-    const totalInventory = allEquipment.filter((e) => [
-      "available",
-      "in-use",
-      "maintenance",
-      "liquidation",
-    ].includes(e.status)).length;
+    const pendingPurchase = allEquipment.filter(
+      (e) => e.status === "pending-purchase"
+    ).length;
+    const purchasing = allEquipment.filter(
+      (e) => e.status === "purchasing"
+    ).length;
+    const purchased = allEquipment.filter(
+      (e) => e.status === "purchased"
+    ).length;
+    const totalInventory = allEquipment.filter((e) =>
+      ["available", "in-use", "maintenance", "liquidation"].includes(e.status)
+    ).length;
     const inUse = allEquipment.filter((e) => e.status === "in-use").length;
-    const maintenance = allEquipment.filter((e) => e.status === "maintenance").length;
-    const liquidation = allEquipment.filter((e) => e.status === "liquidation").length;
+    const maintenance = allEquipment.filter(
+      (e) => e.status === "maintenance"
+    ).length;
+    const liquidation = allEquipment.filter(
+      (e) => e.status === "liquidation"
+    ).length;
 
     // Tạo dữ liệu cho biểu đồ với 7 trạng thái
     const statusKeys = [

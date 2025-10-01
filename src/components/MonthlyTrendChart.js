@@ -11,17 +11,17 @@ const MonthlyTrendChart = ({ activityLogs, equipment }) => {
   const chartData = useMemo(() => {
     const last30Days = [];
     const today = new Date();
-    
+
     // Tạo mảng 30 ngày gần nhất
     for (let i = 29; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
       last30Days.push({
-        date: date.toISOString().split('T')[0],
-        label: date.toLocaleDateString('vi-VN', { 
-          day: '2-digit',
-          month: '2-digit' 
-        })
+        date: date.toISOString().split("T")[0],
+        label: date.toLocaleDateString("vi-VN", {
+          day: "2-digit",
+          month: "2-digit",
+        }),
       });
     }
 
@@ -30,27 +30,28 @@ const MonthlyTrendChart = ({ activityLogs, equipment }) => {
     let cumulativeAllocated = 0;
     let cumulativeMaintenance = 0;
 
-    const trendData = last30Days.map(day => {
-      const dayLogs = activityLogs.filter(log => 
-        log.timestamp && log.timestamp.split('T')[0] === day.date
+    const trendData = last30Days.map((day) => {
+      const dayLogs = activityLogs.filter(
+        (log) => log.timestamp && log.timestamp.split("T")[0] === day.date
       );
 
       // Đếm số lượng nhập trong ngày
-      const dailyImported = dayLogs.filter(log => 
-        log.action?.includes('import') || 
-        log.action === 'procurement-purchased'
+      const dailyImported = dayLogs.filter(
+        (log) =>
+          log.action?.includes("import") ||
+          log.action === "procurement-purchased"
       ).length;
 
       // Đếm số lượng xuất trong ngày
-      const dailyAllocated = dayLogs.filter(log => 
-        log.action?.includes('export') || 
-        log.action?.includes('allocate')
+      const dailyAllocated = dayLogs.filter(
+        (log) =>
+          log.action?.includes("export") || log.action?.includes("allocate")
       ).length;
 
       // Đếm số lượng bảo trì trong ngày
-      const dailyMaintenance = dayLogs.filter(log => 
-        log.action?.includes('repair') || 
-        log.action?.includes('maintenance')
+      const dailyMaintenance = dayLogs.filter(
+        (log) =>
+          log.action?.includes("repair") || log.action?.includes("maintenance")
       ).length;
 
       cumulativeImported += dailyImported;
@@ -62,42 +63,42 @@ const MonthlyTrendChart = ({ activityLogs, equipment }) => {
         imported: cumulativeImported,
         allocated: cumulativeAllocated,
         maintenance: cumulativeMaintenance,
-        dailyActivity: dayLogs.length
+        dailyActivity: dayLogs.length,
       };
     });
 
     return {
-      labels: trendData.map(day => day.label),
+      labels: trendData.map((day) => day.label),
       datasets: [
         {
-          label: t('chart_cumulative_import_label'),
-          data: trendData.map(day => day.imported),
-          borderColor: '#22C55E',
-          backgroundColor: 'rgba(34, 197, 94, 0.1)',
+          label: t("chart_cumulative_import_label"),
+          data: trendData.map((day) => day.imported),
+          borderColor: "#22C55E",
+          backgroundColor: "rgba(34, 197, 94, 0.1)",
           borderWidth: 2,
           fill: true,
           tension: 0.4,
         },
         {
-          label: t('chart_cumulative_export_label'),
-          data: trendData.map(day => day.allocated),
-          borderColor: '#3B82F6',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          label: t("chart_cumulative_export_label"),
+          data: trendData.map((day) => day.allocated),
+          borderColor: "#3B82F6",
+          backgroundColor: "rgba(59, 130, 246, 0.1)",
           borderWidth: 2,
           fill: true,
           tension: 0.4,
         },
         {
-          label: t('chart_daily_activity_label'),
-          data: trendData.map(day => day.dailyActivity),
-          borderColor: '#8B5CF6',
-          backgroundColor: 'rgba(139, 92, 246, 0.1)',
+          label: t("chart_daily_activity_label"),
+          data: trendData.map((day) => day.dailyActivity),
+          borderColor: "#8B5CF6",
+          backgroundColor: "rgba(139, 92, 246, 0.1)",
           borderWidth: 2,
           fill: false,
           tension: 0.4,
-          yAxisID: 'y1',
-        }
-      ]
+          yAxisID: "y1",
+        },
+      ],
     };
   }, [activityLogs, t]);
 
@@ -105,12 +106,12 @@ const MonthlyTrendChart = ({ activityLogs, equipment }) => {
     responsive: true,
     maintainAspectRatio: false,
     interaction: {
-      mode: 'index',
+      mode: "index",
       intersect: false,
     },
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
         labels: {
           color: theme === "dark" ? "#E5E7EB" : "#374151",
           font: {
@@ -122,16 +123,16 @@ const MonthlyTrendChart = ({ activityLogs, equipment }) => {
       },
       title: {
         display: true,
-        text: t('monthly_trend_chart_title'),
+        text: t("monthly_trend_chart_title"),
         color: theme === "dark" ? "#E5E7EB" : "#374151",
         font: {
           size: 14,
-          weight: 'bold',
+          weight: "bold",
         },
         padding: {
           top: 10,
-          bottom: 20
-        }
+          bottom: 20,
+        },
       },
       tooltip: {
         backgroundColor: theme === "dark" ? "#374151" : "#FFFFFF",
@@ -156,9 +157,9 @@ const MonthlyTrendChart = ({ activityLogs, equipment }) => {
         },
       },
       y: {
-        type: 'linear',
+        type: "linear",
         display: true,
-        position: 'left',
+        position: "left",
         beginAtZero: true,
         grid: {
           color: theme === "dark" ? "#374151" : "#E5E7EB",
@@ -171,14 +172,14 @@ const MonthlyTrendChart = ({ activityLogs, equipment }) => {
         },
         title: {
           display: true,
-          text: t('chart_cumulative_import_label'),
+          text: t("chart_cumulative_import_label"),
           color: theme === "dark" ? "#9CA3AF" : "#6B7280",
-        }
+        },
       },
       y1: {
-        type: 'linear',
+        type: "linear",
         display: true,
-        position: 'right',
+        position: "right",
         beginAtZero: true,
         grid: {
           drawOnChartArea: false,
@@ -191,9 +192,9 @@ const MonthlyTrendChart = ({ activityLogs, equipment }) => {
         },
         title: {
           display: true,
-          text: t('chart_daily_activity_label'),
+          text: t("chart_daily_activity_label"),
           color: theme === "dark" ? "#9CA3AF" : "#6B7280",
-        }
+        },
       },
     },
   };
@@ -203,7 +204,7 @@ const MonthlyTrendChart = ({ activityLogs, equipment }) => {
     return (
       <div className="relative h-64 md:h-80 flex items-center justify-center">
         <p className="text-gray-500 dark:text-gray-400">
-          {t('no_data_available')}
+          {t("no_data_available")}
         </p>
       </div>
     );
@@ -212,16 +213,16 @@ const MonthlyTrendChart = ({ activityLogs, equipment }) => {
   try {
     return (
       <div className="relative h-64 md:h-80 overflow-hidden scrollbar-hide chart-container">
-        <Line 
+        <Line
           key={`monthly-trend-${theme}`}
-          data={chartData} 
+          data={chartData}
           options={options}
           redraw={true}
         />
       </div>
     );
   } catch (error) {
-    console.error('MonthlyTrendChart render error:', error);
+    console.error("MonthlyTrendChart render error:", error);
     return (
       <div className="relative h-64 md:h-80 flex items-center justify-center">
         <p className="text-red-500 dark:text-red-400">

@@ -155,17 +155,20 @@ const Sidebar = ({
                   className="w-full flex items-center space-x-3 py-1.5 px-4 rounded-lg font-medium text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 group feedback-button"
                 >
                   <Heart className="w-4 h-4 transform group-hover:scale-110 transition-transform duration-300" />
-                  <span className="transform group-hover:translate-x-1 transition-transform duration-300">{t("feedback_title")}</span>
+                  <span className="transform group-hover:translate-x-1 transition-transform duration-300">
+                    {t("feedback_title")}
+                  </span>
                 </button>
-                
+
                 <button
                   onClick={onLogout}
                   className="w-full flex items-center space-x-3 py-1.5 px-4 rounded-lg font-medium text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-all duration-300 group auth-logout-button"
                 >
                   <LogOut className="w-4 h-4 transform group-hover:scale-110 transition-transform duration-300" />
-                  <span className="transform group-hover:translate-x-1 transition-transform duration-300">{t("logout")}</span>
+                  <span className="transform group-hover:translate-x-1 transition-transform duration-300">
+                    {t("logout")}
+                  </span>
                 </button>
-
               </div>
             </div>
 
@@ -195,7 +198,7 @@ const Sidebar = ({
                   >
                     <Heart className="w-4 h-4" />
                   </button>
-                  
+
                   <button
                     onClick={onLogout}
                     title={t("logout")}
@@ -203,7 +206,6 @@ const Sidebar = ({
                   >
                     <LogOut className="w-4 h-4" />
                   </button>
-
                 </div>
               </div>
             </div>
@@ -231,7 +233,7 @@ const Sidebar = ({
                 >
                   <Heart className="w-4 h-4" />
                 </button>
-                
+
                 <button
                   onClick={onLogout}
                   title={t("logout")}
@@ -239,7 +241,6 @@ const Sidebar = ({
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
-
               </div>
             </div>
           </div>

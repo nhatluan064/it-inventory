@@ -20,23 +20,26 @@ const LoginPage = ({
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Add submit animation
-    e.target.classList.add('auth-login-submit');
+    e.target.classList.add("auth-login-submit");
     setTimeout(() => {
-      e.target.classList.remove('auth-login-submit');
+      e.target.classList.remove("auth-login-submit");
     }, 300);
-    
+
     setIsLoading(true);
     try {
       await onLogin(email, password);
     } catch (error) {
       // Debug: Log authentication error details
-      console.error('Login error:', error.code, error.message);
-      
+      console.error("Login error:", error.code, error.message);
+
       if (error.message === "EMAIL_NOT_VERIFIED") {
         toast.error(t("toast_email_not_verified"));
-      } else if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+      } else if (
+        error.code === "auth/user-not-found" ||
+        error.code === "auth/wrong-password"
+      ) {
         toast.error(t("login_error_credentials"));
       } else if (error.code === "auth/invalid-email") {
         toast.error(t("toast_invalid_email"));
@@ -102,8 +105,11 @@ const LoginPage = ({
       <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 space-y-6 auth-welcome-slide relative overflow-hidden">
         {/* Decorative Background Elements */}
         <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-10 animate-pulse"></div>
-        <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-full opacity-10 animate-pulse" style={{ animationDelay: '1s' }}></div>
-        
+        <div
+          className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-full opacity-10 animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
+
         <div className="flex flex-col items-center relative z-10">
           <div className="p-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/50 dark:to-purple-900/50 rounded-full auth-success-pulse">
             <Package className="w-12 h-12 text-blue-600 dark:text-blue-400" />
@@ -196,7 +202,7 @@ const LoginPage = ({
             type="submit"
             disabled={isLoading}
             className={`w-full flex justify-center py-3 px-4 border rounded-lg text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 font-semibold shadow-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl disabled:scale-100 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 ${
-              isLoading ? 'auth-login-loading' : 'auth-login-submit'
+              isLoading ? "auth-login-loading" : "auth-login-submit"
             }`}
           >
             {isLoading ? (

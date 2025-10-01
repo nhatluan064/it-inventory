@@ -10,7 +10,15 @@ import {
   Calendar,
 } from "lucide-react";
 
-const AllocationModal = ({ show, onClose, onSubmit, item, departmentsList, positionsList, t }) => {
+const AllocationModal = ({
+  show,
+  onClose,
+  onSubmit,
+  item,
+  departmentsList,
+  positionsList,
+  t,
+}) => {
   const [formData, setFormData] = useState({
     recipientName: "",
     employeeId: "",
