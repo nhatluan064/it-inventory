@@ -16,26 +16,28 @@ const EquipmentTypeModal = ({
   const { currentUser } = useAuth();
   const { autoAddCategoryIfNotExists } = useDynamicData(currentUser);
   const [name, setName] = useState("");
-  const [category, setCategory] = useState("pc");
+  const [category, setCategory] = useState("");
   const [customCategory, setCustomCategory] = useState("");
   const [showCustomCategory, setShowCustomCategory] = useState(false);
 
   const isEditing = !!initialData;
 
   useEffect(() => {
-    if (show) {
-      if (isEditing) {
-        setName(initialData.name || "");
-        setCategory(initialData.category || "pc");
-      } else {
-        // Reset form cho chế độ Thêm mới
-        setName("");
-        setCategory("pc");
-        setShowCustomCategory(false);
-        setCustomCategory("");
-      }
+    if (!show) return;
+    if (isEditing) {
+      setName(initialData?.name || "");
+      setCategory(initialData?.category || "");
+      setShowCustomCategory(false);
+      setCustomCategory("");
+    } else {
+      // Thêm mới: chọn category hợp lệ đầu tiên (bỏ id 'all') nếu có
+      const firstCategoryId = (categories || []).find((c) => c.id !== "all")?.id || "";
+      setName("");
+      setCategory(firstCategoryId);
+      setShowCustomCategory(false);
+      setCustomCategory("");
     }
-  }, [show, initialData, isEditing]);
+  }, [show, initialData, isEditing, categories]);
 
   if (!show) {
     return null;
