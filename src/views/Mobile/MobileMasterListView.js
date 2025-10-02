@@ -1,13 +1,5 @@
 import React, { useState, useMemo } from "react";
-import {
-  Filter,
-  Plus,
-  ChevronDown,
-  Check,
-  Layers,
-  Edit2,
-  Trash2,
-} from "lucide-react";
+import { Filter, Plus, Layers, Edit2, Trash2 } from "lucide-react";
 
 const MobileMasterListView = ({
   allItems,
@@ -18,8 +10,8 @@ const MobileMasterListView = ({
   categories,
   fullEquipmentList,
 }) => {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [isSortOpen, setIsSortOpen] = useState(false);
+  // Keep filter controls visible on mobile for better discoverability
+  const [isFilterOpen, setIsFilterOpen] = useState(true);
   const [filters, setFilters] = useState({
     search: "",
     category: "all",
@@ -31,15 +23,6 @@ const MobileMasterListView = ({
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSortChange = (sortKey) => {
-    setFilters((prev) => {
-      const currentDirection = prev.sortDirection || "asc";
-      const newDirection =
-        prev.sortKey === sortKey && currentDirection === "asc" ? "desc" : "asc";
-      return { ...prev, sortKey, sortDirection: newDirection };
-    });
-    setIsSortOpen(false);
-  };
 
   const filteredAndSortedItems = useMemo(() => {
     let items = [...allItems];
@@ -69,10 +52,7 @@ const MobileMasterListView = ({
     return items;
   }, [allItems, filters]);
 
-  const sortOptions = [
-    { key: "name", label: t("master_item_name") },
-    { key: "category", label: t("category") },
-  ];
+  // sort is intentionally removed on mobile for this list
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">
@@ -111,44 +91,23 @@ const MobileMasterListView = ({
                 className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+
+            <div className="grid grid-cols-1 gap-4">
               <select
                 name="category"
                 value={filters.category}
                 onChange={handleFilterChange}
                 className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
               >
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
+                <option key="all" value="all">
+                  {t("all")}
+                </option>
+                {(categories || []).map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
                   </option>
                 ))}
               </select>
-              <div className="relative">
-                <button
-                  onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="w-full flex items-center justify-between p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
-                >
-                  <span className="text-sm">{t("sort_by")}</span>
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {isSortOpen && (
-                  <div className="absolute z-10 top-full right-0 mt-2 w-full bg-white dark:bg-gray-700 rounded-md shadow-lg border dark:border-gray-600">
-                    {sortOptions.map((opt) => (
-                      <button
-                        key={opt.key}
-                        onClick={() => handleSortChange(opt.key)}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 flex justify-between items-center"
-                      >
-                        {opt.label}
-                        {filters.sortKey === opt.key && (
-                          <Check className="w-4 h-4 text-blue-500" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         )}

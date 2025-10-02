@@ -827,7 +827,8 @@ export const useInventory = (currentUser, t, setActiveTab) => {
     async (item, allocationDetails) => {
       const dataToUpdate = {
         status: "in-use",
-        location: "location_in_use",
+        // location should represent the physical place (department) rather than a status
+        location: allocationDetails.department || "location_in_use",
         allocationDetails,
       };
       await updateDoc(
@@ -855,10 +856,15 @@ export const useInventory = (currentUser, t, setActiveTab) => {
           to: allocationDetails.recipientName,
           department: departmentName,
           position: positionName,
+          giverName: allocationDetails.giverName,
+          giverPosition: allocationDetails.giverPosition,
         },
       });
       toast.success(
-        t("toast_item_allocated_successfully", { itemName: item.name })
+        t("toast_item_allocated_successfully", {
+          itemName: item.name,
+          recipientName: allocationDetails.recipientName,
+        })
       );
     },
     [currentUser, equipment, logTransaction, t, departmentsList, positionsList]
@@ -873,6 +879,8 @@ export const useInventory = (currentUser, t, setActiveTab) => {
           handoverDate: item.allocationDetails.handoverDate, // Keep original handover date
           condition: item.allocationDetails.condition, // Keep original condition
         },
+        // keep location in sync with department (physical place)
+        location: updatedDetails.department || item.location,
       };
 
       await updateDoc(
@@ -955,6 +963,8 @@ export const useInventory = (currentUser, t, setActiveTab) => {
         location: "location_in_stock",
         condition,
         recalledFrom: null,
+        // When repair completes and item returns to stock, set importDate to now
+        importDate: new Date().toISOString(),
       };
       await updateDoc(
         doc(db, "users", currentUser.uid, "equipment", item.id),

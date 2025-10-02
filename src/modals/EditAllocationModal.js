@@ -25,10 +25,12 @@ const EditAllocationModal = ({
     position: "",
     positionDescription: "",
     department: "",
+    giverName: "",
+    giverPosition: "",
+    giverDepartment: "",
   });
 
-  const [formStep, setFormStep] = useState(1);
-
+  // Single-step form: populate formData when modal opens
   useEffect(() => {
     if (show && item && item.allocationDetails) {
       const details = item.allocationDetails;
@@ -38,8 +40,10 @@ const EditAllocationModal = ({
         position: details.position || positionsList[0]?.id || "",
         positionDescription: details.positionDescription || "",
         department: details.department || departmentsList[0]?.id || "",
+        giverName: details.giverName || "",
+        giverPosition: details.giverPosition || "",
+        giverDepartment: details.giverDepartment || departmentsList[0]?.id || "",
       });
-      setFormStep(1);
     }
   }, [show, item, positionsList, departmentsList]);
 
@@ -56,22 +60,14 @@ const EditAllocationModal = ({
     onClose();
   };
 
-  const nextStep = () => {
-    setFormStep(2);
-  };
-
-  const prevStep = () => {
-    setFormStep(1);
-  };
-
-  const renderStep1 = () => (
+  // Single combined render that includes recipient, employee id, position and department
+  const renderCombined = () => (
     <>
       <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg mb-6">
         <div className="flex items-center gap-2">
           <CheckCircle className="text-blue-500 w-5 h-5 flex-shrink-0" />
           <p className="text-sm text-blue-800 dark:text-blue-300">
-            {t("editing_allocation_for")}:{" "}
-            <span className="font-medium">{item.name}</span>
+            {t("edit_allocation_details")} <span className="font-medium">{item.name}</span>
           </p>
         </div>
       </div>
@@ -114,41 +110,7 @@ const EditAllocationModal = ({
             />
           </div>
         </div>
-      </div>
 
-      <div className="mt-6 flex justify-end">
-        <button
-          type="button"
-          onClick={onClose}
-          className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800 mr-3"
-        >
-          <X className="mr-2 h-4 w-4" />
-          {t("cancel")}
-        </button>
-        <button
-          type="button"
-          onClick={nextStep}
-          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800"
-        >
-          {t("next")}
-        </button>
-      </div>
-    </>
-  );
-
-  const renderStep2 = () => (
-    <>
-      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg mb-6">
-        <div className="flex items-center gap-2">
-          <CheckCircle className="text-blue-500 w-5 h-5 flex-shrink-0" />
-          <p className="text-sm text-blue-800 dark:text-blue-300">
-            {t("editing_allocation_for")}:{" "}
-            <span className="font-medium">{item.name}</span>
-          </p>
-        </div>
-      </div>
-
-      <div className="space-y-5">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             {t("position")}
@@ -184,22 +146,6 @@ const EditAllocationModal = ({
                 />
               </svg>
             </div>
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {t("position_description")}
-          </label>
-          <div className="mt-1">
-            <input
-              type="text"
-              name="positionDescription"
-              placeholder={t("position_description_placeholder")}
-              value={formData.positionDescription}
-              onChange={handleChange}
-              className="block w-full px-3 py-2.5 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
           </div>
         </div>
 
@@ -242,31 +188,22 @@ const EditAllocationModal = ({
         </div>
       </div>
 
-      <div className="mt-6 flex justify-between">
+      <div className="mt-6 flex justify-end">
         <button
           type="button"
-          onClick={prevStep}
-          className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800"
+          onClick={onClose}
+          className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800 mr-3"
         >
-          {t("previous")}
+          <X className="mr-2 h-4 w-4" />
+          {t("cancel")}
         </button>
-        <div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800 mr-3"
-          >
-            <X className="mr-2 h-4 w-4" />
-            {t("cancel")}
-          </button>
-          <button
-            type="submit"
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-800"
-          >
-            <Save className="mr-2 h-4 w-4" />
-            {t("save_changes")}
-          </button>
-        </div>
+        <button
+          type="submit"
+          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-800"
+        >
+          <Save className="mr-2 h-4 w-4" />
+          {t("save_changes")}
+        </button>
       </div>
     </>
   );
@@ -313,53 +250,12 @@ const EditAllocationModal = ({
               </div>
             </div>
 
-            {/* Progress indicator */}
-            <div className="mt-3 flex">
-              <div className="flex-1">
-                <div className="relative">
-                  <div
-                    className={`h-2 bg-${
-                      formStep >= 1 ? "white" : "blue-400"
-                    } rounded-l-full`}
-                  ></div>
-                  <div className="absolute -top-1 left-0 w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                    <span className="text-blue-600 font-bold text-xs">1</span>
-                  </div>
-                </div>
-                <p className="mt-2 text-xs text-white opacity-90">
-                  {t("recipient_info")}
-                </p>
-              </div>
-
-              <div className="flex-1">
-                <div className="relative">
-                  <div
-                    className={`h-2 bg-${
-                      formStep >= 2 ? "white" : "blue-400"
-                    } rounded-r-full`}
-                  ></div>
-                  <div
-                    className={`absolute -top-1 left-0 w-4 h-4 ${
-                      formStep >= 2
-                        ? "bg-white"
-                        : "bg-blue-400 border-2 border-white"
-                    } rounded-full flex items-center justify-center`}
-                  >
-                    {formStep >= 2 && (
-                      <span className="text-blue-600 font-bold text-xs">2</span>
-                    )}
-                  </div>
-                </div>
-                <p className="mt-2 text-xs text-white opacity-90">
-                  {t("position_info")}
-                </p>
-              </div>
-            </div>
+            {/* removed sub-section titles: recipient_info & position_info */}
           </div>
 
           <form onSubmit={handleSubmit}>
             <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-              {formStep === 1 ? renderStep1() : renderStep2()}
+            {renderCombined()}
             </div>
           </form>
         </div>

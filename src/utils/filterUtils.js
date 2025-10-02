@@ -9,7 +9,11 @@
  * @returns {Array} Filtered inventory items
  */
 export const filterInventoryItems = (inventoryItems, filters) => {
-  return inventoryItems.filter((item) => {
+  // Ensure only 'available' and 'in-use' items are considered for inventory view
+  const allowedStatuses = ["available", "in-use"];
+  return inventoryItems
+    .filter((it) => allowedStatuses.includes(it.status))
+    .filter((item) => {
     const { search, category, importDate, status, condition } = filters;
     const query = search.toLowerCase();
 
@@ -104,8 +108,9 @@ export const getItemsByStatus = (equipment, status) => {
  * @returns {Array} Inventory items
  */
 export const getInventoryItems = (equipment) => {
-  const excludedStatuses = ["pending-purchase", "purchasing", "purchased", "master"];
-  return equipment.filter((item) => !excludedStatuses.includes(item.status));
+  // Only treat available and in-use items as inventory for the Inventory management screens
+  const allowed = ["available", "in-use"];
+  return equipment.filter((item) => allowed.includes(item.status));
 };
 
 /**

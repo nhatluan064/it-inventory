@@ -3,43 +3,58 @@ import {
   RotateCcw,
   Wrench,
   Filter,
-  ChevronDown,
-  Check,
   User,
   Building,
   Calendar,
   Edit,
+  Eye,
 } from "lucide-react";
 import { useDynamicData } from "../../hooks/useDynamicData";
+import { useAuth } from "../../hooks/useAuth";
 
 const MobileAllocatedView = ({
   items,
   onRecallItem,
   onMarkDamaged,
   onEditAllocation,
-  categories,
+  onViewItem,
   t,
   filters,
   setFilters,
 }) => {
-  const { departmentsList } = useDynamicData();
+  const { currentUser } = useAuth();
+  const { departmentsList, categories, positionsList } = useDynamicData(currentUser);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [isSortOpen, setIsSortOpen] = useState(false);
+
+  // Get categories from dynamic data hook and filter out any placeholder 'all'
+  const cleanedCategories = (categories || []).filter(
+    (c) => String(c.id).toLowerCase() !== "all" && (c.name || "").toLowerCase() !== (t("all") || "").toLowerCase()
+  );
+
+  const getDepartmentLabel = (deptId) => {
+    if (!deptId) return "N/A";
+    const dept = (departmentsList || []).find((d) => d.id === deptId);
+    if (dept) {
+      // Prefer explicit display name from the department record.
+      // If a translation key is provided on the department, use it; otherwise return the stored name.
+      if (dept.key) return t(dept.key);
+      return dept.name || deptId;
+    }
+    // If department not found in list, try translating the id (it might be a translation key)
+    return t(deptId) || deptId;
+  };
+
+  const getPositionLabel = (posId) => {
+    if (!posId) return "N/A";
+    const pos = (positionsList || []).find((p) => p.id === posId);
+    if (pos) return pos.name || posId;
+    return t(posId) || posId;
+  };
 
   const handleFilterChange = (e) => {
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSortChange = (sortKey) => {
-    setFilters((prev) => {
-      const newDirection =
-        prev.sortKey === sortKey && prev.sortDirection === "asc"
-          ? "desc"
-          : "asc";
-      return { ...prev, sortKey, sortDirection: newDirection };
-    });
-    setIsSortOpen(false);
-  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "---";
@@ -67,16 +82,8 @@ const MobileAllocatedView = ({
     return sortedItems;
   }, [items, filters]);
 
-  const sortOptions = [
-    { key: "name", label: t("device_name") },
-    { key: "allocationDetails.recipientName", label: t("recipient") },
-    { key: "allocationDetails.handoverDate", label: t("handover_date") },
-  ];
 
-  const departmentOptions = useMemo(() => {
-    const allOption = { id: "all", name: t("all") };
-    return [allOption, ...departmentsList];
-  }, [departmentsList, t]);
+  // departmentOptions no longer needed for mobile allocated view (using category filter instead)
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">
@@ -103,68 +110,44 @@ const MobileAllocatedView = ({
                 value={filters.search}
                 onChange={handleFilterChange}
                 placeholder={t("search_inventory_placeholder")}
-                className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 col-span-2"
+                className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
               />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+
               <select
                 name="category"
                 value={filters.category}
                 onChange={handleFilterChange}
                 className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
               >
-                {categories.map((cat) => (
+                <option value="all">{t("all")}</option>
+                {cleanedCategories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
                   </option>
                 ))}
               </select>
+
               <select
                 name="department"
-                value={filters.department}
+                value={filters.department || "all"}
                 onChange={handleFilterChange}
                 className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
               >
-                {departmentOptions.map((dept) => (
+                <option value="all">{t("all")}</option>
+                {(departmentsList || []).map((dept) => (
                   <option key={dept.id} value={dept.id}>
                     {dept.name}
                   </option>
                 ))}
               </select>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+
               <input
                 name="handoverDate"
                 type="date"
-                value={filters.handoverDate}
+                value={filters.handoverDate || ""}
                 onChange={handleFilterChange}
                 className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
               />
-              <div className="relative">
-                <button
-                  onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="w-full flex items-center justify-between p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
-                >
-                  <span className="text-sm">{t("sort_by")}</span>
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {isSortOpen && (
-                  <div className="absolute z-10 top-full right-0 mt-2 w-full bg-white dark:bg-gray-700 rounded-md shadow-lg border dark:border-gray-600">
-                    {sortOptions.map((opt) => (
-                      <button
-                        key={opt.key}
-                        onClick={() => handleSortChange(opt.key)}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 flex justify-between items-center"
-                      >
-                        {opt.label}
-                        {filters.sortKey === opt.key && (
-                          <Check className="w-4 h-4 text-blue-500" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         )}
@@ -187,9 +170,16 @@ const MobileAllocatedView = ({
                 <span className="text-gray-500">{t("recipient")}:</span>
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4 text-gray-400" />
-                  <span className="font-medium">
-                    {item.allocationDetails?.recipientName}
-                  </span>
+                  <div>
+                    <span className="font-medium">
+                      {item.allocationDetails?.recipientName}
+                    </span>
+                    <div className="text-xs text-gray-500">
+                      {item.allocationDetails?.position
+                        ? getPositionLabel(item.allocationDetails.position)
+                        : ""}
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="flex justify-between items-center">
@@ -197,12 +187,7 @@ const MobileAllocatedView = ({
                 <div className="flex items-center gap-2">
                   <Building className="w-4 h-4 text-gray-400" />
                   <span className="font-medium">
-                    {item.allocationDetails?.department
-                      ? departmentsList.find(
-                          (dept) =>
-                            dept.id === item.allocationDetails.department
-                        )?.name || item.allocationDetails.department
-                      : "N/A"}
+                    {getDepartmentLabel(item.allocationDetails?.department)}
                   </span>
                 </div>
               </div>
@@ -217,6 +202,13 @@ const MobileAllocatedView = ({
               </div>
             </div>
             <div className="border-t dark:border-gray-600 pt-3 flex justify-end space-x-2">
+              <button
+                onClick={() => onViewItem && onViewItem(item)}
+                className="mobile-btn-icon mobile-optimized"
+                title={t("view_info")}
+              >
+                <Eye className="w-5 h-5 text-blue-500" />
+              </button>
               <button
                 onClick={() => onEditAllocation(item)}
                 className="mobile-btn-icon mobile-optimized"

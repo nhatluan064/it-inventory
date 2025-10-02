@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { RotateCcw, Search, Wrench, Edit, ChevronDown, ChevronRight, Package, User } from "lucide-react";
+import { RotateCcw, Search, Wrench, ChevronDown, ChevronRight, Package, User, Eye, Edit } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 
 const AllocatedView = ({
@@ -8,8 +8,10 @@ const AllocatedView = ({
   onRecallItem,
   onMarkDamaged,
   onEditAllocation,
+  onViewItem,
   categories,
   departmentsList,
+  positionsList,
   filters,
   setFilters,
   t,
@@ -87,6 +89,13 @@ const AllocatedView = ({
     const allOption = { id: "all", name: t("all") };
     return [allOption, ...departmentsList];
   }, [departmentsList, t]);
+
+  const getPositionLabel = (posId) => {
+    if (!posId) return "N/A";
+    const pos = (positionsList || []).find((p) => p.id === posId);
+    if (pos) return pos.name || posId;
+    return t(posId) || posId;
+  };
 
   const toggleExpand = (name) => {
     const isExpanded = expandedRows[name];
@@ -301,7 +310,7 @@ const AllocatedView = ({
                                   </p>
                                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                                     {item.allocationDetails?.position
-                                      ? t(item.allocationDetails.position)
+                                      ? getPositionLabel(item.allocationDetails.position)
                                       : "N/A"}
                                   </p>
                                 </div>
@@ -314,7 +323,7 @@ const AllocatedView = ({
                                 ? departmentsList.find(
                                     (dept) =>
                                       dept.id === item.allocationDetails.department
-                                  )?.name || item.allocationDetails.department
+                                  )?.name || t(item.allocationDetails.department) || item.allocationDetails.department
                                 : "N/A"}
                             </div>
 
@@ -326,8 +335,15 @@ const AllocatedView = ({
                             {/* Actions */}
                             <div className="flex items-center gap-2 ml-4">
                               <button
-                                onClick={() => onEditAllocation(item)}
+                                onClick={() => onViewItem && onViewItem(item)}
                                 className="p-2 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200"
+                                title={t("view_info")}
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => onEditAllocation && onEditAllocation(item)}
+                                className="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200"
                                 title={t("edit_recipient")}
                               >
                                 <Edit className="w-4 h-4" />

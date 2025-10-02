@@ -125,7 +125,8 @@ export const useViewRendering = ({
               allItems={masterItems}
               fullEquipmentList={inventory.equipment}
               onAddType={() => modals.openModal("type")}
-              onEditItem={(item) => modals.openModal("type", item)}
+              // Editing a master list entry should open the add/edit item modal
+              onEditItem={(item) => modals.openModal("addEdit", item)}
               onBulkMoveCategory={(payload) =>
                 inventory.bulkMoveCategory(payload)
               }
@@ -227,9 +228,11 @@ export const useViewRendering = ({
                   modals.openModal("editAllocation", item)
                 }
                 onRecallItem={(item) => modals.openModal("recall", item)}
-                onMarkDamaged={(item) =>
-                  modals.openModal("directMaintenanceNote", item)
-                }
+                onMarkDamaged={(item) => {
+                  // switch to Maintenance tab and open the note editor there
+                  handleTabClick(ROUTE_NAMES.MAINTENANCE);
+                  modals.openModal("note", item);
+                }}
                 filters={allocatedFilters}
                 setFilters={setAllocatedFilters}
               />
@@ -242,6 +245,7 @@ export const useViewRendering = ({
               unfilteredAllocatedItems={inventory.equipment.filter(
                 (i) => i.status === "in-use"
               )}
+              onViewItem={(item) => modals.openModal("view", item)}
               onEditAllocation={(item) =>
                 modals.openModal("editAllocation", item)
               }

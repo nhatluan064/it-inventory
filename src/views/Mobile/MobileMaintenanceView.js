@@ -4,8 +4,6 @@ import {
   XCircle,
   Edit,
   Filter,
-  ChevronDown,
-  Check,
   Calendar,
   Wrench,
   User,
@@ -19,31 +17,38 @@ const MobileMaintenanceView = ({
   t,
 }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filters, setFilters] = useState({
-    search: "",
-    sortKey: "maintenanceDate",
-    sortDirection: "desc",
-  });
-  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [filters, setFilters] = useState({ search: "" });
 
   const handleFilterChange = (e) => {
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSortChange = (sortKey) => {
-    setFilters((prev) => {
-      const newDirection =
-        prev.sortKey === sortKey && prev.sortDirection === "desc"
-          ? "asc"
-          : "desc";
-      return { ...prev, sortKey, sortDirection: newDirection };
-    });
-    setIsSortOpen(false);
-  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "---";
     return new Date(dateString).toLocaleString(t("locale_string"));
+  };
+
+  const renderCondition = (condition) => {
+    if (!condition) return "---";
+    if (typeof condition === "object") {
+      // expected shape: { key: 'translation.key', params: { ... } }
+      if (condition.key) {
+        const finalParams = { ...(condition.params || {}) };
+        if (finalParams.note && typeof finalParams.note === "object") {
+          const noteObj = finalParams.note;
+          finalParams.note = noteObj.isKey ? t(noteObj.value) : noteObj.value;
+        }
+        return t(condition.key, finalParams || {});
+      }
+      // fallback to JSON string if no key
+      try {
+        return JSON.stringify(condition);
+      } catch (e) {
+        return String(condition);
+      }
+    }
+    return t(String(condition));
   };
 
   const filteredAndSortedItems = useMemo(() => {
@@ -63,10 +68,6 @@ const MobileMaintenanceView = ({
     return results;
   }, [items, filters]);
 
-  const sortOptions = [
-    { key: "maintenanceDate", label: t("maintenance_date") },
-    { key: "name", label: t("device_name") },
-  ];
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">
@@ -87,7 +88,7 @@ const MobileMaintenanceView = ({
 
         {isFilterOpen && (
           <div className="mt-4 space-y-4 mobile-filter-enter">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <input
                 type="text"
                 name="search"
@@ -96,31 +97,6 @@ const MobileMaintenanceView = ({
                 placeholder={t("search")}
                 className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 col-span-1"
               />
-              <div className="relative col-span-1">
-                <button
-                  onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="w-full flex items-center justify-between p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
-                >
-                  <span className="text-sm">{t("sort_by")}</span>
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {isSortOpen && (
-                  <div className="absolute z-10 top-full right-0 mt-2 w-full bg-white dark:bg-gray-700 rounded-md shadow-lg border dark:border-gray-600">
-                    {sortOptions.map((opt) => (
-                      <button
-                        key={opt.key}
-                        onClick={() => handleSortChange(opt.key)}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 flex justify-between items-center"
-                      >
-                        {opt.label}
-                        {filters.sortKey === opt.key && (
-                          <Check className="w-4 h-4 text-blue-500" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         )}
@@ -147,7 +123,7 @@ const MobileMaintenanceView = ({
                 <span className="text-gray-500 flex items-center gap-2">
                   <Wrench className="w-4 h-4" /> {t("failure_note")}:
                 </span>
-                <span className="font-medium text-right">{item.condition}</span>
+                <span className="font-medium text-right">{renderCondition(item.condition)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500 flex items-center gap-2">

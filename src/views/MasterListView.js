@@ -136,8 +136,8 @@ const MasterListView = ({
 
   return (
     <div className="h-full flex flex-col gap-6 animate-fadeIn">
-      {/* Page transition */}
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">
+      {/* Page transition / Header */}
+      <div className="card card-lg glass-effect animate-slideInDown">
         {/* Header animation */}
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -185,7 +185,7 @@ const MasterListView = ({
         </div>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp p-6">
+  <div className="flex-grow flex flex-col card animate-slideInUp card-lg overflow-hidden">
         {/* Card-based container */}
         <div className="flex-grow overflow-y-auto hide-scrollbar space-y-3">
           {Object.entries(groupedByCategory).map(([categoryId, items], catIndex) => {
@@ -375,16 +375,16 @@ const MasterListView = ({
                           }}
                         >
                           <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <div className="w-2 h-2 bg-green-400 dark:bg-green-500 rounded-full flex-shrink-0"></div>
+                            <div className="w-2 h-2 bg-cyan-400 dark:bg-cyan-500 rounded-full flex-shrink-0"></div>
                             <div className="flex items-center gap-3 flex-1 min-w-0">
-                              <Package className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                              <Package className="w-4 h-4 text-cyan-600 dark:text-cyan-400 flex-shrink-0" />
                               <div className="min-w-0 flex-1">
                                 <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                                   {item.name}
                                 </p>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
                                   {isModelInUse ? (
-                                    <span className="text-green-600 dark:text-green-400 font-medium">
+                                    <span className="text-cyan-600 dark:text-cyan-400 font-medium">
                                       {t("has_been_used")}
                                     </span>
                                   ) : (
@@ -401,7 +401,7 @@ const MasterListView = ({
                           <div className="flex items-center gap-2 ml-4">
                             <button
                               onClick={() => onEditItem(item)}
-                              className="p-2 text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all duration-200"
+                              className="p-2 text-cyan-500 hover:bg-cyan-100 dark:hover:bg-cyan-900/30 rounded-lg transition-all duration-200"
                               title={t("edit")}
                             >
                               <Edit2 className="w-4 h-4" />

@@ -1,36 +1,14 @@
 import React, { useState, useMemo } from "react";
-import {
-  Trash2,
-  Filter,
-  ChevronDown,
-  Check,
-  User,
-  Wrench,
-} from "lucide-react";
+import { Trash2, Filter, User, Wrench } from "lucide-react";
 
 const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filters, setFilters] = useState({
-    search: "",
-    sortKey: "name",
-    sortDirection: "asc",
-  });
-  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [filters, setFilters] = useState({ search: "" });
 
   const handleFilterChange = (e) => {
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSortChange = (sortKey) => {
-    setFilters((prev) => {
-      const newDirection =
-        prev.sortKey === sortKey && prev.sortDirection === "asc"
-          ? "desc"
-          : "asc";
-      return { ...prev, sortKey, sortDirection: newDirection };
-    });
-    setIsSortOpen(false);
-  };
 
   const filteredAndSortedItems = useMemo(() => {
     let results = items.filter(
@@ -49,7 +27,26 @@ const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
     return results;
   }, [items, filters]);
 
-  const sortOptions = [{ key: "name", label: t("device_name") }];
+  const renderCondition = (item) => {
+    if (!item || !item.condition) return "---";
+    if (typeof item.condition === "object") {
+      if (item.condition.key) {
+        const finalParams = { ...(item.condition.params || {}) };
+        if (finalParams.note && typeof finalParams.note === "object") {
+          const noteObj = finalParams.note;
+          finalParams.note = noteObj.isKey ? t(noteObj.value) : noteObj.value;
+        }
+        return t(item.condition.key, finalParams);
+      }
+      try {
+        return JSON.stringify(item.condition);
+      } catch (e) {
+        return String(item.condition);
+      }
+    }
+    return t(String(item.condition));
+  };
+
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">
@@ -70,7 +67,7 @@ const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
 
         {isFilterOpen && (
           <div className="mt-4 space-y-4 animate-fadeIn">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <input
                 type="text"
                 name="search"
@@ -79,31 +76,6 @@ const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
                 placeholder={t("search")}
                 className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 col-span-1"
               />
-              <div className="relative col-span-1">
-                <button
-                  onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="w-full flex items-center justify-between p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
-                >
-                  <span className="text-sm">{t("sort_by")}</span>
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {isSortOpen && (
-                  <div className="absolute z-10 top-full right-0 mt-2 w-full bg-white dark:bg-gray-700 rounded-md shadow-lg border dark:border-gray-600">
-                    {sortOptions.map((opt) => (
-                      <button
-                        key={opt.key}
-                        onClick={() => handleSortChange(opt.key)}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 flex justify-between items-center"
-                      >
-                        {opt.label}
-                        {filters.sortKey === opt.key && (
-                          <Check className="w-4 h-4 text-blue-500" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         )}
@@ -132,7 +104,7 @@ const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
                     <Wrench className="w-4 h-4" /> {t("failure_note")}:
                   </span>
                   <span className="font-medium text-right">
-                    {item.condition}
+                    {renderCondition(item)}
                   </span>
                 </div>
                 <div className="flex justify-between">

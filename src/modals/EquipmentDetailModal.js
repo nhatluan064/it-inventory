@@ -7,6 +7,8 @@ const EquipmentDetailModal = ({
   onClose,
   item,
   categories,
+  departmentsList,
+  positionsList,
   statusLabels,
   statusColors, // Nhận thêm prop này từ App.js
   t,
@@ -42,6 +44,12 @@ const EquipmentDetailModal = ({
 
   const category = categories.find((c) => c.id === item.category);
   const details = item.allocationDetails || {};
+  const departmentName =
+    (departmentsList || []).find((d) => d.id === details.department)?.name ||
+    (details.department ? t(details.department) : "N/A");
+  const positionName =
+    (positionsList || []).find((p) => p.id === details.position)?.name ||
+    (details.position ? t(details.position) : "N/A");
 
   const DetailRow = ({ icon: Icon, label, value, valueClassName = "" }) => (
     <div className="flex items-start">
@@ -90,11 +98,11 @@ const EquipmentDetailModal = ({
           
           {item.status === 'in-use' && details.recipientName && (
             <div className="mt-6 pt-4 border-t dark:border-gray-700">
-              <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3">{t("Thông tin bàn giao")}</h3>
+              <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3">{t("handover_info")}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                 <DetailRow icon={CircleUser} label={t("recipient")} value={`${details.recipientName} (${details.employeeId})`} />
-                <DetailRow icon={Building} label={t("department")} value={t(details.department)} />
-                <DetailRow icon={Milestone} label={t("position")} value={t(details.position)} />
+                <DetailRow icon={Building} label={t("department")} value={departmentName} />
+                <DetailRow icon={Milestone} label={t("position")} value={positionName} />
                 <DetailRow icon={Calendar} label={t("handover_date")} value={formatDate(details.handoverDate)} />
               </div>
             </div>

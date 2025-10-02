@@ -15,6 +15,7 @@ const InventoryView = ({
   onViewItem,
   onAllocateItem,
   onAddLegacyItem,
+  departmentsList,
   t,
 }) => {
   const [expandedRows, setExpandedRows] = useState({});
@@ -86,10 +87,7 @@ const InventoryView = ({
     }, {});
   }, [unfilteredEquipment]);
 
-  const uniqueStatuses = useMemo(() => {
-    if (!unfilteredEquipment) return [];
-    return [...new Set(unfilteredEquipment.map((item) => item.status))];
-  }, [unfilteredEquipment]);
+  // Note: status options limited to Available and In Use per product requirement
 
   const formatDate = (dateString) => {
     if (!dateString) return "---";
@@ -110,7 +108,7 @@ const InventoryView = ({
     }
   };
 
-  const requestSubSort = (groupName, key) => {
+  const _requestSubSort = (groupName, key) => {
     setSubSortConfigs((prevConfigs) => {
       const currentConfig = prevConfigs[groupName] || {};
       let direction = "ascending";
@@ -129,8 +127,8 @@ const InventoryView = ({
 
   return (
     <div className="h-full flex flex-col gap-6 animate-fadeIn">
-      {/* Page transition */}
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">
+      {/* Page transition / Filter section */}
+      <div className="card card-lg glass-effect animate-slideInDown">
         {/* Filter section animation */}
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -199,11 +197,8 @@ const InventoryView = ({
               onChange={handleFilterChange}
             >
               <option value="all">{t("all")}</option>
-              {uniqueStatuses.map((status) => (
-                <option key={status} value={status}>
-                  {statusLabels[status] || status}
-                </option>
-              ))}
+              <option value="available">{statusLabels.available || t("available")}</option>
+              <option value="in-use">{statusLabels["in-use"] || t("in_use")}</option>
             </select>
           </div>
           <div>
@@ -221,7 +216,7 @@ const InventoryView = ({
         </div>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp p-6">
+  <div className="flex-grow flex flex-col card animate-slideInUp card-lg overflow-hidden">
         {/* Card-based container */}
         <div className="flex-grow overflow-y-auto hide-scrollbar space-y-3">
               {Object.entries(groupedByCategory).map(([categoryId, items], catIndex) => {
@@ -340,9 +335,13 @@ const InventoryView = ({
                                 )}
                               </div>
 
-                              {/* Location */}
+                              {/* Location: show department when allocated, otherwise show stock location */}
                               <div className="text-xs text-gray-600 dark:text-gray-300 ml-4 min-w-0">
-                                📍 {t(item.location) || item.location}
+                                📍 {item.status === "in-use" && item.allocationDetails?.department
+                                  ? (departmentsList?.find((dept) => dept.id === item.allocationDetails.department)?.name
+                                      || t(item.allocationDetails.department) 
+                                      || item.allocationDetails.department)
+                                  : t("location_in_stock")}
                               </div>
 
                               {/* Actions */}

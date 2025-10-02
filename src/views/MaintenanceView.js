@@ -1,134 +1,105 @@
-import React from "react";
-import { CheckCircle, XCircle, Edit, Package } from "lucide-react";
+import React, { useMemo, useState, useEffect } from "react";
+import { CheckCircle, XCircle, Edit, Package, ChevronDown, ChevronRight } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 
-const MaintenanceView = ({
-  items,
-  onRepairComplete,
-  onMarkUnrepairable,
-  onEditNote,
-  t,
-}) => {
-  const {
-    items: sortedItems,
-    requestSort,
-    sortConfig,
-  } = useSort(items, { key: "maintenanceDate", direction: "descending" });
+const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNote, categories, t }) => {
+  const [expandedRows, setExpandedRows] = useState({});
+  const subSortConfigs = {};
 
-  const columns = [
-    { key: "name", label: "device_name", sortable: true },
-    { key: "serialNumber", label: "serial_number_sn", sortable: true },
-    { key: "maintenanceDate", label: "maintenance_date", sortable: true },
-    { key: "condition", label: "failure_note", sortable: true },
-    { key: "recalledFrom", label: "recalled_from_user", sortable: true },
-    {
-      key: "actions",
-      label: "actions",
-      sortable: false,
-      className: "text-center",
-    },
-  ];
+  const { items: sortedItems } = useSort(items || [], { key: "name", direction: "ascending" });
 
-  const formatDate = (dateString) =>
-    new Date(dateString).toLocaleString(t("locale_string"));
+  const groupedByCategory = useMemo(() => {
+    const grouped = (sortedItems || []).reduce((acc, item) => {
+      const key = item.category || "uncategorized";
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(item);
+      return acc;
+    }, {});
+    // keep category order stable
+    return grouped;
+  }, [sortedItems]);
+
+  useEffect(() => {
+    setExpandedRows({});
+  }, [items]);
+
+  const toggleExpand = (name) => {
+    setExpandedRows((prev) => ({ ...prev, [name]: !prev[name] }));
+  };
+
+  // sub-sort helper intentionally omitted for maintenance view
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "---";
+    return new Date(dateString).toLocaleString(t("locale_string"));
+  };
 
   return (
     <div className="h-full flex flex-col gap-6 animate-fadeIn">
-      {/* Page transition */}
       <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">
-        {/* Header animation */}
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-          {t("maintenance_management")}
-        </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          {t("maintenance_desc")}
-        </p>
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">{t("maintenance_management")}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t("maintenance_desc")}</p>
       </div>
 
-      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp">
-        {/* Table container animation */}
-        <div className="flex-grow overflow-y-auto hide-scrollbar">
-          {sortedItems.length > 0 ? (
-            <table className="w-full text-xs table-fixed">
-              <thead className="bg-white dark:bg-gray-800 sticky top-0 z-10">
-                <tr>
-                  {columns.map((col) => (
-                    <th
-                      key={col.key}
-                      className={`px-4 py-3.5 text-left font-medium uppercase text-gray-500 dark:text-gray-400 border-b-2 border-gray-100 dark:border-gray-700 ${
-                        col.className || ""
-                      } cursor-pointer select-none`}
-                      onClick={() => col.sortable && requestSort(col.key)}
-                    >
-                      {t(col.label)}
-                      {sortConfig.key === col.key &&
-                        (sortConfig.direction === "ascending" ? " ▲" : " ▼")}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                {sortedItems.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="h-16 hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                  >
-                    <td className="px-4 font-semibold align-middle">
-                      {item.name}
-                    </td>
-                    <td className="px-4 font-mono align-middle">
-                      {item.serialNumber || "N/A"}
-                    </td>
-                    <td className="px-4 align-middle">
-                      {formatDate(item.maintenanceDate)}
-                    </td>
-                    <td className="px-4 align-middle">
-                      {typeof item.condition === "object" &&
-                      item.condition?.params?.note
-                        ? item.condition.params.note.value
-                        : item.condition || "---"}
-                    </td>
-                    <td className="px-4 font-semibold align-middle">
-                      {item.recalledFrom || "---"}
-                    </td>
-                    <td className="px-4 text-center align-middle">
-                      <div className="flex items-center justify-center space-x-1">
-                        <button
-                          onClick={() => onEditNote(item)}
-                          className="p-2 rounded-lg text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 animate-hoverScale transition-all duration-200"
-                          title={t("edit_failure_note")}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => onRepairComplete(item)}
-                          className="p-2 rounded-lg text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 animate-hoverScale transition-all duration-200"
-                          title={t("repair_completed")}
-                        >
-                          <CheckCircle className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => onMarkUnrepairable(item)}
-                          className="p-2 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 animate-hoverScale transition-all duration-200"
-                          title={t("mark_unrepairable")}
-                        >
-                          <XCircle className="w-4 h-4" />
-                        </button>
+      <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp p-6">
+        <div className="flex-grow overflow-y-auto hide-scrollbar space-y-3">
+          {Object.entries(groupedByCategory).map(([categoryId, items], catIndex) => {
+            const isExpanded = expandedRows[categoryId];
+            const category = (categories || []).find((c) => c.id === categoryId);
+            const subSortConfig = subSortConfigs[categoryId] || { key: "name", direction: "ascending" };
+            const sortedSubItems = [...items].sort((a, b) => {
+              const aValue = a[subSortConfig.key] || "";
+              const bValue = b[subSortConfig.key] || "";
+              const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+              const comparison = collator.compare(aValue.toString(), bValue.toString());
+              return subSortConfig.direction === "ascending" ? comparison : -comparison;
+            });
+
+            return (
+              <div key={categoryId} className="border-2 border-orange-100 dark:border-orange-700 rounded-lg overflow-hidden animate-fadeIn" style={{ animationDelay: `${catIndex * 0.05}s` }}>
+                <div onClick={() => toggleExpand(categoryId)} className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/30 hover:from-orange-100 hover:to-red-100 cursor-pointer transition-all duration-200">
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 dark:from-orange-400 dark:to-red-500 rounded-lg flex items-center justify-center shadow-md">
+                      {isExpanded ? (<ChevronDown className="w-5 h-5 text-white" />) : (<ChevronRight className="w-5 h-5 text-white" />)}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900 dark:text-white">{category?.name || categoryId}</h3>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">{items.length} {t("label_devices")}</p>
+                    </div>
+                  </div>
+                  <div className="text-sm font-medium text-orange-600 dark:text-orange-400">{isExpanded ? t("collapse") : t("expand")}</div>
+                </div>
+
+                {isExpanded && (
+                  <div className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+                    {sortedSubItems.map((item, itemIndex) => (
+                      <div key={item.id} className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 animate-slideInLeft border-l-4 border-transparent hover:border-orange-300" style={{ animationDelay: `${itemIndex * 0.03}s` }}>
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="w-2 h-2 bg-orange-400 dark:bg-orange-500 rounded-full flex-shrink-0"></div>
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-red-400 dark:from-orange-500 dark:to-red-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow">
+                              <Package className="w-4 h-4 text-white" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium truncate text-gray-900 dark:text-white">{item.name}</p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">{t("serial_number_sn")}: {item.serialNumber || "N/A"}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 ml-4">
+                          <div className="text-xs mr-3">{formatDate(item.maintenanceDate)}</div>
+                          <button onClick={() => onEditNote(item)} className="p-2 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200" title={t("edit_failure_note")}><Edit className="w-4 h-4"/></button>
+                          <button onClick={() => onRepairComplete(item)} className="p-2 text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all duration-200" title={t("repair_completed")}><CheckCircle className="w-4 h-4"/></button>
+                          <button onClick={() => onMarkUnrepairable(item)} className="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all duration-200" title={t("mark_unrepairable")}><XCircle className="w-4 h-4"/></button>
+                        </div>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="text-center py-16 m-auto">
-              <Package className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-              <p className="text-sm font-semibold">{t("no_data_available")}</p>
-              <p className="mt-2 text-xs text-gray-500">
-                {t("maintenance_desc")}
-              </p>
-            </div>
-          )}
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

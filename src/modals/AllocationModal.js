@@ -25,6 +25,9 @@ const AllocationModal = ({
     position: "",
     positionDescription: "",
     department: "",
+    giverName: "",
+    giverPosition: "",
+    giverDepartment: "",
     condition: "",
     handoverDate: new Date().toISOString(),
   });
@@ -59,6 +62,9 @@ const AllocationModal = ({
         position: positionsList[0]?.id || "",
         positionDescription: "",
         department: departmentsList[0]?.id || "",
+        giverName: "",
+        giverPosition: "",
+        giverDepartment: departmentsList[0]?.id || "",
         condition: displayCondition,
         handoverDate: new Date().toISOString(),
       });
@@ -137,6 +143,40 @@ const AllocationModal = ({
                   onChange={handleChange}
                   className="w-full pl-10 pr-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
                   required
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Giver fields */}
+          <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t("giver_name")}
+              </label>
+              <div className="relative mt-1">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  name="giverName"
+                  value={formData.giverName}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t("giver_position")}
+              </label>
+              <div className="relative mt-1">
+                <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  name="giverPosition"
+                  value={formData.giverPosition}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
                 />
               </div>
             </div>

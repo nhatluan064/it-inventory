@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import {
   Eye,
   Edit,
@@ -7,14 +7,11 @@ import {
   User,
   Filter,
   Plus,
-  ChevronDown,
-  Check,
   Calendar,
 } from "lucide-react";
 
 const MobileInventoryView = ({
   equipment,
-  unfilteredEquipment,
   categories,
   statusLabels,
   filters,
@@ -26,8 +23,8 @@ const MobileInventoryView = ({
   onAddLegacyItem,
   t,
 }) => {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [isSortOpen, setIsSortOpen] = useState(false);
+  // Keep filters visible on mobile by default
+  const [isFilterOpen, setIsFilterOpen] = useState(true);
 
   const formatDate = (dateString) => {
     if (!dateString) return "---";
@@ -36,8 +33,22 @@ const MobileInventoryView = ({
 
   const renderCondition = (item) => {
     if (!item || !item.condition) return "---";
-    if (typeof item.condition === "object" && item.condition.key) {
-      return t(item.condition.key, item.condition.params);
+    if (typeof item.condition === "object") {
+      // If condition is a translation key with params, ensure note param is a string
+      if (item.condition.key) {
+        const finalParams = { ...(item.condition.params || {}) };
+        if (finalParams.note && typeof finalParams.note === "object") {
+          const noteObj = finalParams.note;
+          finalParams.note = noteObj.isKey ? t(noteObj.value) : noteObj.value;
+        }
+        return t(item.condition.key, finalParams);
+      }
+      // Fallback to safe stringification
+      try {
+        return JSON.stringify(item.condition);
+      } catch (e) {
+        return String(item.condition);
+      }
     }
     return t(String(item.condition));
   };
@@ -46,28 +57,15 @@ const MobileInventoryView = ({
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSortChange = (sortKey) => {
-    setFilters((prev) => {
-      const currentDirection = prev.sortDirection || "desc";
-      const newDirection =
-        prev.sortKey === sortKey && currentDirection === "desc"
-          ? "asc"
-          : "desc";
-      return { ...prev, sortKey, sortDirection: newDirection };
-    });
-    setIsSortOpen(false);
-  };
 
-  const uniqueStatuses = useMemo(() => {
-    if (!unfilteredEquipment) return [];
-    return [...new Set(unfilteredEquipment.map((item) => item.status))];
-  }, [unfilteredEquipment]);
+  // uniqueStatuses not needed after restricting status dropdown to fixed options
 
-  const sortOptions = [
-    { key: "importDate", label: t("import_date") },
-    { key: "name", label: t("device_name") },
-    { key: "status", label: t("status") },
-  ];
+  // Filter out any category placeholders named or keyed 'all' to avoid duplicate "All" options
+  const cleanedCategories = (categories || []).filter(
+    (c) => String(c.id).toLowerCase() !== "all" && (c.name || "").toLowerCase() !== (t("all") || "").toLowerCase()
+  );
+
+  // sort helpers removed for mobile - using explicit importDate filter instead
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">
@@ -103,31 +101,13 @@ const MobileInventoryView = ({
                 placeholder={t("search_inventory_placeholder")}
                 className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 col-span-1"
               />
-              <div className="relative col-span-1">
-                <button
-                  onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="w-full flex items-center justify-between p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
-                >
-                  <span className="text-sm">{t("sort_by")}</span>
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {isSortOpen && (
-                  <div className="absolute z-10 top-full right-0 mt-2 w-full bg-white dark:bg-gray-700 rounded-md shadow-lg border dark:border-gray-600">
-                    {sortOptions.map((opt) => (
-                      <button
-                        key={opt.key}
-                        onClick={() => handleSortChange(opt.key)}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 flex justify-between items-center"
-                      >
-                        {opt.label}
-                        {filters.sortKey === opt.key && (
-                          <Check className="w-4 h-4 text-blue-500" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <input
+                type="date"
+                name="importDate"
+                value={filters.importDate || ""}
+                onChange={handleFilterChange}
+                className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 col-span-1"
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <select
@@ -136,7 +116,8 @@ const MobileInventoryView = ({
                 onChange={handleFilterChange}
                 className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
               >
-                {categories.map((cat) => (
+                <option value="all">{t("all")}</option>
+                {cleanedCategories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
                   </option>
@@ -149,11 +130,8 @@ const MobileInventoryView = ({
                 className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
               >
                 <option value="all">{t("all")}</option>
-                {uniqueStatuses.map((status) => (
-                  <option key={status} value={status}>
-                    {statusLabels[status] || status}
-                  </option>
-                ))}
+                <option value="available">{statusLabels.available || t("available")}</option>
+                <option value="in-use">{statusLabels["in-use"] || t("in_use")}</option>
               </select>
             </div>
           </div>

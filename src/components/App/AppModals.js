@@ -7,6 +7,7 @@ import ConfirmDeleteModal from "../../modals/ConfirmDeleteModal";
 import EquipmentDetailModal from "../../modals/EquipmentDetailModal";
 import EquipmentTypeModal from "../../modals/EquipmentTypeModal";
 import AllocationModal from "../../modals/AllocationModal";
+import EditAllocationModal from "../../modals/EditAllocationModal";
 import CancelNoteModal from "../../modals/CancelNoteModal";
 import BulkEditModal from "../../modals/BulkEditModal";
 import RecallModal from "../../modals/RecallModal";
@@ -140,6 +141,8 @@ const AppModals = ({
         onClose={() => modals.closeModal("view")}
         item={modals.currentItem}
         categories={categories}
+        departmentsList={departmentsList}
+        positionsList={positionsList}
         statusLabels={statusLabels}
         statusColors={statusColors}
         t={t}
@@ -150,6 +153,17 @@ const AppModals = ({
         show={modals.modalState.allocation}
         onClose={() => modals.closeModal("allocation")}
         onSubmit={inventory.allocateItem}
+        item={modals.currentItem}
+        departmentsList={departmentsList}
+        positionsList={positionsList}
+        t={t}
+      />
+
+      {/* Edit Allocation Modal (mobile edit) */}
+      <EditAllocationModal
+        show={modals.modalState.editAllocation}
+        onClose={() => modals.closeModal("editAllocation")}
+        onSubmit={inventory.updateAllocationDetails}
         item={modals.currentItem}
         departmentsList={departmentsList}
         positionsList={positionsList}

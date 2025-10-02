@@ -1,13 +1,5 @@
 import React, { useState, useMemo } from "react";
-import {
-  ShoppingCart,
-  Trash2,
-  Plus,
-  Filter,
-  Check,
-  ChevronDown,
-  Layers,
-} from "lucide-react";
+import { ShoppingCart, Trash2, Plus, Filter, Layers } from "lucide-react";
 import toast from "react-hot-toast";
 
 const MobilePendingPurchaseView = ({
@@ -19,13 +11,15 @@ const MobilePendingPurchaseView = ({
   t,
 }) => {
   const [purchaseData, setPurchaseData] = useState({});
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  // Show filters visible by default on mobile
+  const [isFilterOpen, setIsFilterOpen] = useState(true);
   const [filters, setFilters] = useState({
     search: "",
     sortKey: "name",
     sortDirection: "asc",
+    category: "all",
   });
-  const [isSortOpen, setIsSortOpen] = useState(false);
+  // sort dropdown replaced with inline select
 
   const handleDataChange = (id, field, value) => {
     setPurchaseData((prev) => ({
@@ -48,15 +42,6 @@ const MobilePendingPurchaseView = ({
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSortChange = (sortKey) => {
-    setFilters((prev) => {
-      const currentDirection = prev.sortDirection || "asc";
-      const newDirection =
-        prev.sortKey === sortKey && currentDirection === "asc" ? "desc" : "asc";
-      return { ...prev, sortKey, sortDirection: newDirection };
-    });
-    setIsSortOpen(false);
-  };
 
   const filteredAndSortedItems = useMemo(() => {
     let sortedItems = [...items];
@@ -81,10 +66,7 @@ const MobilePendingPurchaseView = ({
     return sortedItems;
   }, [items, filters]);
 
-  const sortOptions = [
-    { key: "name", label: t("device_name") },
-    { key: "category", label: t("category") },
-  ];
+  // sort options are handled on desktop; mobile uses category select and simple search
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">
@@ -123,31 +105,21 @@ const MobilePendingPurchaseView = ({
                 placeholder={t("search_master_item_placeholder")}
                 className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 col-span-1"
               />
-              <div className="relative col-span-1">
-                <button
-                  onClick={() => setIsSortOpen(!isSortOpen)}
-                  className="w-full flex items-center justify-between p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
-                >
-                  <span className="text-sm">{t("sort_by")}</span>
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {isSortOpen && (
-                  <div className="absolute z-10 top-full right-0 mt-2 w-full bg-white dark:bg-gray-700 rounded-md shadow-lg border dark:border-gray-600">
-                    {sortOptions.map((opt) => (
-                      <button
-                        key={opt.key}
-                        onClick={() => handleSortChange(opt.key)}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 flex justify-between items-center"
-                      >
-                        {opt.label}
-                        {filters.sortKey === opt.key && (
-                          <Check className="w-4 h-4 text-blue-500" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <select
+                name="category"
+                value={filters.category}
+                onChange={handleFilterChange}
+                className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 col-span-1"
+              >
+                <option key="all" value="all">
+                  {t("all")}
+                </option>
+                {(categories || []).map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         )}
