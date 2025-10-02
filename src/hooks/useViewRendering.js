@@ -125,8 +125,8 @@ export const useViewRendering = ({
               allItems={masterItems}
               fullEquipmentList={inventory.equipment}
               onAddType={() => modals.openModal("type")}
-              // Editing a master list entry should open the add/edit item modal
-              onEditItem={(item) => modals.openModal("addEdit", item)}
+              // Editing a master list entry should open the EquipmentTypeModal (Name + Category only)
+              onEditItem={(item) => modals.openModal("type", item)}
               onBulkMoveCategory={(payload) =>
                 inventory.bulkMoveCategory(payload)
               }
@@ -228,11 +228,9 @@ export const useViewRendering = ({
                   modals.openModal("editAllocation", item)
                 }
                 onRecallItem={(item) => modals.openModal("recall", item)}
-                onMarkDamaged={(item) => {
-                  // switch to Maintenance tab and open the note editor there
-                  handleTabClick(ROUTE_NAMES.MAINTENANCE);
-                  modals.openModal("note", item);
-                }}
+                onMarkDamaged={(item) =>
+                  modals.openModal("directMaintenanceNote", item)
+                }
                 filters={allocatedFilters}
                 setFilters={setAllocatedFilters}
               />

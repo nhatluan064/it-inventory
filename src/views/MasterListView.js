@@ -16,8 +16,8 @@ const MasterListView = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [expandedRows, setExpandedRows] = useState({});
-  const [animatingRows, setAnimatingRows] = useState({});
-  const [subSortConfigs, setSubSortConfigs] = useState({});
+  const [, setAnimatingRows] = useState({});
+  const [subSortConfigs] = useState({});
   const [bulkTargets, setBulkTargets] = useState({});
 
   // State để quản lý sorting category riêng
@@ -115,23 +115,10 @@ const MasterListView = ({
         setAnimatingRows((prev) => ({ ...prev, [name]: undefined }));
       }, 300);
     } else {
-      setExpandedRows((prev) => ({ ...prev, [name]: true }));
+      // Only keep clicked open
+      setExpandedRows({ [name]: true });
       setAnimatingRows((prev) => ({ ...prev, [name]: "opening" }));
     }
-  };
-
-  const requestSubSort = (groupName, key) => {
-    setSubSortConfigs((prevConfigs) => {
-      const currentConfig = prevConfigs[groupName] || {};
-      let direction = "ascending";
-      if (
-        currentConfig.key === key &&
-        currentConfig.direction === "ascending"
-      ) {
-        direction = "descending";
-      }
-      return { ...prevConfigs, [groupName]: { key, direction } };
-    });
   };
 
   return (

@@ -23,7 +23,6 @@ const MobileMasterListView = ({
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-
   const filteredAndSortedItems = useMemo(() => {
     let items = [...allItems];
 
@@ -116,9 +115,10 @@ const MobileMasterListView = ({
       {/* Item List Section */}
       <div className="flex-grow overflow-y-auto p-3 space-y-2 mobile-stagger">
         {filteredAndSortedItems.map((item) => {
+          // Align in-use detection with desktop logic
           const isModelInUse = fullEquipmentList.some(
             (e) =>
-              e.name === item.name &&
+              e.name.split(" (User:")[0].trim() === item.name &&
               e.category === item.category &&
               e.status !== "master"
           );
@@ -159,8 +159,12 @@ const MobileMasterListView = ({
               <div className="border-t dark:border-gray-600 pt-2 flex justify-end space-x-2">
                 <button
                   onClick={() => onEditItem(item)}
-                  disabled={isModelInUse}
-                  className="mobile-btn-icon mobile-optimized disabled:opacity-40"
+                  className="mobile-btn-icon mobile-optimized"
+                  title={
+                    isModelInUse
+                      ? t("cannot_edit_name_item_in_use")
+                      : undefined
+                  }
                 >
                   <Edit2 className="w-5 h-5 text-amber-500" />
                 </button>

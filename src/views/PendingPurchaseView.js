@@ -15,8 +15,8 @@ const PendingPurchaseView = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [expandedRows, setExpandedRows] = useState({});
-  const [animatingRows, setAnimatingRows] = useState({});
-  const [subSortConfigs, setSubSortConfigs] = useState({});
+  const [, setAnimatingRows] = useState({});
+  const [subSortConfigs] = useState({});
 
   const { items: sortedItems } = useSort(items || [], {
     key: "name",
@@ -75,20 +75,9 @@ const PendingPurchaseView = ({
         setAnimatingRows((prev) => ({ ...prev, [name]: undefined }));
       }, 300);
     } else {
-      setExpandedRows((prev) => ({ ...prev, [name]: true }));
+      setExpandedRows({ [name]: true });
       setAnimatingRows((prev) => ({ ...prev, [name]: "opening" }));
     }
-  };
-
-  const requestSubSort = (groupName, key) => {
-    setSubSortConfigs((prevConfigs) => {
-      const currentConfig = prevConfigs[groupName] || {};
-      let direction = "ascending";
-      if (currentConfig.key === key && currentConfig.direction === "ascending") {
-        direction = "descending";
-      }
-      return { ...prevConfigs, [groupName]: { key, direction } };
-    });
   };
 
   useEffect(() => {

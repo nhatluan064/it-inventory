@@ -27,11 +27,15 @@ const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNo
     setExpandedRows((prev) => ({ ...prev, [name]: !prev[name] }));
   };
 
-  // sub-sort helper intentionally omitted for maintenance view
-
   const formatDate = (dateString) => {
     if (!dateString) return "---";
     return new Date(dateString).toLocaleString(t("locale_string"));
+  };
+
+  const getFailureNote = (condition) => {
+    const noteObj = condition?.params?.note;
+    if (!noteObj) return "---";
+    return noteObj.isKey ? t(noteObj.value) : noteObj.value;
   };
 
   return (
@@ -83,6 +87,12 @@ const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNo
                             <div className="flex-1 min-w-0">
                               <p className="font-medium truncate text-gray-900 dark:text-white">{item.name}</p>
                               <p className="text-xs text-gray-500 dark:text-gray-400">{t("serial_number_sn")}: {item.serialNumber || "N/A"}</p>
+                              <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                                {t("failure_note")}: <span className="font-medium">{getFailureNote(item.condition)}</span>
+                              </p>
+                              <p className="text-xs text-gray-600 dark:text-gray-300">
+                                {t("recalled_from_user")}: <span className="font-medium">{item.recalledFrom || "---"}</span>{item.recalledDepartment ? ` • ${item.recalledDepartment}` : ""}
+                              </p>
                             </div>
                           </div>
                         </div>

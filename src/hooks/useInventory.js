@@ -963,6 +963,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
         location: "location_in_stock",
         condition,
         recalledFrom: null,
+        recalledDepartment: null,
         // When repair completes and item returns to stock, set importDate to now
         importDate: new Date().toISOString(),
       };
@@ -1045,11 +1046,19 @@ export const useInventory = (currentUser, t, setActiveTab) => {
         key: "condition_damaged",
         params: { note: { value: noteValue, isKey: isNoteKey } },
       };
+      // Resolve department name from id if possible
+      const recalledDeptName = item.allocationDetails?.department
+        ? (departmentsList || []).find(
+            (d) => d.id === item.allocationDetails.department
+          )?.name || item.allocationDetails.department
+        : null;
+
       const dataToUpdate = {
         status: "maintenance",
         location: "location_maintenance",
         condition,
         recalledFrom: item.allocationDetails?.recipientName || "N/A",
+        recalledDepartment: recalledDeptName || "N/A",
         allocationDetails: null,
         maintenanceDate: new Date().toISOString(),
       };
@@ -1064,11 +1073,11 @@ export const useInventory = (currentUser, t, setActiveTab) => {
         type: "inventory",
         reason: "damaged",
         itemName: item.name,
-        details: { note: noteValue },
+        details: { note: noteValue, recalledDepartment: dataToUpdate.recalledDepartment },
       });
       toast.success(t("toast_moved_to_maintenance", { itemName: item.name }));
     },
-    [currentUser, equipment, logTransaction, t]
+    [currentUser, equipment, logTransaction, t, departmentsList]
   );
 
   const updateMaintenanceNote = useCallback(
@@ -1088,7 +1097,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
         reason: "update-note",
         itemName: item.name,
       });
-      toast.success(t("toast_note_updated_successfully"));
+      toast.success(t("toast_maintenance_note_updated"));
     },
     [currentUser, equipment, logTransaction, t]
   );
@@ -1113,6 +1122,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
         details: {
           recalledFrom:
             item.recalledFrom || item.allocationDetails?.recipientName,
+          recalledDepartment: item.recalledDepartment,
         },
       });
       toast.success(t("toast_moved_to_liquidation", { itemName: item.name }));
@@ -1128,7 +1138,7 @@ export const useInventory = (currentUser, t, setActiveTab) => {
         type: "inventory",
         reason: "liquidated",
         itemName: item.name,
-        details: { recalledFrom: item.recalledFrom },
+        details: { recalledFrom: item.recalledFrom, recalledDepartment: item.recalledDepartment },
       });
       toast.success(
         t("toast_item_liquidated_successfully", { itemName: item.name })

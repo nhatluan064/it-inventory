@@ -1,13 +1,12 @@
 import React, { useState, useMemo } from "react";
 import toast from "react-hot-toast";
-import { LogIn, CheckCircle, Layers, Package, ChevronDown, ChevronRight } from "lucide-react";
+import { LogIn, CheckCircle, Package, ChevronDown, ChevronRight } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 
 const PurchasedView = ({ items, onImportItem, categories, t }) => {
   const [importingIds, setImportingIds] = useState([]);
   const [serialNumbers, setSerialNumbers] = useState({});
   const [expandedRows, setExpandedRows] = useState({});
-  const [subSortConfigs, setSubSortConfigs] = useState({});
 
   const { items: sortedItems } = useSort(items || [], { key: "name", direction: "ascending" });
 
@@ -43,16 +42,7 @@ const PurchasedView = ({ items, onImportItem, categories, t }) => {
     }
   };
 
-  const toggleExpand = (name) => setExpandedRows((prev) => ({ ...prev, [name]: !prev[name] }));
-
-  const requestSubSort = (groupName, key) => {
-    setSubSortConfigs((prev) => {
-      const cur = prev[groupName] || {};
-      let dir = "ascending";
-      if (cur.key === key && cur.direction === "ascending") dir = "descending";
-      return { ...prev, [groupName]: { key, direction: dir } };
-    });
-  };
+  const toggleExpand = (name) => setExpandedRows((prev) => ({ [name]: !prev[name] }));
 
   return (
     <div className="h-full flex flex-col gap-6 animate-fadeIn">
@@ -65,13 +55,11 @@ const PurchasedView = ({ items, onImportItem, categories, t }) => {
         <div className="flex-grow overflow-y-auto hide-scrollbar space-y-3">
           {Object.entries(groupedByCategory).map(([categoryId, items], catIndex) => {
             const isExpanded = expandedRows[categoryId];
-            const subSortConfig = subSortConfigs[categoryId] || { key: "name", direction: "ascending" };
             const sortedSubItems = [...items].sort((a, b) => {
-              const aValue = a[subSortConfig.key] || "";
-              const bValue = b[subSortConfig.key] || "";
+              const aValue = a.name || "";
+              const bValue = b.name || "";
               const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
-              const comparison = collator.compare(aValue.toString(), bValue.toString());
-              return subSortConfig.direction === "ascending" ? comparison : -comparison;
+              return collator.compare(aValue.toString(), bValue.toString());
             });
 
             return (

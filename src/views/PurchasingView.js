@@ -1,10 +1,9 @@
 import React, { useState, useMemo } from "react";
-import { CheckCircle, XCircle, Layers, Package, ChevronDown, ChevronRight } from "lucide-react";
+import { CheckCircle, XCircle, Package, ChevronDown, ChevronRight } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 
 const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
   const [expandedRows, setExpandedRows] = useState({});
-  const [subSortConfigs, setSubSortConfigs] = useState({});
 
   const { items: sortedItems } = useSort(items || [], { key: "name", direction: "ascending" });
 
@@ -18,16 +17,7 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
   }, [sortedItems]);
 
   const toggleExpand = (name) => {
-    setExpandedRows((prev) => ({ ...prev, [name]: !prev[name] }));
-  };
-
-  const requestSubSort = (groupName, key) => {
-    setSubSortConfigs((prev) => {
-      const cur = prev[groupName] || {};
-      let dir = "ascending";
-      if (cur.key === key && cur.direction === "ascending") dir = "descending";
-      return { ...prev, [groupName]: { key, direction: dir } };
-    });
+    setExpandedRows((prev) => ({ [name]: !prev[name] }));
   };
 
   const formatCurrency = (amount) => {
@@ -46,7 +36,7 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
         <div className="flex-grow overflow-y-auto hide-scrollbar space-y-3">
           {Object.entries(groupedByCategory).map(([categoryId, items], catIndex) => {
             const isExpanded = expandedRows[categoryId];
-            const subSortConfig = subSortConfigs[categoryId] || { key: "name", direction: "ascending" };
+            const subSortConfig = { key: "name", direction: "ascending" };
             const sortedSubItems = [...items].sort((a, b) => {
               const aValue = a[subSortConfig.key] || "";
               const bValue = b[subSortConfig.key] || "";

@@ -20,7 +20,7 @@ const LiquidationView = ({ items, onLiquidateItem, categories, t }) => {
     setExpandedRows({});
   }, [items]);
 
-  const toggleExpand = (name) => setExpandedRows((prev) => ({ ...prev, [name]: !prev[name] }));
+  const toggleExpand = (name) => setExpandedRows((prev) => ({ [name]: !prev[name] }));
 
   return (
     <div className="h-full flex flex-col gap-6 animate-fadeIn">

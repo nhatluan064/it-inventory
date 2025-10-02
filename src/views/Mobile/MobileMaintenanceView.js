@@ -23,7 +23,6 @@ const MobileMaintenanceView = ({
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-
   const formatDate = (dateString) => {
     if (!dateString) return "---";
     return new Date(dateString).toLocaleString(t("locale_string"));
@@ -67,7 +66,6 @@ const MobileMaintenanceView = ({
 
     return results;
   }, [items, filters]);
-
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">
@@ -123,7 +121,9 @@ const MobileMaintenanceView = ({
                 <span className="text-gray-500 flex items-center gap-2">
                   <Wrench className="w-4 h-4" /> {t("failure_note")}:
                 </span>
-                <span className="font-medium text-right">{renderCondition(item.condition)}</span>
+                <span className="font-medium text-right">
+                  {renderCondition(item.condition)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500 flex items-center gap-2">
@@ -137,8 +137,11 @@ const MobileMaintenanceView = ({
                 <span className="text-gray-500 flex items-center gap-2">
                   <User className="w-4 h-4" /> {t("recalled_from_user")}:
                 </span>
-                <span className="font-medium">
-                  {item.recalledFrom || "---"}
+                <span className="font-medium text-right">
+                  {(item.recalledFrom || "---") +
+                    (item.recalledDepartment
+                      ? ` • ${item.recalledDepartment}`
+                      : "")}
                 </span>
               </div>
             </div>
