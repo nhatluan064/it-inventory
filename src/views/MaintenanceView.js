@@ -73,7 +73,7 @@ const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNo
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t("maintenance_desc")}</p>
         {/* Filters */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end mt-6">
-          <div className="sm:col-span-1">
+          <div className="sm:col-span-2 lg:col-span-2">
             <label className="block text-xs font-semibold mb-2">{t("search")}</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
