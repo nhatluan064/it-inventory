@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
 import { Trash2, Filter, User, Wrench } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { useDynamicData } from "../../hooks/useDynamicData";
@@ -21,11 +22,13 @@ const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
   };
 
 
+  const debouncedSearch = useDebouncedValue(filters.search, 300);
+
   const filteredAndSortedItems = useMemo(() => {
     let results = items.filter(
       (item) =>
-        (item.name || "").toLowerCase().includes(filters.search.toLowerCase()) ||
-        (item.serialNumber || "").toLowerCase().includes(filters.search.toLowerCase())
+        (item.name || "").toLowerCase().includes((debouncedSearch || "").toLowerCase()) ||
+        (item.serialNumber || "").toLowerCase().includes((debouncedSearch || "").toLowerCase())
     );
 
     if (filters.category && filters.category !== "all") {
@@ -53,7 +56,7 @@ const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
     });
 
     return results;
-  }, [items, filters, departmentsList]);
+  }, [items, debouncedSearch, filters.category, filters.department, filters.sortKey, filters.sortDirection, departmentsList]);
 
   const renderCondition = (item) => {
     if (!item) return "---";

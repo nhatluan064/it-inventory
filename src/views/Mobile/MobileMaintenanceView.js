@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from "react";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
+import EmptyState from "../../components/EmptyState";
 import {
   CheckCircle,
   XCircle,
@@ -46,11 +48,13 @@ const MobileMaintenanceView = ({
     return String(noteObj);
   };
 
+  const debouncedSearch = useDebouncedValue(filters.search, 300);
+
   const filteredAndSortedItems = useMemo(() => {
     let results = items.filter(
       (item) =>
-        item.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-        item.serialNumber?.toLowerCase().includes(filters.search.toLowerCase())
+        item.name.toLowerCase().includes((debouncedSearch || "").toLowerCase()) ||
+        item.serialNumber?.toLowerCase().includes((debouncedSearch || "").toLowerCase())
     );
 
     // Category filter (compare by id on item.category when present)
@@ -76,7 +80,7 @@ const MobileMaintenanceView = ({
     });
 
     return results;
-  }, [items, filters, departmentsList]);
+  }, [items, debouncedSearch, filters.category, filters.department, filters.sortKey, filters.sortDirection, departmentsList]);
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">
@@ -213,9 +217,11 @@ const MobileMaintenanceView = ({
           </div>
         ))}
         {filteredAndSortedItems.length === 0 && (
-          <div className="text-center py-10">
-            <p className="text-gray-500">{t("no_data_available")}</p>
-          </div>
+          <EmptyState
+            icon={Wrench}
+            title={t("no_data_available")}
+            description={t("try_adjusting_filters")}
+          />
         )}
       </div>
     </div>

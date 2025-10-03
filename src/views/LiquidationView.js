@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
+import useDebouncedValue from "../hooks/useDebouncedValue";
 import { Trash2, Package, ChevronDown, ChevronRight, Search } from "lucide-react";
 import EmptyState from "../components/EmptyState";
 import { useSort } from "../hooks/useSort";
@@ -7,10 +8,12 @@ const LiquidationView = ({ items, onLiquidateItem, categories, departmentsList =
   const [expandedRows, setExpandedRows] = useState({});
   const [filters, setFilters] = useState({ search: "", category: "all", department: "all" });
 
+  const debouncedSearch = useDebouncedValue(filters.search, 300);
+
   const filteredItems = useMemo(() => {
     let data = items || [];
-    if (filters.search) {
-      const q = filters.search.toLowerCase();
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
       data = data.filter((it) =>
         (it.name || "").toLowerCase().includes(q) ||
         (it.serialNumber || "").toLowerCase().includes(q)
@@ -25,7 +28,7 @@ const LiquidationView = ({ items, onLiquidateItem, categories, departmentsList =
       data = data.filter((it) => String(it.recalledDepartment || "").toLowerCase().includes(target));
     }
     return data;
-  }, [items, filters, departmentsList]);
+  }, [items, debouncedSearch, filters.category, filters.department, departmentsList]);
 
   const { items: sortedItems } = useSort(filteredItems || [], { key: "name", direction: "ascending" });
 

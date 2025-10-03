@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
+import useDebouncedValue from "../hooks/useDebouncedValue";
 import { CheckCircle, XCircle, Edit, Package, ChevronDown, ChevronRight, Search } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 
@@ -7,11 +8,13 @@ const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNo
   const [filters, setFilters] = useState({ search: "", category: "all", department: "all" });
   const subSortConfigs = {};
 
+  const debouncedSearch = useDebouncedValue(filters.search, 300);
+
   // Apply filters before sort/group
   const filteredItems = useMemo(() => {
     let data = items || [];
-    if (filters.search) {
-      const q = filters.search.toLowerCase();
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
       data = data.filter((it) =>
         (it.name || "").toLowerCase().includes(q) ||
         (it.serialNumber || "").toLowerCase().includes(q) ||
@@ -30,7 +33,7 @@ const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNo
       });
     }
     return data;
-  }, [items, filters, departmentsList]);
+  }, [items, debouncedSearch, filters.category, filters.department, departmentsList]);
 
   const { items: sortedItems } = useSort(filteredItems, { key: "name", direction: "ascending" });
 
