@@ -14,7 +14,7 @@ const SettingsView = ({ t }) => {
   const { theme, setTheme, language, setLanguage } = useContext(AppContext);
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto animate-fadeIn">
+    <div className="space-y-8 animate-fadeIn">
       <div className="animate-slideInDown">
         <ViewHeader title={t("system_settings")} />
       </div>

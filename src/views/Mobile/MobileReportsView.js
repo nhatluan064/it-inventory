@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
 import {
-  Search,
   SlidersHorizontal,
   Download,
   FilePlus,
@@ -15,8 +14,10 @@ import {
   User,
   Package,
   Info,
+  Eye,
 } from "lucide-react";
 import { CSVLink } from "react-csv";
+import ReportDetailsModal from "../../modals/ReportDetailsModal";
 
 const MobileReportsView = ({ transactions, t, categories }) => {
   // State quản lý bộ lọc và sắp xếp riêng cho mobile
@@ -27,6 +28,7 @@ const MobileReportsView = ({ transactions, t, categories }) => {
     startDate: "",
     endDate: "",
   });
+  const [selectedTrans, setSelectedTrans] = useState(null);
 
   // Tái sử dụng logic ánh xạ chi tiết log
   const logDetails = useMemo(
@@ -106,6 +108,37 @@ const MobileReportsView = ({ transactions, t, categories }) => {
         icon: Trash2,
         color: "text-slate-500",
       },
+      // Additional actions for completeness
+      "allocation-allocate": {
+        text: t("allocation-allocate"),
+        icon: Edit,
+        color: "text-indigo-500",
+      },
+      "allocation-recall": {
+        text: t("allocation-recall"),
+        icon: RotateCcw,
+        color: "text-green-600",
+      },
+      "inventory-damaged": {
+        text: t("inventory-damaged"),
+        icon: XCircle,
+        color: "text-orange-500",
+      },
+      "inventory-bulk-category-move": {
+        text: t("inventory-bulk-category-move"),
+        icon: Edit,
+        color: "text-purple-500",
+      },
+      "master-list-add-legacy": {
+        text: t("master-list-add-legacy"),
+        icon: ArrowDownLeft,
+        color: "text-green-600",
+      },
+      "master-list-delete-override": {
+        text: t("master-list-delete-override"),
+        icon: Trash2,
+        color: "text-red-500",
+      },
     }),
     [t]
   );
@@ -119,8 +152,9 @@ const MobileReportsView = ({ transactions, t, categories }) => {
       // ... Tái sử dụng hàm renderDetails từ bản Desktop ...
       if (!trans.details) return null;
       const details = trans.details;
-      if (details.note) return `Note: ${details.note}`;
-      if (details.serials) return `SNs: ${details.serials.join(", ")}`;
+      if (details.note) return `${t("note")}: ${details.note}`;
+      if (details.serials)
+        return `${t("serials")}: ${details.serials.join(", ")}`;
       if (details.recipientName)
         return `${t("recipient")}: ${details.recipientName}`;
       if (details.returnCondition)
@@ -186,7 +220,6 @@ const MobileReportsView = ({ transactions, t, categories }) => {
         timestamp: new Date(trans.timestamp).toLocaleString(t("locale_string")),
         actionText: logDetails[detailKey]?.text || detailKey,
         itemName: trans.itemName || "N/A",
-        quantity: trans.quantity || "-",
         user: trans.user,
         detailsText: renderDetails(trans) || "---",
       };
@@ -198,7 +231,6 @@ const MobileReportsView = ({ transactions, t, categories }) => {
       { label: t("timestamp"), key: "timestamp" },
       { label: t("action"), key: "actionText" },
       { label: t("object"), key: "itemName" },
-      { label: t("quantity"), key: "quantity" },
       { label: t("performed_by"), key: "user" },
       { label: t("details"), key: "detailsText" },
     ],
@@ -287,7 +319,7 @@ const MobileReportsView = ({ transactions, t, categories }) => {
               color: "text-gray-500",
             };
             const Icon = detail.icon;
-            const detailsText = renderDetails(trans);
+            // details are shown inside modal on demand
 
             return (
               <div
@@ -324,17 +356,19 @@ const MobileReportsView = ({ transactions, t, categories }) => {
                     </span>
                     <span className="font-medium">{trans.user}</span>
                   </div>
-                  {detailsText && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500 flex items-center gap-2">
-                        <Info className="w-4 h-4" />
-                        {t("details")}:
-                      </span>
-                      <span className="font-medium text-right">
-                        {detailsText}
-                      </span>
-                    </div>
-                  )}
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-gray-500 flex items-center gap-2">
+                      <Info className="w-4 h-4" />
+                      {t("view_details")}:
+                    </span>
+                    <button
+                      aria-label={t("view_details")}
+                      className="mobile-btn-icon"
+                      onClick={() => setSelectedTrans(trans)}
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -345,6 +379,14 @@ const MobileReportsView = ({ transactions, t, categories }) => {
           </div>
         )}
       </div>
+
+      <ReportDetailsModal
+        show={!!selectedTrans}
+        onClose={() => setSelectedTrans(null)}
+        trans={selectedTrans}
+        t={t}
+        categories={categories}
+      />
     </div>
   );
 };

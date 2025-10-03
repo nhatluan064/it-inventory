@@ -12,15 +12,19 @@ import {
   Search,
   Download,
   Package,
+  Eye,
 } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 import { CSVLink } from "react-csv";
+import ReportDetailsModal from "../modals/ReportDetailsModal";
+import EmptyState from "../components/EmptyState";
 
 const ReportsView = ({ transactions, t, categories }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [actionType, setActionType] = useState("all");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [selectedTrans, setSelectedTrans] = useState(null);
 
   const logDetails = useMemo(
     () => ({
@@ -99,6 +103,37 @@ const ReportsView = ({ transactions, t, categories }) => {
         icon: Trash2,
         color: "text-slate-500",
       },
+      // Additional actions
+      "allocation-allocate": {
+        text: t("allocation-allocate"),
+        icon: Edit,
+        color: "text-indigo-500",
+      },
+      "allocation-recall": {
+        text: t("allocation-recall"),
+        icon: RotateCcw,
+        color: "text-green-600",
+      },
+      "inventory-damaged": {
+        text: t("inventory-damaged"),
+        icon: XCircle,
+        color: "text-orange-500",
+      },
+      "inventory-bulk-category-move": {
+        text: t("inventory-bulk-category-move"),
+        icon: Edit,
+        color: "text-purple-500",
+      },
+      "master-list-add-legacy": {
+        text: t("master-list-add-legacy"),
+        icon: ArrowDownLeft,
+        color: "text-green-600",
+      },
+      "master-list-delete-override": {
+        text: t("master-list-delete-override"),
+        icon: Trash2,
+        color: "text-red-500",
+      },
     }),
     [t]
   );
@@ -106,8 +141,9 @@ const ReportsView = ({ transactions, t, categories }) => {
   const renderDetails = (trans) => {
     if (!trans.details) return "---";
     const details = trans.details;
-    if (details.note) return `Note: ${details.note}`;
-    if (details.serials) return `SNs: ${details.serials.join(", ")}`;
+    if (details.note) return `${t("note")}: ${details.note}`;
+    if (details.serials)
+      return `${t("serials")}: ${details.serials.join(", ")}`;
     if (details.recipientName)
       return `${t("recipient")}: ${details.recipientName}`;
     if (details.returnCondition)
@@ -170,12 +206,6 @@ const ReportsView = ({ transactions, t, categories }) => {
     { key: "timestamp", label: "timestamp", sortable: true },
     { key: "reason", label: "action", sortable: true },
     { key: "itemName", label: "object", sortable: true },
-    {
-      key: "quantity",
-      label: "quantity",
-      sortable: true,
-      className: "text-right",
-    },
     { key: "user", label: "performed_by", sortable: true },
     { key: "details", label: "details", sortable: false },
   ];
@@ -185,7 +215,6 @@ const ReportsView = ({ transactions, t, categories }) => {
       { label: t("timestamp"), key: "timestamp" },
       { label: t("action"), key: "actionText" },
       { label: t("object"), key: "itemName" },
-      { label: t("quantity"), key: "quantity" },
       { label: t("performed_by"), key: "user" },
       { label: t("details"), key: "detailsText" },
     ],
@@ -310,10 +339,9 @@ const ReportsView = ({ transactions, t, categories }) => {
             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {sortedTransactions.length > 0 ? (
                 sortedTransactions.map((trans) => {
-                  const detail = logDetails[
-                    `${trans.type}-${trans.reason}`
-                  ] || {
-                    text: `${trans.type}-${trans.reason}`,
+                  const key = `${trans.type}-${trans.reason}`;
+                  const detail = logDetails[key] || {
+                    text: t(key) || key,
                     icon: Edit,
                     color: "text-gray-500",
                   };
@@ -339,23 +367,33 @@ const ReportsView = ({ transactions, t, categories }) => {
                       <td className="px-4 font-medium align-middle">
                         {trans.itemName}
                       </td>
-                      <td className="px-4 text-right font-bold align-middle">
-                        {trans.quantity || "-"}
-                      </td>
+                      {/* Quantity column removed as per request */}
                       <td className="px-4 align-middle">{trans.user}</td>
                       <td className="px-4 align-middle">
-                        {renderDetails(trans)}
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                            {t("view_details")}:
+                          </span>
+                          <button
+                            aria-label={t("view_details") || "View details"}
+                            className="p-1.5 rounded-md border hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                            onClick={() => setSelectedTrans(trans)}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
                 })
               ) : (
                 <tr>
-                  <td colSpan={columns.length} className="text-center py-16">
-                    <Package className="w-12 h-12 mx-auto text-gray-300" />
-                    <p className="mt-3 text-sm text-gray-500">
-                      {t("no_data_available")}
-                    </p>
+                  <td colSpan={columns.length}>
+                    <EmptyState
+                      icon={Package}
+                      title={t("empty_reports_title")}
+                      description={t("empty_reports_text")}
+                    />
                   </td>
                 </tr>
               )}
@@ -363,6 +401,15 @@ const ReportsView = ({ transactions, t, categories }) => {
           </table>
         </div>
       </div>
+
+      {/* Details modal */}
+      <ReportDetailsModal
+        show={!!selectedTrans}
+        onClose={() => setSelectedTrans(null)}
+        trans={selectedTrans}
+        t={t}
+        categories={categories}
+      />
     </div>
   );
 };

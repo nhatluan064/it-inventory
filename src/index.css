@@ -150,7 +150,8 @@
 @layer components {
   /* Desktop container to center and constrain content */
   .container-desktop {
-    @apply mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-6xl;
+    /* Expand to full width on desktop to utilize available space */
+    @apply mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-none;
   }
 
   /* Standard card styles to unify appearance across pages */

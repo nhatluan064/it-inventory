@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
-import { ShoppingCart, Trash2, Plus, Filter, Layers } from "lucide-react";
+import { ShoppingCart, Trash2, Plus, Filter, Layers, ShoppingBag } from "lucide-react";
+import EmptyState from "../../components/EmptyState";
 import toast from "react-hot-toast";
 
 const MobilePendingPurchaseView = ({
@@ -189,9 +190,11 @@ const MobilePendingPurchaseView = ({
           </div>
         ))}
         {filteredAndSortedItems.length === 0 && (
-          <div className="text-center py-10">
-            <p className="text-gray-500">{t("no_data_available")}</p>
-          </div>
+          <EmptyState
+            icon={ShoppingBag}
+            title={t("empty_pending_title")}
+            description={t("empty_pending_text")}
+          />
         )}
       </div>
     </div>

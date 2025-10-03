@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { Trash2, Package, ChevronDown, ChevronRight } from "lucide-react";
+import EmptyState from "../components/EmptyState";
 import { useSort } from "../hooks/useSort";
 
 const LiquidationView = ({ items, onLiquidateItem, categories, t }) => {
@@ -31,6 +32,13 @@ const LiquidationView = ({ items, onLiquidateItem, categories, t }) => {
 
       <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp p-6">
         <div className="flex-grow overflow-y-auto hide-scrollbar space-y-3">
+          {Object.keys(groupedByCategory).length === 0 && (
+            <EmptyState
+              icon={Trash2}
+              title={t("liquidation_empty_title")}
+              description={t("liquidation_empty_text")}
+            />
+          )}
           {Object.entries(groupedByCategory).map(([categoryId, items], catIndex) => {
             const isExpanded = expandedRows[categoryId];
             const category = (categories || []).find((c) => c.id === categoryId);

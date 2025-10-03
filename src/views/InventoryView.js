@@ -10,9 +10,12 @@ import {
   ChevronDown,
   ChevronRight,
   Package,
+  Calendar,
+  MapPin,
 } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 import { AnimatedButton } from "../components/AnimatedButton";
+import EmptyState from "../components/EmptyState";
 
 const InventoryView = ({
   equipment,
@@ -45,6 +48,7 @@ const InventoryView = ({
   });
 
   // Handler riêng cho category sort
+  // eslint-disable-next-line no-unused-vars
   const handleCategorySort = () => {
     setCategorySortConfig((prev) => ({
       key: "category",
@@ -102,9 +106,14 @@ const InventoryView = ({
 
   // Note: status options limited to Available and In Use per product requirement
 
-  const formatDate = (dateString) => {
+  const formatDateDMY = (dateString) => {
     if (!dateString) return "---";
-    return new Date(dateString).toLocaleDateString(t("locale_string"));
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return "---";
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
   };
 
   const toggleExpand = (name) => {
@@ -223,6 +232,13 @@ const InventoryView = ({
       <div className="flex-grow flex flex-col card animate-slideInUp card-lg overflow-hidden">
         {/* Card-based container */}
         <div className="flex-grow overflow-y-auto hide-scrollbar space-y-3">
+          {Object.keys(groupedByCategory).length === 0 && (
+            <EmptyState
+              icon={MapPin}
+              title={t("empty_inventory_title")}
+              description={t("empty_inventory_text")}
+            />
+          )}
           {Object.entries(groupedByCategory).map(
             ([categoryId, items], catIndex) => {
               const isExpanded = expandedRows[categoryId];
@@ -288,14 +304,15 @@ const InventoryView = ({
                         return (
                           <div
                             key={item.id}
-                            className={`flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 animate-slideInLeft border-l-4 border-transparent hover:border-blue-400 dark:hover:border-blue-500 ${
+                            className={`grid grid-cols-12 items-center p-4 md:gap-x-4 lg:gap-x-6 xl:gap-x-8 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 animate-slideInLeft border-l-4 border-transparent hover:border-blue-400 dark:hover:border-blue-500 ${
                               isInUse ? "bg-blue-50 dark:bg-blue-900/20" : ""
                             }`}
                             style={{
                               animationDelay: `${itemIndex * 0.03}s`,
                             }}
                           >
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                            {/* Device Info (4) */}
+                            <div className="col-span-12 md:col-span-5 lg:col-span-4 flex items-center gap-3 min-w-0">
                               <div className="w-2 h-2 bg-blue-400 dark:bg-blue-500 rounded-full flex-shrink-0"></div>
                               <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <div className="w-9 h-9 bg-gradient-to-br from-blue-400 to-indigo-400 dark:from-blue-500 dark:to-indigo-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow">
@@ -318,52 +335,63 @@ const InventoryView = ({
                               </div>
                             </div>
 
-                            {/* User Info */}
-                            <div className="flex items-center gap-2 ml-4 min-w-0 flex-1">
+                            {/* Dates (1) - moved left */}
+                            <div className="col-span-6 md:col-span-2 lg:col-span-2 text-xs text-gray-500 dark:text-gray-400 min-w-0 mt-2 md:mt-0 pr-2 lg:pr-4">
+                              <div className="flex items-center gap-2 truncate" title={`${t('import_date_short')}: ${formatDateDMY(item.importDate)}`}>
+                                <Calendar className="w-4 h-4 text-gray-400" />
+                                <span className="truncate">
+                                  {t('import_date_short')}: {formatDateDMY(item.importDate)}
+                                </span>
+                              </div>
+                              {isInUse && (
+                                <div className="flex items-center gap-2 truncate mt-1" title={`${t('export_date_short')}: ${formatDateDMY(item.allocationDetails?.handoverDate)}`}>
+                                  <Calendar className="w-4 h-4 text-gray-400" />
+                                  <span className="truncate">
+                                    {t('export_date_short')}: {formatDateDMY(item.allocationDetails?.handoverDate)}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* User (3) */}
+                            <div className="col-span-12 md:col-span-3 lg:col-span-2 flex items-center gap-2 min-w-0 mt-2 md:mt-0 lg:pl-4">
                               {isInUse ? (
-                                <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+                                <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 min-w-0">
                                   <User className="w-4 h-4 flex-shrink-0" />
                                   <span className="text-sm truncate">
                                     {item.allocationDetails?.recipientName}
                                   </span>
                                 </div>
                               ) : (
-                                <span className="text-sm text-gray-500 italic">
+                                <span className="text-sm text-gray-500 italic truncate">
                                   {t("user_not_use")}
                                 </span>
                               )}
                             </div>
 
-                            {/* Dates */}
-                            <div className="flex flex-col text-xs text-gray-500 dark:text-gray-400 ml-4 min-w-0">
-                              <span>📅 {formatDate(item.importDate)}</span>
-                              {isInUse && (
-                                <span>
-                                  🤝{" "}
-                                  {formatDate(
-                                    item.allocationDetails?.handoverDate
-                                  )}
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Location: show department when allocated, otherwise show stock location */}
-                            <div className="text-xs text-gray-600 dark:text-gray-300 ml-4 min-w-0">
-                              📍{" "}
-                              {item.status === "in-use" &&
-                              item.allocationDetails?.department
-                                ? departmentsList?.find(
-                                    (dept) =>
-                                      dept.id ===
+                            {/* Department / Location (2) */}
+                            <div className="col-span-6 md:col-span-2 lg:col-span-2 text-xs text-gray-600 dark:text-gray-300 min-w-0 mt-2 md:mt-0">
+                              <div className="flex items-center gap-2 truncate">
+                                <MapPin className="w-4 h-4 text-gray-400" />
+                                <span
+                                  className="truncate whitespace-nowrap"
+                                  title={(item.status === "in-use" && item.allocationDetails?.department
+                                    ? (departmentsList?.find((dept) => dept.id === item.allocationDetails.department)?.name ||
+                                      t(item.allocationDetails.department) ||
+                                      item.allocationDetails.department)
+                                    : t("location_in_stock"))}
+                                >
+                                  {item.status === "in-use" && item.allocationDetails?.department
+                                    ? departmentsList?.find((dept) => dept.id === item.allocationDetails.department)?.name ||
+                                      t(item.allocationDetails.department) ||
                                       item.allocationDetails.department
-                                  )?.name ||
-                                  t(item.allocationDetails.department) ||
-                                  item.allocationDetails.department
-                                : t("location_in_stock")}
+                                    : t("location_in_stock")}
+                                </span>
+                              </div>
                             </div>
 
-                            {/* Actions */}
-                            <div className="flex items-center gap-2 ml-4">
+                            {/* Actions (2) */}
+                            <div className="col-span-12 md:col-span-12 lg:col-span-2 flex items-center justify-end gap-2 mt-3 lg:mt-0 shrink-0">
                               <button
                                 onClick={() => onAllocateItem(item)}
                                 disabled={item.status !== "available"}

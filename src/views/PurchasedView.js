@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import toast from "react-hot-toast";
-import { LogIn, CheckCircle, Package, ChevronDown, ChevronRight } from "lucide-react";
+import { LogIn, CheckCircle, Package, ChevronDown, ChevronRight, Inbox } from "lucide-react";
+import EmptyState from "../components/EmptyState";
 import { useSort } from "../hooks/useSort";
 
 const PurchasedView = ({ items, onImportItem, categories, t }) => {
@@ -53,6 +54,13 @@ const PurchasedView = ({ items, onImportItem, categories, t }) => {
 
       <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp p-6">
         <div className="flex-grow overflow-y-auto hide-scrollbar space-y-3">
+          {Object.keys(groupedByCategory).length === 0 && (
+            <EmptyState
+              icon={Inbox}
+              title={t("empty_purchased_title")}
+              description={t("empty_purchased_text")}
+            />
+          )}
           {Object.entries(groupedByCategory).map(([categoryId, items], catIndex) => {
             const isExpanded = expandedRows[categoryId];
             const sortedSubItems = [...items].sort((a, b) => {

@@ -8,7 +8,11 @@ import {
   Filter,
   Plus,
   Calendar,
+  Building,
 } from "lucide-react";
+import { useDynamicData } from "../../hooks/useDynamicData";
+import EmptyState from "../../components/EmptyState";
+import { useAuth } from "../../hooks/useAuth";
 
 const MobileInventoryView = ({
   equipment,
@@ -25,6 +29,20 @@ const MobileInventoryView = ({
 }) => {
   // Keep filters visible on mobile by default
   const [isFilterOpen, setIsFilterOpen] = useState(true);
+
+  // Load dynamic department data for label resolution
+  const { currentUser } = useAuth();
+  const { departmentsList } = useDynamicData(currentUser);
+
+  const getDepartmentLabel = (deptId) => {
+    if (!deptId) return "N/A";
+    const dept = (departmentsList || []).find((d) => d.id === deptId);
+    if (dept) {
+      if (dept.key) return t(dept.key);
+      return dept.name || deptId;
+    }
+    return t(deptId) || deptId;
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "---";
@@ -198,6 +216,15 @@ const MobileInventoryView = ({
                       </span>
                     </div>
                   </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500">{t("department")}:</span>
+                    <div className="flex items-center gap-2">
+                      <Building className="w-4 h-4 text-gray-400" />
+                      <span className="font-medium">
+                        {getDepartmentLabel(item.allocationDetails?.department)}
+                      </span>
+                    </div>
+                  </div>
                 </>
               )}
             </div>
@@ -232,9 +259,11 @@ const MobileInventoryView = ({
           </div>
         ))}
         {equipment.length === 0 && (
-          <div className="text-center py-10">
-            <p className="text-gray-500">{t("no_devices_match_search")}</p>
-          </div>
+          <EmptyState
+            icon={Building}
+            title={t("empty_inventory_title")}
+            description={t("empty_inventory_text")}
+          />
         )}
       </div>
     </div>

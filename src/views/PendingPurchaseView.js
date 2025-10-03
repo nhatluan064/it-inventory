@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { ShoppingCart, Trash2, Plus, Search, Package, ChevronDown, ChevronRight } from "lucide-react";
+import { ShoppingCart, Trash2, Plus, Search, Package, ChevronDown, ChevronRight, ShoppingBag } from "lucide-react";
+import EmptyState from "../components/EmptyState";
 import toast from "react-hot-toast";
 import { useSort } from "../hooks/useSort";
 
@@ -133,6 +134,13 @@ const PendingPurchaseView = ({
 
       <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp p-6">
         <div className="flex-grow overflow-y-auto hide-scrollbar space-y-3">
+          {Object.keys(groupedByCategory).length === 0 && (
+            <EmptyState
+              icon={ShoppingBag}
+              title={t("empty_pending_title")}
+              description={t("empty_pending_text")}
+            />
+          )}
           {Object.entries(groupedByCategory).map(([categoryId, items], catIndex) => {
             const isExpanded = expandedRows[categoryId];
             const category = (categories || []).find((c) => c.id === categoryId);

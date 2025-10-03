@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
-import { CheckCircle, XCircle, Layers, Filter } from "lucide-react";
+import { CheckCircle, XCircle, Layers, Filter, PackageSearch } from "lucide-react";
+import EmptyState from "../../components/EmptyState";
 
 const MobilePurchasingView = ({
   items,
@@ -146,9 +147,11 @@ const MobilePurchasingView = ({
           </div>
         ))}
         {filteredAndSortedItems.length === 0 && (
-          <div className="text-center py-10">
-            <p className="text-gray-500">{t("no_data_available")}</p>
-          </div>
+          <EmptyState
+            icon={PackageSearch}
+            title={t("empty_purchasing_title")}
+            description={t("empty_purchasing_text")}
+          />
         )}
       </div>
     </div>

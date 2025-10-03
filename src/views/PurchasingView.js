@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
-import { CheckCircle, XCircle, Package, ChevronDown, ChevronRight } from "lucide-react";
+import { CheckCircle, XCircle, Package, ChevronDown, ChevronRight, PackageSearch } from "lucide-react";
+import EmptyState from "../components/EmptyState";
 import { useSort } from "../hooks/useSort";
 
 const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
@@ -34,6 +35,13 @@ const PurchasingView = ({ items, onUpdateStatus, onCancel, categories, t }) => {
 
       <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp p-6">
         <div className="flex-grow overflow-y-auto hide-scrollbar space-y-3">
+          {Object.keys(groupedByCategory).length === 0 && (
+            <EmptyState
+              icon={PackageSearch}
+              title={t("empty_purchasing_title")}
+              description={t("empty_purchasing_text")}
+            />
+          )}
           {Object.entries(groupedByCategory).map(([categoryId, items], catIndex) => {
             const isExpanded = expandedRows[categoryId];
             const subSortConfig = { key: "name", direction: "ascending" };

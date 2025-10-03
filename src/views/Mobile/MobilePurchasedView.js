@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
-import { LogIn, Layers, Filter } from "lucide-react";
+import { LogIn, Layers, Filter, Inbox } from "lucide-react";
+import EmptyState from "../../components/EmptyState";
 import toast from "react-hot-toast";
 
 const MobilePurchasedView = ({ items, onImportItem, categories, t }) => {
@@ -184,9 +185,11 @@ const MobilePurchasedView = ({ items, onImportItem, categories, t }) => {
           );
         })}
         {filteredAndSortedItems.length === 0 && (
-          <div className="text-center py-10">
-            <p className="text-gray-500">{t("no_data_available")}</p>
-          </div>
+          <EmptyState
+            icon={Inbox}
+            title={t("empty_purchased_title")}
+            description={t("empty_purchased_text")}
+          />
         )}
       </div>
     </div>

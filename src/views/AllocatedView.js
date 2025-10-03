@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { RotateCcw, Search, Wrench, ChevronDown, ChevronRight, Package, User, Eye, Edit } from "lucide-react";
+import { RotateCcw, Search, Wrench, ChevronDown, ChevronRight, Package, User, Eye, Edit, Calendar, Building, Users } from "lucide-react";
+import EmptyState from "../components/EmptyState";
 import { useSort } from "../hooks/useSort";
 
 const AllocatedView = ({
@@ -17,6 +18,7 @@ const AllocatedView = ({
   t,
 }) => {
   const [expandedRows, setExpandedRows] = useState({});
+  // eslint-disable-next-line no-unused-vars
   const [animatingRows, setAnimatingRows] = useState({});
   const [subSortConfigs, setSubSortConfigs] = useState({});
 
@@ -27,6 +29,7 @@ const AllocatedView = ({
   });
 
   // Handler riêng cho category sort
+  // eslint-disable-next-line no-unused-vars
   const handleCategorySort = () => {
     setCategorySortConfig((prev) => ({
       key: "category",
@@ -111,6 +114,7 @@ const AllocatedView = ({
     }
   };
 
+  // eslint-disable-next-line no-unused-vars
   const requestSubSort = (groupName, key) => {
     setSubSortConfigs((prevConfigs) => {
       const currentConfig = prevConfigs[groupName] || {};
@@ -212,6 +216,13 @@ const AllocatedView = ({
       <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp p-6">
         {/* Card-based container */}
         <div className="flex-grow overflow-y-auto hide-scrollbar space-y-3">
+              {Object.keys(groupedByCategory).length === 0 && (
+                <EmptyState
+                  icon={Users}
+                  title={t("empty_allocated_title")}
+                  description={t("empty_allocated_text")}
+                />
+              )}
               {Object.entries(groupedByCategory).map(([categoryId, items], catIndex) => {
                 const isExpanded = expandedRows[categoryId];
                 const category = categories.find((c) => c.id === categoryId);
@@ -278,62 +289,60 @@ const AllocatedView = ({
                         {sortedSubItems.map((item, itemIndex) => (
                           <div
                             key={item.id}
-                            className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 animate-slideInLeft border-l-4 border-transparent hover:border-yellow-400 dark:hover:border-yellow-500"
+                            className="grid grid-cols-12 items-center p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 animate-slideInLeft border-l-4 border-transparent hover:border-yellow-400 dark:hover:border-yellow-500"
                             style={{
                               animationDelay: `${itemIndex * 0.03}s`,
                             }}
                           >
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                            {/* Device */}
+                            <div className="col-span-12 md:col-span-5 lg:col-span-4 flex items-center gap-3 min-w-0">
                               <div className="w-2 h-2 bg-yellow-400 dark:bg-yellow-500 rounded-full flex-shrink-0"></div>
                               <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-amber-400 dark:from-orange-500 dark:to-amber-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow">
                                   <Package className="w-4 h-4 text-white" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-gray-900 dark:text-white truncate">
-                                    {item.name}
-                                  </p>
-                                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate font-mono">
-                                    SN: {item.serialNumber || "N/A"}
-                                  </p>
+                                  <p className="font-medium text-gray-900 dark:text-white truncate">{item.name}</p>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate font-mono">SN: {item.serialNumber || "N/A"}</p>
                                 </div>
                               </div>
                             </div>
-                            
-                            {/* User Info */}
-                            <div className="flex items-center gap-2 ml-4 min-w-0 flex-1">
-                              <div className="flex items-center gap-2 text-yellow-600 dark:text-yellow-400">
+
+                            {/* Recipient + Position */}
+                            <div className="col-span-12 md:col-span-3 lg:col-span-3 flex items-center gap-2 min-w-0 mt-2 md:mt-0">
+                              <div className="flex items-center gap-2 text-yellow-600 dark:text-yellow-400 min-w-0">
                                 <User className="w-4 h-4 flex-shrink-0" />
                                 <div className="min-w-0">
-                                  <p className="text-sm font-medium truncate">
-                                    {item.allocationDetails?.recipientName || "N/A"}
-                                  </p>
+                                  <p className="text-sm font-medium truncate">{item.allocationDetails?.recipientName || "N/A"}</p>
                                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                    {item.allocationDetails?.position
-                                      ? getPositionLabel(item.allocationDetails.position)
-                                      : "N/A"}
+                                    {item.allocationDetails?.position ? getPositionLabel(item.allocationDetails.position) : "N/A"}
                                   </p>
                                 </div>
                               </div>
                             </div>
 
                             {/* Department */}
-                            <div className="text-xs text-gray-600 dark:text-gray-300 ml-4 min-w-0">
-                              🏢 {item.allocationDetails?.department
-                                ? departmentsList.find(
-                                    (dept) =>
-                                      dept.id === item.allocationDetails.department
-                                  )?.name || t(item.allocationDetails.department) || item.allocationDetails.department
-                                : "N/A"}
+                            <div className="col-span-6 md:col-span-2 lg:col-span-2 text-xs text-gray-600 dark:text-gray-300 min-w-0 mt-2 md:mt-0">
+                              <div className="flex items-center gap-2 truncate">
+                                <Building className="w-4 h-4 text-gray-400" />
+                                <span className="truncate">
+                                  {item.allocationDetails?.department
+                                    ? departmentsList.find((dept) => dept.id === item.allocationDetails.department)?.name || t(item.allocationDetails.department) || item.allocationDetails.department
+                                    : "N/A"}
+                                </span>
+                              </div>
                             </div>
 
                             {/* Handover Date */}
-                            <div className="text-xs text-gray-500 dark:text-gray-400 ml-4 min-w-0">
-                              🤝 {formatDate(item.allocationDetails?.handoverDate)}
+                            <div className="col-span-6 md:col-span-2 lg:col-span-2 text-xs text-gray-500 dark:text-gray-400 min-w-0 mt-2 md:mt-0">
+                              <div className="flex items-center gap-2 truncate">
+                                <Calendar className="w-4 h-4 text-gray-400" />
+                                <span className="truncate">{formatDate(item.allocationDetails?.handoverDate)}</span>
+                              </div>
                             </div>
 
                             {/* Actions */}
-                            <div className="flex items-center gap-2 ml-4">
+                            <div className="col-span-12 md:col-span-12 lg:col-span-1 flex items-center justify-end gap-2 mt-3 lg:mt-0">
                               <button
                                 onClick={() => onViewItem && onViewItem(item)}
                                 className="p-2 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200"
