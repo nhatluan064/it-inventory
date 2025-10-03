@@ -47,7 +47,9 @@ export const validateFirebaseConfig = (config) => {
   return true;
 };
 
-export default {
+const securityConfig = {
   initializeSecurityConfig,
   validateFirebaseConfig
 };
+
+export default securityConfig;

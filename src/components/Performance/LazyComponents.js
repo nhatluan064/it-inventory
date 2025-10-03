@@ -1,6 +1,6 @@
 // src/components/Performance/LazyComponents.js
 import React, { lazy, Suspense } from 'react';
-import { ChartLoadingSkeleton, TableLoadingSkeleton } from '../LoadingStates/GlobalLoader';
+import { ChartLoadingSkeleton } from '../LoadingStates/GlobalLoader';
 
 // Lazy load heavy views that users might not visit immediately
 export const LazyReportsView = lazy(() => 
@@ -67,12 +67,14 @@ export class ErrorBoundary extends React.Component {
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(_error) {
     return { hasError: true };
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('Lazy component loading error:', error, errorInfo);
+    // Optionally report to a logging service; avoid console for clean builds
+    void error;
+    void errorInfo;
   }
 
   render() {

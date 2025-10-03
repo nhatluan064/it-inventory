@@ -21,7 +21,7 @@ const MasterListView = ({
   const [bulkTargets, setBulkTargets] = useState({});
 
   // State để quản lý sorting category riêng
-  const [categorySortConfig, setCategorySortConfig] = useState({
+  const [categorySortConfig] = useState({
     key: "category",
     direction: "ascending",
   });
@@ -31,13 +31,7 @@ const MasterListView = ({
     direction: "ascending",
   });
 
-  // Handler riêng cho category sort
-  const handleCategorySort = () => {
-    setCategorySortConfig((prev) => ({
-      key: "category",
-      direction: prev.direction === "ascending" ? "descending" : "ascending",
-    }));
-  };
+  // Category sort config can be toggled by future UI controls; function removed to keep build clean
 
   const categoryCounts = useMemo(() => {
     if (!allItems) return {};

@@ -4,7 +4,7 @@ import { Line } from "react-chartjs-2";
 import "../utils/chartSetup"; // Import chart setup
 import AppContext from "../context/AppContext";
 
-const MonthlyTrendChart = ({ activityLogs, equipment }) => {
+const MonthlyTrendChart = ({ activityLogs }) => {
   const { theme, t } = useContext(AppContext);
 
   // Tạo dữ liệu xu hướng 30 ngày gần nhất

@@ -7,10 +7,7 @@ import AppContext from "../context/AppContext";
 const TopDevicesChart = ({ equipment }) => {
   const { theme, t } = useContext(AppContext);
 
-  // Debug: log data (development only)
-  if (process.env.NODE_ENV === "development") {
-    console.log("TopDevicesChart equipment:", equipment);
-  }
+  // Debug logging removed to satisfy ESLint clean build
 
   // Tạo dữ liệu Top 5 thiết bị được sử dụng nhiều nhất
   const chartData = useMemo(() => {
@@ -111,8 +108,7 @@ const TopDevicesChart = ({ equipment }) => {
           },
         ],
       };
-    } catch (error) {
-      console.error("Error creating chart data:", error);
+    } catch (_error) {
       return {
         labels: [],
         datasets: [],
@@ -230,8 +226,7 @@ const TopDevicesChart = ({ equipment }) => {
         />
       </div>
     );
-  } catch (error) {
-    console.error("TopDevicesChart render error:", error);
+  } catch (_error) {
     return (
       <div className="relative h-64 md:h-80 flex items-center justify-center">
         <p className="text-red-500 dark:text-red-400">Lỗi hiển thị biểu đồ</p>
