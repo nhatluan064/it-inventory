@@ -34,26 +34,16 @@ const MobileMaintenanceView = ({
     return new Date(dateString).toLocaleString(t("locale_string"));
   };
 
-  const renderCondition = (condition) => {
-    if (!condition) return "---";
-    if (typeof condition === "object") {
-      // expected shape: { key: 'translation.key', params: { ... } }
-      if (condition.key) {
-        const finalParams = { ...(condition.params || {}) };
-        if (finalParams.note && typeof finalParams.note === "object") {
-          const noteObj = finalParams.note;
-          finalParams.note = noteObj.isKey ? t(noteObj.value) : noteObj.value;
-        }
-        return t(condition.key, finalParams || {});
-      }
-      // fallback to JSON string if no key
-      try {
-        return JSON.stringify(condition);
-      } catch (e) {
-        return String(condition);
-      }
+
+  // Extract only the actual failure note text, similar to desktop
+  const getFailureNote = (condition) => {
+    const noteObj = condition?.params?.note;
+    if (!noteObj) return "---";
+    if (typeof noteObj === "object") {
+      return noteObj.isKey ? t(noteObj.value) : noteObj.value;
     }
-    return t(String(condition));
+    // If note was stored as a plain string
+    return String(noteObj);
   };
 
   const filteredAndSortedItems = useMemo(() => {
@@ -173,7 +163,7 @@ const MobileMaintenanceView = ({
                   <Wrench className="w-4 h-4" /> {t("failure_note")}:
                 </span>
                 <span className="font-medium text-right">
-                  {renderCondition(item.condition)}
+                  {getFailureNote(item.condition)}
                 </span>
               </div>
               <div className="flex justify-between">

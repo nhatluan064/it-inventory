@@ -56,23 +56,31 @@ const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
   }, [items, filters, departmentsList]);
 
   const renderCondition = (item) => {
-    if (!item || !item.condition) return "---";
-    if (typeof item.condition === "object") {
-      if (item.condition.key) {
-        const finalParams = { ...(item.condition.params || {}) };
-        if (finalParams.note && typeof finalParams.note === "object") {
-          const noteObj = finalParams.note;
-          finalParams.note = noteObj.isKey ? t(noteObj.value) : noteObj.value;
-        }
-        return t(item.condition.key, finalParams);
+    if (!item) return "---";
+    const cond = item.condition;
+    if (!cond) return "---";
+    // Prefer explicit note text if available (like desktop)
+    const noteObj = cond?.params?.note;
+    if (noteObj) {
+      if (typeof noteObj === "object") {
+        return noteObj.isKey ? t(noteObj.value) : noteObj.value;
       }
-      try {
-        return JSON.stringify(item.condition);
-      } catch (e) {
-        return String(item.condition);
-      }
+      return String(noteObj);
     }
-    return t(String(item.condition));
+    // Fallback: translate whole condition object or string
+    if (typeof cond === "object" && cond.key) {
+      const finalParams = { ...(cond.params || {}) };
+      if (finalParams.note && typeof finalParams.note === "object") {
+        const n = finalParams.note;
+        finalParams.note = n.isKey ? t(n.value) : n.value;
+      }
+      return t(cond.key, finalParams);
+    }
+    try {
+      return typeof cond === "object" ? JSON.stringify(cond) : t(String(cond));
+    } catch {
+      return String(cond);
+    }
   };
 
 
