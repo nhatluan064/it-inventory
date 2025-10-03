@@ -49,8 +49,10 @@ const LiquidationView = ({ items, onLiquidateItem, categories, departmentsList =
   return (
     <div className="h-full flex flex-col gap-6 animate-fadeIn">
       <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">
-        {/* Filters moved above title */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end mb-6">
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-500 to-gray-600 bg-clip-text text-transparent">{t("liquidation_list")}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t("liquidation_desc")}</p>
+        {/* Filters placed below title */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end mt-6">
           <div className="sm:col-span-2 lg:col-span-2">
             <label className="block text-xs font-semibold mb-2">{t("search")}</label>
             <div className="relative">
@@ -94,9 +96,6 @@ const LiquidationView = ({ items, onLiquidateItem, categories, departmentsList =
             </select>
           </div>
         </div>
-
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-500 to-gray-600 bg-clip-text text-transparent">{t("liquidation_list")}</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t("liquidation_desc")}</p>
       </div>
 
       <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp p-6">
