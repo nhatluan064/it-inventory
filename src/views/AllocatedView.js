@@ -109,8 +109,9 @@ const AllocatedView = ({
         setAnimatingRows((prev) => ({ ...prev, [name]: undefined }));
       }, 300);
     } else {
-      setExpandedRows((prev) => ({ ...prev, [name]: true }));
-      setAnimatingRows((prev) => ({ ...prev, [name]: "opening" }));
+      // Single-open: close all others and open only the requested one
+      setExpandedRows({ [name]: true });
+      setAnimatingRows({ [name]: "opening" });
     }
   };
 

@@ -52,7 +52,7 @@ const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNo
   const handleFilterChange = (e) => setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const toggleExpand = (name) => {
-    setExpandedRows((prev) => ({ ...prev, [name]: !prev[name] }));
+    setExpandedRows((prev) => ({ [name]: !prev[name] }));
   };
 
   const formatDate = (dateString) => {
