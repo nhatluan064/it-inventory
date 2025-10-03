@@ -1,12 +1,38 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { CheckCircle, XCircle, Edit, Package, ChevronDown, ChevronRight } from "lucide-react";
+import { CheckCircle, XCircle, Edit, Package, ChevronDown, ChevronRight, Search } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 
-const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNote, categories, t }) => {
+const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNote, categories, departmentsList = [], t }) => {
   const [expandedRows, setExpandedRows] = useState({});
+  const [filters, setFilters] = useState({ search: "", category: "all", department: "all" });
   const subSortConfigs = {};
 
-  const { items: sortedItems } = useSort(items || [], { key: "name", direction: "ascending" });
+  // Apply filters before sort/group
+  const filteredItems = useMemo(() => {
+    let data = items || [];
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      data = data.filter((it) =>
+        (it.name || "").toLowerCase().includes(q) ||
+        (it.serialNumber || "").toLowerCase().includes(q) ||
+        (it.recalledFrom || "").toLowerCase().includes(q)
+      );
+    }
+    if (filters.category && filters.category !== "all") {
+      data = data.filter((it) => it.category === filters.category);
+    }
+    if (filters.department && filters.department !== "all") {
+      const dept = (departmentsList || []).find((d) => d.id === filters.department);
+      const target = (dept?.name || filters.department || "").toLowerCase();
+      data = data.filter((it) => {
+        const val = String(it.recalledDepartment || "").toLowerCase();
+        return val === target || val.includes(target) || it.recalledDepartment === filters.department;
+      });
+    }
+    return data;
+  }, [items, filters, departmentsList]);
+
+  const { items: sortedItems } = useSort(filteredItems, { key: "name", direction: "ascending" });
 
   const groupedByCategory = useMemo(() => {
     const grouped = (sortedItems || []).reduce((acc, item) => {
@@ -21,7 +47,9 @@ const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNo
 
   useEffect(() => {
     setExpandedRows({});
-  }, [items]);
+  }, [items, filters]);
+
+  const handleFilterChange = (e) => setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const toggleExpand = (name) => {
     setExpandedRows((prev) => ({ ...prev, [name]: !prev[name] }));
@@ -43,6 +71,51 @@ const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNo
       <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">{t("maintenance_management")}</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t("maintenance_desc")}</p>
+        {/* Filters */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end mt-6">
+          <div className="sm:col-span-1">
+            <label className="block text-xs font-semibold mb-2">{t("search")}</label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                name="search"
+                type="text"
+                placeholder={t("search")}
+                className="w-full pl-9 pr-4 py-2 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+                value={filters.search}
+                onChange={handleFilterChange}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold mb-2">{t("category")}</label>
+            <select
+              name="category"
+              className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              value={filters.category}
+              onChange={handleFilterChange}
+            >
+              <option value="all">{t("all")}</option>
+              {(categories || []).map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold mb-2">{t("department")}</label>
+            <select
+              name="department"
+              className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              value={filters.department}
+              onChange={handleFilterChange}
+            >
+              <option value="all">{t("all")}</option>
+              {(departmentsList || []).map((d) => (
+                <option key={d.id} value={d.id}>{d.name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
 
       <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp p-6">

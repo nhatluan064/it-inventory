@@ -1,9 +1,20 @@
 import React, { useState, useMemo } from "react";
 import { Trash2, Filter, User, Wrench } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
+import { useDynamicData } from "../../hooks/useDynamicData";
 
 const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filters, setFilters] = useState({ search: "" });
+  const [filters, setFilters] = useState({
+    search: "",
+    category: "all",
+    department: "all",
+    sortKey: "name",
+    sortDirection: "asc",
+  });
+
+  const { currentUser } = useAuth();
+  const { categories, departmentsList } = useDynamicData(currentUser);
 
   const handleFilterChange = (e) => {
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -13,19 +24,36 @@ const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
   const filteredAndSortedItems = useMemo(() => {
     let results = items.filter(
       (item) =>
-        item.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-        item.serialNumber?.toLowerCase().includes(filters.search.toLowerCase())
+        (item.name || "").toLowerCase().includes(filters.search.toLowerCase()) ||
+        (item.serialNumber || "").toLowerCase().includes(filters.search.toLowerCase())
     );
 
+    if (filters.category && filters.category !== "all") {
+      results = results.filter((item) => item.category === filters.category);
+    }
+
+    if (filters.department && filters.department !== "all") {
+      const dept = (departmentsList || []).find((d) => d.id === filters.department);
+      const targetName = (dept?.name || filters.department || "").toLowerCase();
+      results = results.filter((item) => {
+        const val = String(item.recalledDepartment || "").toLowerCase();
+        return (
+          val === targetName ||
+          val.includes(targetName) ||
+          item.recalledDepartment === filters.department
+        );
+      });
+    }
+
     results.sort((a, b) => {
-      const aVal = a[filters.sortKey] || "";
-      const bVal = b[filters.sortKey] || "";
+      const aVal = (a[filters.sortKey] || "").toString();
+      const bVal = (b[filters.sortKey] || "").toString();
       const comparison = aVal.localeCompare(bVal, undefined, { numeric: true });
       return filters.sortDirection === "asc" ? comparison : -comparison;
     });
 
     return results;
-  }, [items, filters]);
+  }, [items, filters, departmentsList]);
 
   const renderCondition = (item) => {
     if (!item || !item.condition) return "---";
@@ -76,6 +104,34 @@ const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
                 placeholder={t("search")}
                 className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 col-span-1"
               />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <select
+                name="category"
+                value={filters.category}
+                onChange={handleFilterChange}
+                className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+              >
+                <option value="all">{t("all")}</option>
+                {(categories || []).map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              <select
+                name="department"
+                value={filters.department}
+                onChange={handleFilterChange}
+                className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+              >
+                <option value="all">{t("all")}</option>
+                {(departmentsList || []).map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         )}

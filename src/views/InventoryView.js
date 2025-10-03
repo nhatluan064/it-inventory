@@ -12,9 +12,11 @@ import {
   Package,
   Calendar,
   MapPin,
+  Download,
 } from "lucide-react";
 import { useSort } from "../hooks/useSort";
 import { AnimatedButton } from "../components/AnimatedButton";
+import { CSVLink } from "react-csv";
 import EmptyState from "../components/EmptyState";
 
 const InventoryView = ({
@@ -157,6 +159,33 @@ const InventoryView = ({
               <Plus className="w-5 h-5" />
               <span>{t("import_unlisted_device")}</span>
             </AnimatedButton>
+            {/* Download all inventory CSV (in-use + in-stock) */}
+            <CSVLink
+              data={(unfilteredEquipment || []).map((item) => ({
+                name: item.name,
+                serialNumber: item.serialNumber || "",
+                status: (statusLabels[item.status] || t(item.status) || item.status),
+                category: (categories.find((c) => c.id === item.category)?.name || item.category || ""),
+                importDate: item.importDate ? new Date(item.importDate).toLocaleString(t("locale_string")) : "",
+                handoverDate: item.allocationDetails?.handoverDate ? new Date(item.allocationDetails.handoverDate).toLocaleString(t("locale_string")) : "",
+                recipient: item.allocationDetails?.recipientName || "",
+                department: item.allocationDetails?.department || "",
+              }))}
+              headers={[
+                { label: t("device_name"), key: "name" },
+                { label: t("serial_number_sn"), key: "serialNumber" },
+                { label: t("status"), key: "status" },
+                { label: t("category"), key: "category" },
+                { label: t("import_date"), key: "importDate" },
+                { label: t("handover_date"), key: "handoverDate" },
+                { label: t("recipient"), key: "recipient" },
+                { label: t("department"), key: "department" },
+              ]}
+              filename="inventory_devices.csv"
+              className="p-2.5 bg-green-100 dark:bg-green-700/50 rounded-lg text-green-600 dark:text-green-300 animate-hoverScale transition-all duration-200"
+            >
+              <Download className="w-5 h-5" />
+            </CSVLink>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">

@@ -8,6 +8,8 @@ import {
   Wrench,
   User,
 } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
+import { useDynamicData } from "../../hooks/useDynamicData";
 
 const MobileMaintenanceView = ({
   items,
@@ -17,7 +19,11 @@ const MobileMaintenanceView = ({
   t,
 }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filters, setFilters] = useState({ search: "" });
+  const [filters, setFilters] = useState({ search: "", category: "all", department: "all" });
+
+  // Load dynamic categories and departments for filters
+  const { currentUser } = useAuth();
+  const { categories: dynCategories, departmentsList } = useDynamicData(currentUser);
 
   const handleFilterChange = (e) => {
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -57,6 +63,21 @@ const MobileMaintenanceView = ({
         item.serialNumber?.toLowerCase().includes(filters.search.toLowerCase())
     );
 
+    // Category filter (compare by id on item.category when present)
+    if (filters.category && filters.category !== "all") {
+      results = results.filter((item) => item.category === filters.category);
+    }
+
+    // Department filter: compare recalledDepartment with either id or name of selected dept
+    if (filters.department && filters.department !== "all") {
+      const dept = (departmentsList || []).find((d) => d.id === filters.department);
+      const targetName = (dept?.name || filters.department || "").toLowerCase();
+      results = results.filter((item) => {
+        const val = String(item.recalledDepartment || "").toLowerCase();
+        return val === targetName || val.includes(targetName) || item.recalledDepartment === filters.department;
+      });
+    }
+
     results.sort((a, b) => {
       const aVal = a[filters.sortKey] || "";
       const bVal = b[filters.sortKey] || "";
@@ -65,7 +86,7 @@ const MobileMaintenanceView = ({
     });
 
     return results;
-  }, [items, filters]);
+  }, [items, filters, departmentsList]);
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">
@@ -95,6 +116,36 @@ const MobileMaintenanceView = ({
                 placeholder={t("search")}
                 className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 col-span-1"
               />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {/* Category filter */}
+              <select
+                name="category"
+                value={filters.category}
+                onChange={handleFilterChange}
+                className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+              >
+                <option value="all">{t("all")}</option>
+                {(dynCategories || []).map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              {/* Department filter */}
+              <select
+                name="department"
+                value={filters.department}
+                onChange={handleFilterChange}
+                className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+              >
+                <option value="all">{t("all")}</option>
+                {(departmentsList || []).map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         )}
