@@ -1,4 +1,4 @@
-Dưới đây là một file note tổng hợp lại toàn bộ quy trình thiết lập CI/CD với GitHub Actions và Firebase Hosting, bao gồm cả các bước gỡ lỗi mà chúng ta đã trải qua. Bạn có thể lưu lại để tham khảo sau này.
+File note tổng hợp lại toàn bộ quy trình thiết lập CI/CD với GitHub Actions và Firebase Hosting, bao gồm cả các bước gỡ lỗi mà chúng ta đã trải qua. Bạn có thể lưu lại để tham khảo sau này.
 
 Hướng Dẫn Toàn Tập: CI/CD Tự Động cho Firebase Hosting bằng GitHub Actions
 Phần 1: Chuẩn bị & Cấp quyền
