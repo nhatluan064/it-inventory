@@ -1,0 +1,152 @@
+Dưới đây là một file note tổng hợp lại toàn bộ quy trình thiết lập CI/CD với GitHub Actions và Firebase Hosting, bao gồm cả các bước gỡ lỗi mà chúng ta đã trải qua. Bạn có thể lưu lại để tham khảo sau này.
+
+Hướng Dẫn Toàn Tập: CI/CD Tự Động cho Firebase Hosting bằng GitHub Actions
+Phần 1: Chuẩn bị & Cấp quyền
+1. Tạo Service Account (Google Cloud)
+Đây là tài khoản dịch vụ để GitHub có quyền deploy lên Firebase.
+
+Truy cập trang Service Accounts.
+
+Chọn đúng Project Google Cloud của bạn.
+
+Nhấn "CREATE SERVICE ACCOUNT".
+
+Name: github-actions-deploy
+
+Description: Deploy Firebase Hosting from GitHub Actions
+
+Gán Role (quyền):
+
+Firebase Hosting Admin (Đây là quyền tối thiểu cần thiết).
+
+Nhấn "DONE".
+
+Tạo Key cho Service Account:
+
+Vào tab "KEYS" của service account vừa tạo.
+
+Chọn "ADD KEY" -> "Create new key" -> JSON.
+
+Một file .json sẽ được tải về. Đây là file bí mật, tuyệt đối không commit lên Git.
+
+2. Thêm Bí mật (Secrets) vào GitHub
+Lưu trữ nội dung file .json một cách an toàn.
+
+Vào repo GitHub -> Settings -> Secrets and variables -> Actions.
+
+Nhấn "New repository secret".
+
+Tạo secret đầu tiên:
+
+Name: FIREBASE_SERVICE_ACCOUNT
+
+Value: Mở file .json vừa tải, sao chép toàn bộ nội dung và dán vào đây.
+
+Tạo các secret cho biến môi trường:
+
+Mở file .env.example của bạn để xem danh sách các biến cần thiết.
+
+Tạo một secret mới cho từng biến môi trường. Ví dụ:
+
+Name: REACT_APP_FIREBASE_API_KEY
+
+Value: AIzaSyDS_g... (giá trị tương ứng trong file .env)
+
+Phần 2: Cấu hình Workflow
+1. Tạo file Workflow
+Trong project, tạo thư mục và file: .github/workflows/firebase-deploy.yml.
+
+Dán nội dung hoàn chỉnh dưới đây vào file:
+
+YAML
+
+name: Deploy to Firebase Hosting
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Bước quan trọng: Tự động tạo file .env từ GitHub Secrets
+      - name: Create .env file
+        run: |
+          echo REACT_APP_FIREBASE_API_KEY=${{ secrets.REACT_APP_FIREBASE_API_KEY }} >> .env
+          echo REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }} >> .env
+          echo REACT_APP_FIREBASE_PROJECT_ID=${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }} >> .env
+          echo REACT_APP_FIREBASE_STORAGE_BUCKET=${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET }} >> .env
+          echo REACT_APP_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }} >> .env
+          echo REACT_APP_FIREBASE_APP_ID=${{ secrets.REACT_APP_FIREBASE_APP_ID }} >> .env
+          echo REACT_APP_FIREBASE_MEASUREMENT_ID=${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }} >> .env
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          channelId: live
+          projectId: your-project-id # <-- THAY BẰNG PROJECT ID CỦA BẠN
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
+Lưu ý: Thay your-project-id bằng Project ID Firebase của bạn.
+
+Phần 3: Gỡ lỗi Thường gặp
+1. Lỗi Build do thiếu file .env
+Nguyên nhân: File .env được đưa vào .gitignore (để bảo mật) nên không tồn tại khi GitHub Actions chạy.
+
+Giải pháp: Thêm bước "Create .env file" vào workflow (như trong file mẫu ở trên) và lưu các biến môi trường vào GitHub Secrets.
+
+2. Lỗi git push bị từ chối (Push rejected)
+Nguyên nhân: Tính năng Secret Scanning của GitHub phát hiện bạn đã vô tình commit một file chứa thông tin nhạy cảm (như file .json của Google Cloud).
+
+Giải pháp: Xóa file nhạy cảm khỏi lịch sử commit trên máy bạn trước khi push.
+
+Trường hợp 1: File chỉ nằm trong commit gần nhất
+
+Bash
+
+# 1. Gỡ file khỏi Git (nhưng vẫn giữ trên máy)
+git rm --cached ten-file-nhay-cam.json
+# 2. Sửa lại commit gần nhất
+git commit --amend --no-edit
+# 3. Push lại
+git push
+Trường hợp 2: File nằm trong nhiều commit cũ
+
+Bash
+
+# 1. Gộp N commit gần nhất lại (thay N bằng số commit cần gộp)
+git reset --soft HEAD~N
+# 2. Kiểm tra trạng thái, đảm bảo file nhạy cảm không còn trong danh sách
+git status
+# 3. Tạo commit gộp đã được làm sạch
+git commit -m "chore: Consolidate commits and remove secret"
+# 4. Push với force-with-lease (vì đã viết lại lịch sử)
+git push --force-with-lease
+Phần 4: Quy trình làm việc sau khi thiết lập
+Từ bây giờ, bạn chỉ cần tập trung vào việc code. Mỗi khi bạn hoàn thành một tính năng, chỉ cần thực hiện các lệnh Git như bình thường:
+
+Bash
+
+git add .
+git commit -m "feat: Add new awesome feature"
+git push origin main
+Mọi việc build và deploy còn lại sẽ được GitHub Actions tự động thực hiện.
