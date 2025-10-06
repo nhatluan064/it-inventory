@@ -1,13 +1,7 @@
 // src/views/SettingsView.js
 import React, { useContext } from "react";
 import AppContext from "../context/AppContext";
-import {
-  Settings,
-  Monitor,
-  Sun,
-  Moon,
-  Globe,
-} from "lucide-react";
+import { Settings, Monitor, Sun, Moon, Globe } from "lucide-react";
 import ViewHeader from "../components/ViewHeader";
 
 const SettingsView = ({ t }) => {

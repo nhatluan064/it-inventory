@@ -21,14 +21,17 @@ const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-
   const debouncedSearch = useDebouncedValue(filters.search, 300);
 
   const filteredAndSortedItems = useMemo(() => {
     let results = items.filter(
       (item) =>
-        (item.name || "").toLowerCase().includes((debouncedSearch || "").toLowerCase()) ||
-        (item.serialNumber || "").toLowerCase().includes((debouncedSearch || "").toLowerCase())
+        (item.name || "")
+          .toLowerCase()
+          .includes((debouncedSearch || "").toLowerCase()) ||
+        (item.serialNumber || "")
+          .toLowerCase()
+          .includes((debouncedSearch || "").toLowerCase())
     );
 
     if (filters.category && filters.category !== "all") {
@@ -36,7 +39,9 @@ const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
     }
 
     if (filters.department && filters.department !== "all") {
-      const dept = (departmentsList || []).find((d) => d.id === filters.department);
+      const dept = (departmentsList || []).find(
+        (d) => d.id === filters.department
+      );
       const targetName = (dept?.name || filters.department || "").toLowerCase();
       results = results.filter((item) => {
         const val = String(item.recalledDepartment || "").toLowerCase();
@@ -56,7 +61,15 @@ const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
     });
 
     return results;
-  }, [items, debouncedSearch, filters.category, filters.department, filters.sortKey, filters.sortDirection, departmentsList]);
+  }, [
+    items,
+    debouncedSearch,
+    filters.category,
+    filters.department,
+    filters.sortKey,
+    filters.sortDirection,
+    departmentsList,
+  ]);
 
   const renderCondition = (item) => {
     if (!item) return "---";
@@ -85,7 +98,6 @@ const MobileLiquidationView = ({ items, onLiquidateItem, t }) => {
       return String(cond);
     }
   };
-
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">

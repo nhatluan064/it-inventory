@@ -53,9 +53,10 @@ const MobilePurchasedView = ({ items, onImportItem, categories, t }) => {
   };
 
   const cleanedCategories = (categories || []).filter(
-    (c) => String(c.id).toLowerCase() !== "all" && (c.name || "").toLowerCase() !== (t("all") || "").toLowerCase()
+    (c) =>
+      String(c.id).toLowerCase() !== "all" &&
+      (c.name || "").toLowerCase() !== (t("all") || "").toLowerCase()
   );
-
 
   const filteredAndSortedItems = useMemo(() => {
     let sortedItems = [...items].filter((item) =>
@@ -63,7 +64,9 @@ const MobilePurchasedView = ({ items, onImportItem, categories, t }) => {
     );
 
     if (filters.category && filters.category !== "all") {
-      sortedItems = sortedItems.filter((item) => item.category === filters.category);
+      sortedItems = sortedItems.filter(
+        (item) => item.category === filters.category
+      );
     }
 
     sortedItems.sort((a, b) => {

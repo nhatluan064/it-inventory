@@ -1,0 +1,62 @@
+name: Deploy to Firebase Hosting
+
+on:
+  push:
+    branches: [main]
+  pull_request: # Thêm trigger cho Pull Request
+    branches: [main]
+  workflow_dispatch:
+
+# Thêm concurrency để tránh deploy chồng chéo
+concurrency:
+  group: hosting-deploy-main
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # BƯỚC MỚI: Thêm bước này vào
+      - name: Create .env file
+        run: |
+          echo REACT_APP_FIREBASE_API_KEY=${{ secrets.REACT_APP_FIREBASE_API_KEY }} >> .env
+          echo REACT_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }} >> .env
+          echo REACT_APP_FIREBASE_PROJECT_ID=${{ secrets.REACT_APP_FIREBASE_PROJECT_ID }} >> .env
+          echo REACT_APP_FIREBASE_STORAGE_BUCKET=${{ secrets.REACT_APP_FIREBASE_STORAGE_BUCKET }} >> .env
+          echo REACT_APP_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }} >> .env
+          echo REACT_APP_FIREBASE_APP_ID=${{ secrets.REACT_APP_FIREBASE_APP_ID }} >> .env
+          echo REACT_APP_FIREBASE_MEASUREMENT_ID=${{ secrets.REACT_APP_FIREBASE_MEASUREMENT_ID }} >> .env
+
+      # Thêm bước kiểm tra bảo mật (tùy chọn)
+      - name: Run security audit (optional)
+        run: npm audit --production || true
+
+      # Thêm bước chạy test (tùy chọn, bỏ comment nếu bạn có thiết lập test)
+      # - name: Run tests (optional)
+      #   run: npm test -- --watchAll=false
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Firebase Hosting (PR or main) # Sửa tên bước deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          # Tự động deploy kênh live cho main, và kênh preview cho PR
+          channelId: ${{ github.ref == 'refs/heads/main' && 'live' || 'pr-preview' }}
+          projectId: it-inventory-108a0
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks

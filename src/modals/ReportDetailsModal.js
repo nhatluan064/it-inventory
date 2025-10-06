@@ -4,8 +4,12 @@ import { X, Info } from "lucide-react";
 
 const Row = ({ label, value }) => (
   <div className="flex justify-between gap-4 py-1 text-sm">
-    <span className="text-gray-500 dark:text-gray-400 whitespace-nowrap">{label}</span>
-    <span className="font-medium text-gray-900 dark:text-gray-100 text-right break-words max-w-[70%]">{value ?? "---"}</span>
+    <span className="text-gray-500 dark:text-gray-400 whitespace-nowrap">
+      {label}
+    </span>
+    <span className="font-medium text-gray-900 dark:text-gray-100 text-right break-words max-w-[70%]">
+      {value ?? "---"}
+    </span>
   </div>
 );
 
@@ -27,8 +31,8 @@ const ReportDetailsModal = ({ show, onClose, trans, t, categories }) => {
       giverDepartment: t("giver_department") || "Department",
       department: t("department"),
       position: t("position"),
-  note: t("note"),
-  serials: t("serials"),
+      note: t("note"),
+      serials: t("serials"),
       returnCondition: t("returnCondition"),
       recalledFrom: t("recalled_from_user") || t("recalledFrom"),
       from: t("from_user") || t("recalledFrom"),
@@ -68,7 +72,10 @@ const ReportDetailsModal = ({ show, onClose, trans, t, categories }) => {
         </div>
 
         <div className="p-5 space-y-2">
-          <Row label={t("timestamp")} value={new Date(trans.timestamp).toLocaleString(t("locale_string"))} />
+          <Row
+            label={t("timestamp")}
+            value={new Date(trans.timestamp).toLocaleString(t("locale_string"))}
+          />
           <Row label={t("action")} value={actionText} />
           <Row label={t("object")} value={trans.itemName} />
           <Row label={t("quantity")} value={trans.quantity} />

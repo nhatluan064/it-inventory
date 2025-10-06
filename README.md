@@ -10,6 +10,7 @@ Hệ thống quản lý kho thiết bị công nghệ thông tin hiện đại v
 ## 🚀 Tính năng chính
 
 ### 📊 Quản lý thiết bị
+
 - ✅ **Danh sách Master** - Quản lý các mẫu thiết bị chuẩn
 - ✅ **Thiết bị đã mua** - Theo dõi thiết bị thực tế trong kho
 - ✅ **Yêu cầu mua** - Quản lý quy trình mua sắm thiết bị
@@ -17,12 +18,14 @@ Hệ thống quản lý kho thiết bị công nghệ thông tin hiện đại v
 - ✅ **Thu hồi thiết bị** - Quy trình thu hồi và bảo trì
 
 ### 📈 Báo cáo và Thống kê
+
 - 📊 **Dashboard tổng quan** với biểu đồ trực quan
 - 📋 **Báo cáo chi tiết** theo danh mục và trạng thái
 - 📉 **Thống kê xu hướng** theo thời gian
 - 🎯 **Phân tích sử dụng** thiết bị
 
 ### 🎨 Giao diện và Trải nghiệm
+
 - 📱 **Responsive Design** - Tối ưu cho mọi thiết bị
 - 🌙 **Dark/Light Mode** - Chế độ sáng/tối
 - 🔍 **Tìm kiếm và Lọc** thông minh
@@ -31,6 +34,7 @@ Hệ thống quản lý kho thiết bị công nghệ thông tin hiện đại v
 ## �️ Công nghệ sử dụng
 
 ### Frontend
+
 - **React 19.1.1** - Framework chính
 - **Tailwind CSS** - Styling framework
 - **Chart.js 4.5.0** - Thư viện biểu đồ
@@ -38,12 +42,14 @@ Hệ thống quản lý kho thiết bị công nghệ thông tin hiện đại v
 - **React Hot Toast** - Notification system
 
 ### Backend & Database
+
 - **Firebase 12.2.1** - Backend as a Service
 - **Firestore** - NoSQL Database
 - **Firebase Auth** - Xác thực người dùng
 - **Firebase Hosting** - Deployment platform
 
 ### Performance & Tools
+
 - **Webpack Bundle Analyzer** - Phân tích bundle size
 - **React.lazy & Suspense** - Code splitting
 - **React.memo** - Tối ưu re-rendering
@@ -76,38 +82,46 @@ it-inventory/
 ## 🚀 Cài đặt và Chạy dự án
 
 ### Yêu cầu hệ thống
+
 - Node.js >= 16.0.0
 - npm >= 8.0.0
 - Firebase account
 
 ### 1. Clone dự án
+
 ```bash
 git clone https://github.com/nhatluan064/it-inventory.git
 cd it-inventory
 ```
 
 ### 2. Cài đặt dependencies
+
 ```bash
 npm install
 ```
 
 ### 3. Cấu hình Firebase
+
 ```bash
 npm run setup-env
 ```
+
 Hoặc tạo file `.env` từ `.env.example` và điền thông tin Firebase.
 
 ### 4. Chạy development server
+
 ```bash
 npm start
 ```
 
 ### 5. Build production
+
 ```bash
 npm run build
 ```
 
 ### 6. Deploy to Firebase
+
 ```bash
 npm run deploy
 ```
@@ -115,12 +129,14 @@ npm run deploy
 ## 📊 Performance Optimization
 
 ### Bundle Size Analysis
+
 - **Main Bundle**: 312.3 kB (gzipped)
 - **Chart Chunks**: 5 separate chunks (~1.4-1.8 kB each)
 - **Lazy Loading**: Charts load on-demand
 - **Code Splitting**: Optimal caching strategy
 
 ### Performance Features
+
 - ⚡ **React.lazy** - Component-level code splitting
 - 🧠 **React.memo** - Prevent unnecessary re-renders
 - 🔍 **Intersection Observer** - Smart lazy loading
@@ -132,9 +148,11 @@ npm run deploy
 - 🛡️ **Firebase Security Rules** - Database access control
 - 🔐 **Content Security Policy** - XSS protection
 - 📋 **Input Validation** - Data sanitization
+
 ## 📋 Tính năng sắp tới
 
 ### Phase 3: Tính năng nâng cao
+
 - [ ] 📸 Upload và quản lý hình ảnh thiết bị
 - [ ] 💾 Backup/restore dữ liệu tự động
 - [ ] 🌙 Dark theme support
@@ -142,6 +160,7 @@ npm run deploy
 - [ ] 📱 PWA offline support
 
 ### Security & Dependencies
+
 - [ ] 🔄 Cập nhật dependencies định kỳ
 - [ ] 🔍 Security audit thường xuyên
 - [ ] 🛡️ Advanced authentication methods
@@ -151,12 +170,14 @@ npm run deploy
 ### Lỗi thường gặp
 
 **Firebase connection error:**
+
 ```bash
 # Kiểm tra cấu hình Firebase
 npm run check-firebase-config
 ```
 
 **Build fails:**
+
 ```bash
 # Clear cache và rebuild
 npm run clean
@@ -165,26 +186,30 @@ npm run build
 ```
 
 **Performance issues:**
+
 ```bash
 # Phân tích bundle size
 npm run analyze
 ```
 
 ### Debug Steps
+
 1. 🔍 **Firebase Console** - Kiểm tra authentication/database
-2. 🌐 **Browser Console** - Xem client-side errors  
+2. 🌐 **Browser Console** - Xem client-side errors
 3. 📡 **Network Tab** - Kiểm tra API requests
 4. ⚡ **Performance Tab** - Phân tích load time
 
 ## 🤝 Đóng góp & Hỗ trợ
 
 ### Liên hệ
+
 - 📧 **Email**: nhatluan064@gmail.com
 - 🐛 **Bug Reports**: [GitHub Issues](https://github.com/nhatluan064/it-inventory/issues)
 - 💡 **Feature Requests**: [Discussions](https://github.com/nhatluan064/it-inventory/discussions)
 - 📚 **Documentation**: [Wiki](https://github.com/nhatluan064/it-inventory/wiki)
 
 ### Quy trình đóng góp
+
 1. **Fork** repository này
 2. **Create** feature branch (`git checkout -b feature/ten-tinh-nang`)
 3. **Commit** changes (`git commit -m 'Thêm tính năng mới'`)
@@ -198,11 +223,9 @@ Dự án này được cấp phép theo **MIT License** - xem file [LICENSE](LIC
 ---
 
 <div align="center">
-  <p><strong>Được tạo với AI Gemini, Claude, ChatGPT, Copilot Github, bởi Nhật Luân IT Networking</strong></p>
+  <p><strong>Được tạo với AI Gemini 2.5 Pro, Claude, ChatGPT 5.0 Pro, Copilot Github Pro, bởi Nhật Luân IT Networking</strong></p>
   <p>© 2024 IT Inventory Management System | Hệ thống Quản lý Thiết bị CNTT</p>
   
   [![Vietnam](https://img.shields.io/badge/Made%20in-Vietnam-red.svg)](https://vietnam.travel)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 </div>
-
-

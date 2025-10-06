@@ -21,11 +21,16 @@ const MobileMaintenanceView = ({
   t,
 }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filters, setFilters] = useState({ search: "", category: "all", department: "all" });
+  const [filters, setFilters] = useState({
+    search: "",
+    category: "all",
+    department: "all",
+  });
 
   // Load dynamic categories and departments for filters
   const { currentUser } = useAuth();
-  const { categories: dynCategories, departmentsList } = useDynamicData(currentUser);
+  const { categories: dynCategories, departmentsList } =
+    useDynamicData(currentUser);
 
   const handleFilterChange = (e) => {
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -35,7 +40,6 @@ const MobileMaintenanceView = ({
     if (!dateString) return "---";
     return new Date(dateString).toLocaleString(t("locale_string"));
   };
-
 
   // Extract only the actual failure note text, similar to desktop
   const getFailureNote = (condition) => {
@@ -53,8 +57,12 @@ const MobileMaintenanceView = ({
   const filteredAndSortedItems = useMemo(() => {
     let results = items.filter(
       (item) =>
-        item.name.toLowerCase().includes((debouncedSearch || "").toLowerCase()) ||
-        item.serialNumber?.toLowerCase().includes((debouncedSearch || "").toLowerCase())
+        item.name
+          .toLowerCase()
+          .includes((debouncedSearch || "").toLowerCase()) ||
+        item.serialNumber
+          ?.toLowerCase()
+          .includes((debouncedSearch || "").toLowerCase())
     );
 
     // Category filter (compare by id on item.category when present)
@@ -64,11 +72,17 @@ const MobileMaintenanceView = ({
 
     // Department filter: compare recalledDepartment with either id or name of selected dept
     if (filters.department && filters.department !== "all") {
-      const dept = (departmentsList || []).find((d) => d.id === filters.department);
+      const dept = (departmentsList || []).find(
+        (d) => d.id === filters.department
+      );
       const targetName = (dept?.name || filters.department || "").toLowerCase();
       results = results.filter((item) => {
         const val = String(item.recalledDepartment || "").toLowerCase();
-        return val === targetName || val.includes(targetName) || item.recalledDepartment === filters.department;
+        return (
+          val === targetName ||
+          val.includes(targetName) ||
+          item.recalledDepartment === filters.department
+        );
       });
     }
 
@@ -80,7 +94,15 @@ const MobileMaintenanceView = ({
     });
 
     return results;
-  }, [items, debouncedSearch, filters.category, filters.department, filters.sortKey, filters.sortDirection, departmentsList]);
+  }, [
+    items,
+    debouncedSearch,
+    filters.category,
+    filters.department,
+    filters.sortKey,
+    filters.sortDirection,
+    departmentsList,
+  ]);
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">

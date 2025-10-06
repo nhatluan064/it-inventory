@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Eye,
   Edit,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useDynamicData } from "../../hooks/useDynamicData";
 import EmptyState from "../../components/EmptyState";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
 import { useAuth } from "../../hooks/useAuth";
 
 const MobileInventoryView = ({
@@ -27,8 +28,8 @@ const MobileInventoryView = ({
   onAddLegacyItem,
   t,
 }) => {
-  // Keep filters visible on mobile by default
-  const [isFilterOpen, setIsFilterOpen] = useState(true);
+  // Keep filters collapsed by default; user can expand when needed
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Load dynamic department data for label resolution
   const { currentUser } = useAuth();
@@ -44,9 +45,67 @@ const MobileInventoryView = ({
     return t(deptId) || deptId;
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "---";
-    return new Date(dateString).toLocaleDateString(t("locale_string"));
+  // Robust date formatter to avoid Safari parsing quirks
+  const formatDate = (value) => {
+    if (!value) return "---";
+    // Normalize to Date instance first using safe parsing
+    const d = (() => {
+      // Firestore Timestamp
+      if (value && typeof value === "object") {
+        if (typeof value.toDate === "function") return value.toDate();
+        if (typeof value.seconds === "number")
+          return new Date(value.seconds * 1000);
+        // Already a Date
+        if (value instanceof Date) return value;
+      }
+      if (typeof value === "number") return new Date(value);
+      if (typeof value === "string") {
+        const s = value.trim();
+        // yyyy-mm-dd (keep as local date components instead of relying on Date parsing)
+        const isoDay = /^\d{4}-\d{2}-\d{2}$/;
+        if (isoDay.test(s)) {
+          const [y, m, d] = s.split("-").map((x) => parseInt(x, 10));
+          return new Date(y, m - 1, d);
+        }
+        // dd/mm/yyyy or dd-mm-yyyy
+        const dmySlash = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+        const dmyDash = /^(\d{2})-(\d{2})-(\d{4})$/;
+        let m;
+        if ((m = s.match(dmySlash))) {
+          const [, dd, mm, yy] = m;
+          return new Date(
+            parseInt(yy, 10),
+            parseInt(mm, 10) - 1,
+            parseInt(dd, 10)
+          );
+        }
+        if ((m = s.match(dmyDash))) {
+          const [, dd, mm, yy] = m;
+          return new Date(
+            parseInt(yy, 10),
+            parseInt(mm, 10) - 1,
+            parseInt(dd, 10)
+          );
+        }
+        // yyyy/mm/dd
+        const ymdSlash = /^(\d{4})\/(\d{2})\/(\d{2})$/;
+        if ((m = s.match(ymdSlash))) {
+          const [, yy, mm, dd] = m;
+          return new Date(
+            parseInt(yy, 10),
+            parseInt(mm, 10) - 1,
+            parseInt(dd, 10)
+          );
+        }
+        // Fallback to native parsing as last resort
+        const nd = new Date(s);
+        if (!Number.isNaN(nd.getTime())) return nd;
+      }
+      return null;
+    })();
+
+    if (!d || Number.isNaN(d.getTime())) return "---";
+    return d.toLocaleDateString(t("locale_string"));
   };
 
   const renderCondition = (item) => {
@@ -75,15 +134,132 @@ const MobileInventoryView = ({
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-
   // uniqueStatuses not needed after restricting status dropdown to fixed options
 
   // Filter out any category placeholders named or keyed 'all' to avoid duplicate "All" options
   const cleanedCategories = (categories || []).filter(
-    (c) => String(c.id).toLowerCase() !== "all" && (c.name || "").toLowerCase() !== (t("all") || "").toLowerCase()
+    (c) =>
+      String(c.id).toLowerCase() !== "all" &&
+      (c.name || "").toLowerCase() !== (t("all") || "").toLowerCase()
   );
 
   // sort helpers removed for mobile - using explicit importDate filter instead
+
+  // Debounced search term for smoother UX on mobile
+  const debouncedSearch = useDebouncedValue(filters.search, 300);
+
+  // Helpers
+  // Normalize various possible date shapes to a stable local yyyy-mm-dd string
+  const normalizeDateToYMD = (value) => {
+    if (!value) return "";
+    // Firestore Timestamp
+    if (value && typeof value === "object") {
+      if (typeof value.toDate === "function") {
+        const d = value.toDate();
+        if (d && !Number.isNaN(d.getTime())) {
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, "0");
+          const day = String(d.getDate()).padStart(2, "0");
+          return `${y}-${m}-${day}`;
+        }
+      }
+      if (typeof value.seconds === "number") {
+        const d = new Date(value.seconds * 1000);
+        if (!Number.isNaN(d.getTime())) {
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, "0");
+          const day = String(d.getDate()).padStart(2, "0");
+          return `${y}-${m}-${day}`;
+        }
+      }
+      if (value instanceof Date) {
+        const d = value;
+        if (!Number.isNaN(d.getTime())) {
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, "0");
+          const day = String(d.getDate()).padStart(2, "0");
+          return `${y}-${m}-${day}`;
+        }
+      }
+    }
+    if (typeof value === "number") {
+      const d = new Date(value);
+      if (!Number.isNaN(d.getTime())) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${day}`;
+      }
+      return "";
+    }
+    if (typeof value === "string") {
+      const s = value.trim();
+      // yyyy-mm-dd → already normalized
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+      // dd/mm/yyyy
+      let m;
+      if ((m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/))) {
+        const [, dd, mm, yy] = m;
+        return `${yy}-${mm}-${dd}`;
+      }
+      // dd-mm-yyyy
+      if ((m = s.match(/^(\d{2})-(\d{2})-(\d{4})$/))) {
+        const [, dd, mm, yy] = m;
+        return `${yy}-${mm}-${dd}`;
+      }
+      // yyyy/mm/dd
+      if ((m = s.match(/^(\d{4})\/(\d{2})\/(\d{2})$/))) {
+        const [, yy, mm, dd] = m;
+        return `${yy}-${mm}-${dd}`;
+      }
+      // Fallback try native date
+      const nd = new Date(s);
+      if (!Number.isNaN(nd.getTime())) {
+        const y = nd.getFullYear();
+        const mm = String(nd.getMonth() + 1).padStart(2, "0");
+        const dd = String(nd.getDate()).padStart(2, "0");
+        return `${y}-${mm}-${dd}`;
+      }
+      return "";
+    }
+    return "";
+  };
+
+  // Apply local filters for mobile: search, category, status, importDate
+  const filteredItems = useMemo(() => {
+    let data = Array.isArray(equipment) ? equipment : [];
+
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
+      data = data.filter(
+        (it) =>
+          (it.name || "").toLowerCase().includes(q) ||
+          (it.serialNumber || "").toLowerCase().includes(q)
+      );
+    }
+
+    if (filters.category && filters.category !== "all") {
+      data = data.filter((it) => it.category === filters.category);
+    }
+
+    if (filters.status && filters.status !== "all") {
+      data = data.filter((it) => it.status === filters.status);
+    }
+
+    if (filters.importDate) {
+      data = data.filter(
+        (it) => normalizeDateToYMD(it.importDate) === filters.importDate
+      );
+    }
+
+    return data;
+  }, [
+    equipment,
+    debouncedSearch,
+    filters.category,
+    filters.status,
+    filters.importDate,
+  ]);
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">
@@ -93,20 +269,12 @@ const MobileInventoryView = ({
             <h2 className="text-lg font-bold">{t("inventory_list")}</h2>
             <p className="text-sm text-gray-500">{t("inventory_desc")}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="mobile-btn-icon mobile-optimized"
-            >
-              <Filter className="w-5 h-5" />
-            </button>
-            <button
-              onClick={onAddLegacyItem}
-              className="mobile-btn-primary rounded-full p-2 mobile-optimized"
-            >
-              <Plus className="w-5 h-5" />
-            </button>
-          </div>
+          <button
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className="mobile-btn-icon mobile-optimized"
+          >
+            <Filter className="w-5 h-5" />
+          </button>
         </div>
         {isFilterOpen && (
           <div className="mt-4 space-y-4 mobile-filter-enter">
@@ -124,7 +292,7 @@ const MobileInventoryView = ({
                 name="importDate"
                 value={filters.importDate || ""}
                 onChange={handleFilterChange}
-                className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 col-span-1"
+                className="w-full min-w-0 p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 col-span-1"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -148,15 +316,19 @@ const MobileInventoryView = ({
                 className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
               >
                 <option value="all">{t("all")}</option>
-                <option value="available">{statusLabels.available || t("available")}</option>
-                <option value="in-use">{statusLabels["in-use"] || t("in_use")}</option>
+                <option value="available">
+                  {statusLabels.available || t("available")}
+                </option>
+                <option value="in-use">
+                  {statusLabels["in-use"] || t("in_use")}
+                </option>
               </select>
             </div>
           </div>
         )}
       </div>
       <div className="flex-grow overflow-y-auto p-4 space-y-4 mobile-stagger">
-        {equipment.map((item) => (
+        {filteredItems.map((item) => (
           <div
             key={item.id}
             className="bg-white dark:bg-gray-800 rounded-lg shadow-md border dark:border-gray-700 p-4 space-y-3 mobile-card"
@@ -258,7 +430,7 @@ const MobileInventoryView = ({
             </div>
           </div>
         ))}
-        {equipment.length === 0 && (
+        {filteredItems.length === 0 && (
           <EmptyState
             icon={Building}
             title={t("empty_inventory_title")}
@@ -266,6 +438,15 @@ const MobileInventoryView = ({
           />
         )}
       </div>
+      {/* Floating Add button to keep feature while matching header to Allocated */}
+      <button
+        onClick={onAddLegacyItem}
+        className="fixed bottom-20 right-4 z-50 mobile-btn-primary rounded-full p-3 shadow-lg mobile-optimized"
+        aria-label={t("import_unlisted_device")}
+        title={t("import_unlisted_device")}
+      >
+        <Plus className="w-6 h-6" />
+      </button>
     </div>
   );
 };

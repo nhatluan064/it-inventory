@@ -1,17 +1,17 @@
 // src/config/security.config.js
-import { validateEnvVariables } from '../utils/security';
+import { validateEnvVariables } from "../utils/security";
 
 // Validate environment variables on app start
 export const initializeSecurityConfig = () => {
   // Check if required environment variables are set
   const isValid = validateEnvVariables();
-  
-  if (!isValid && process.env.NODE_ENV === 'production') {
-    throw new Error('Missing required environment variables for production');
+
+  if (!isValid && process.env.NODE_ENV === "production") {
+    throw new Error("Missing required environment variables for production");
   }
-  
+
   // Configure Content Security Policy
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === "production") {
     const csp = `
       default-src 'self';
       script-src 'self' 'unsafe-inline' https://www.googletagmanager.com;
@@ -21,14 +21,18 @@ export const initializeSecurityConfig = () => {
       connect-src 'self' https://firestore.googleapis.com https://firebase.googleapis.com;
       frame-src 'none';
       object-src 'none';
-    `.replace(/\s+/g, ' ').trim();
-    
+    `
+      .replace(/\s+/g, " ")
+      .trim();
+
     // Add CSP meta tag if not already present
-    const existingCsp = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+    const existingCsp = document.querySelector(
+      'meta[http-equiv="Content-Security-Policy"]'
+    );
     if (!existingCsp) {
-      const meta = document.createElement('meta');
-      meta.setAttribute('http-equiv', 'Content-Security-Policy');
-      meta.setAttribute('content', csp);
+      const meta = document.createElement("meta");
+      meta.setAttribute("http-equiv", "Content-Security-Policy");
+      meta.setAttribute("content", csp);
       document.head.appendChild(meta);
     }
   }
@@ -36,20 +40,20 @@ export const initializeSecurityConfig = () => {
 
 // Firebase config validation
 export const validateFirebaseConfig = (config) => {
-  const requiredFields = ['apiKey', 'authDomain', 'projectId'];
-  
+  const requiredFields = ["apiKey", "authDomain", "projectId"];
+
   for (const field of requiredFields) {
     if (!config[field]) {
       throw new Error(`Missing Firebase config field: ${field}`);
     }
   }
-  
+
   return true;
 };
 
 const securityConfig = {
   initializeSecurityConfig,
-  validateFirebaseConfig
+  validateFirebaseConfig,
 };
 
 export default securityConfig;

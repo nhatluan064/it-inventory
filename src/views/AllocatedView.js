@@ -1,5 +1,18 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { RotateCcw, Search, Wrench, ChevronDown, ChevronRight, Package, User, Eye, Edit, Calendar, Building, Users } from "lucide-react";
+import {
+  RotateCcw,
+  Search,
+  Wrench,
+  ChevronDown,
+  ChevronRight,
+  Package,
+  User,
+  Eye,
+  Edit,
+  Calendar,
+  Building,
+  Users,
+} from "lucide-react";
 import EmptyState from "../components/EmptyState";
 import { useSort } from "../hooks/useSort";
 
@@ -217,169 +230,192 @@ const AllocatedView = ({
       <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp p-6">
         {/* Card-based container */}
         <div className="flex-grow overflow-y-auto hide-scrollbar space-y-3">
-              {Object.keys(groupedByCategory).length === 0 && (
-                <EmptyState
-                  icon={Users}
-                  title={t("empty_allocated_title")}
-                  description={t("empty_allocated_text")}
-                />
-              )}
-              {Object.entries(groupedByCategory).map(([categoryId, items], catIndex) => {
-                const isExpanded = expandedRows[categoryId];
-                const category = categories.find((c) => c.id === categoryId);
-                const subSortConfig = subSortConfigs[categoryId] || {
-                  key: "name",
-                  direction: "ascending",
-                };
-                const sortedSubItems = [...items].sort((a, b) => {
-                  const getNestedValue = (obj, key) =>
-                    key
-                      .split(".")
-                      .reduce((o, i) => (o ? o[i] : undefined), obj);
-                  const aValue = getNestedValue(a, subSortConfig.key) || "";
-                  const bValue = getNestedValue(b, subSortConfig.key) || "";
-                  const collator = new Intl.Collator(undefined, {
-                    numeric: true,
-                    sensitivity: "base",
-                  });
-                  const comparison = collator.compare(
-                    aValue.toString(),
-                    bValue.toString()
-                  );
-                  return subSortConfig.direction === "ascending"
-                    ? comparison
-                    : -comparison;
+          {Object.keys(groupedByCategory).length === 0 && (
+            <EmptyState
+              icon={Users}
+              title={t("empty_allocated_title")}
+              description={t("empty_allocated_text")}
+            />
+          )}
+          {Object.entries(groupedByCategory).map(
+            ([categoryId, items], catIndex) => {
+              const isExpanded = expandedRows[categoryId];
+              const category = categories.find((c) => c.id === categoryId);
+              const subSortConfig = subSortConfigs[categoryId] || {
+                key: "name",
+                direction: "ascending",
+              };
+              const sortedSubItems = [...items].sort((a, b) => {
+                const getNestedValue = (obj, key) =>
+                  key.split(".").reduce((o, i) => (o ? o[i] : undefined), obj);
+                const aValue = getNestedValue(a, subSortConfig.key) || "";
+                const bValue = getNestedValue(b, subSortConfig.key) || "";
+                const collator = new Intl.Collator(undefined, {
+                  numeric: true,
+                  sensitivity: "base",
                 });
-                
-                return (
+                const comparison = collator.compare(
+                  aValue.toString(),
+                  bValue.toString()
+                );
+                return subSortConfig.direction === "ascending"
+                  ? comparison
+                  : -comparison;
+              });
+
+              return (
+                <div
+                  key={categoryId}
+                  className="border-2 border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden animate-fadeIn"
+                  style={{ animationDelay: `${catIndex * 0.05}s` }}
+                >
+                  {/* Category Header with Yellow Gradient */}
                   <div
-                    key={categoryId}
-                    className="border-2 border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden animate-fadeIn"
-                    style={{ animationDelay: `${catIndex * 0.05}s` }}
+                    onClick={() => toggleExpand(categoryId)}
+                    className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 hover:from-yellow-100 hover:to-amber-100 dark:hover:from-yellow-800/40 dark:hover:to-amber-800/40 cursor-pointer transition-all duration-200"
                   >
-                    {/* Category Header with Yellow Gradient */}
-                    <div
-                      onClick={() => toggleExpand(categoryId)}
-                      className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 hover:from-yellow-100 hover:to-amber-100 dark:hover:from-yellow-800/40 dark:hover:to-amber-800/40 cursor-pointer transition-all duration-200"
-                    >
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="w-8 h-8 bg-gradient-to-br from-yellow-500 to-yellow-600 dark:from-yellow-400 dark:to-yellow-500 rounded-lg flex items-center justify-center shadow-md">
-                          {isExpanded ? (
-                            <ChevronDown className="w-5 h-5 text-white" />
-                          ) : (
-                            <ChevronRight className="w-5 h-5 text-white" />
-                          )}
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-gray-900 dark:text-white">
-                            {category?.name || categoryId}
-                          </h3>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">
-                            {items.length} {t("label_devices")}
-                          </p>
-                        </div>
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="w-8 h-8 bg-gradient-to-br from-yellow-500 to-yellow-600 dark:from-yellow-400 dark:to-yellow-500 rounded-lg flex items-center justify-center shadow-md">
+                        {isExpanded ? (
+                          <ChevronDown className="w-5 h-5 text-white" />
+                        ) : (
+                          <ChevronRight className="w-5 h-5 text-white" />
+                        )}
                       </div>
-                      <div className="text-sm font-medium text-yellow-600 dark:text-yellow-400">
-                        {isExpanded ? t("collapse") : t("expand")}
+                      <div>
+                        <h3 className="font-bold text-gray-900 dark:text-white">
+                          {category?.name || categoryId}
+                        </h3>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                          {items.length} {t("label_devices")}
+                        </p>
                       </div>
                     </div>
+                    <div className="text-sm font-medium text-yellow-600 dark:text-yellow-400">
+                      {isExpanded ? t("collapse") : t("expand")}
+                    </div>
+                  </div>
 
-                    {/* Category Items */}
-                    {isExpanded && (
-                      <div className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
-                        {sortedSubItems.map((item, itemIndex) => (
-                          <div
-                            key={item.id}
-                            className="grid grid-cols-12 items-center p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 animate-slideInLeft border-l-4 border-transparent hover:border-yellow-400 dark:hover:border-yellow-500"
-                            style={{
-                              animationDelay: `${itemIndex * 0.03}s`,
-                            }}
-                          >
-                            {/* Device */}
-                            <div className="col-span-12 md:col-span-5 lg:col-span-4 flex items-center gap-3 min-w-0">
-                              <div className="w-2 h-2 bg-yellow-400 dark:bg-yellow-500 rounded-full flex-shrink-0"></div>
-                              <div className="flex items-center gap-3 flex-1 min-w-0">
-                                <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-amber-400 dark:from-orange-500 dark:to-amber-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow">
-                                  <Package className="w-4 h-4 text-white" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-gray-900 dark:text-white truncate">{item.name}</p>
-                                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate font-mono">SN: {item.serialNumber || "N/A"}</p>
-                                </div>
+                  {/* Category Items */}
+                  {isExpanded && (
+                    <div className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+                      {sortedSubItems.map((item, itemIndex) => (
+                        <div
+                          key={item.id}
+                          className="grid grid-cols-12 items-center p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 animate-slideInLeft border-l-4 border-transparent hover:border-yellow-400 dark:hover:border-yellow-500"
+                          style={{
+                            animationDelay: `${itemIndex * 0.03}s`,
+                          }}
+                        >
+                          {/* Device */}
+                          <div className="col-span-12 md:col-span-5 lg:col-span-4 flex items-center gap-3 min-w-0">
+                            <div className="w-2 h-2 bg-yellow-400 dark:bg-yellow-500 rounded-full flex-shrink-0"></div>
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-amber-400 dark:from-orange-500 dark:to-amber-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow">
+                                <Package className="w-4 h-4 text-white" />
                               </div>
-                            </div>
-
-                            {/* Recipient + Position */}
-                            <div className="col-span-12 md:col-span-3 lg:col-span-3 flex items-center gap-2 min-w-0 mt-2 md:mt-0">
-                              <div className="flex items-center gap-2 text-yellow-600 dark:text-yellow-400 min-w-0">
-                                <User className="w-4 h-4 flex-shrink-0" />
-                                <div className="min-w-0">
-                                  <p className="text-sm font-medium truncate">{item.allocationDetails?.recipientName || "N/A"}</p>
-                                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                    {item.allocationDetails?.position ? getPositionLabel(item.allocationDetails.position) : "N/A"}
-                                  </p>
-                                </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-gray-900 dark:text-white truncate">
+                                  {item.name}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate font-mono">
+                                  SN: {item.serialNumber || "N/A"}
+                                </p>
                               </div>
-                            </div>
-
-                            {/* Department */}
-                            <div className="col-span-6 md:col-span-2 lg:col-span-2 text-xs text-gray-600 dark:text-gray-300 min-w-0 mt-2 md:mt-0">
-                              <div className="flex items-center gap-2 truncate">
-                                <Building className="w-4 h-4 text-gray-400" />
-                                <span className="truncate">
-                                  {item.allocationDetails?.department
-                                    ? departmentsList.find((dept) => dept.id === item.allocationDetails.department)?.name || t(item.allocationDetails.department) || item.allocationDetails.department
-                                    : "N/A"}
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Handover Date */}
-                            <div className="col-span-6 md:col-span-2 lg:col-span-2 text-xs text-gray-500 dark:text-gray-400 min-w-0 mt-2 md:mt-0">
-                              <div className="flex items-center gap-2 truncate">
-                                <Calendar className="w-4 h-4 text-gray-400" />
-                                <span className="truncate">{formatDate(item.allocationDetails?.handoverDate)}</span>
-                              </div>
-                            </div>
-
-                            {/* Actions */}
-                            <div className="col-span-12 md:col-span-12 lg:col-span-1 flex items-center justify-end gap-2 mt-3 lg:mt-0">
-                              <button
-                                onClick={() => onViewItem && onViewItem(item)}
-                                className="p-2 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200"
-                                title={t("view_info")}
-                              >
-                                <Eye className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => onEditAllocation && onEditAllocation(item)}
-                                className="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200"
-                                title={t("edit_recipient")}
-                              >
-                                <Edit className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => onRecallItem(item)}
-                                className="p-2 text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all duration-200"
-                                title={t("recall_device")}
-                              >
-                                <RotateCcw className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => onMarkDamaged(item)}
-                                className="p-2 text-yellow-500 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 rounded-lg transition-all duration-200"
-                                title={t("maintenance")}
-                              >
-                                <Wrench className="w-4 h-4" />
-                              </button>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+
+                          {/* Recipient + Position */}
+                          <div className="col-span-12 md:col-span-3 lg:col-span-3 flex items-center gap-2 min-w-0 mt-2 md:mt-0">
+                            <div className="flex items-center gap-2 text-yellow-600 dark:text-yellow-400 min-w-0">
+                              <User className="w-4 h-4 flex-shrink-0" />
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium truncate">
+                                  {item.allocationDetails?.recipientName ||
+                                    "N/A"}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                  {item.allocationDetails?.position
+                                    ? getPositionLabel(
+                                        item.allocationDetails.position
+                                      )
+                                    : "N/A"}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Department */}
+                          <div className="col-span-6 md:col-span-2 lg:col-span-2 text-xs text-gray-600 dark:text-gray-300 min-w-0 mt-2 md:mt-0">
+                            <div className="flex items-center gap-2 truncate">
+                              <Building className="w-4 h-4 text-gray-400" />
+                              <span className="truncate">
+                                {item.allocationDetails?.department
+                                  ? departmentsList.find(
+                                      (dept) =>
+                                        dept.id ===
+                                        item.allocationDetails.department
+                                    )?.name ||
+                                    t(item.allocationDetails.department) ||
+                                    item.allocationDetails.department
+                                  : "N/A"}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Handover Date */}
+                          <div className="col-span-6 md:col-span-2 lg:col-span-2 text-xs text-gray-500 dark:text-gray-400 min-w-0 mt-2 md:mt-0">
+                            <div className="flex items-center gap-2 truncate">
+                              <Calendar className="w-4 h-4 text-gray-400" />
+                              <span className="truncate">
+                                {formatDate(
+                                  item.allocationDetails?.handoverDate
+                                )}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="col-span-12 md:col-span-12 lg:col-span-1 flex items-center justify-end gap-2 mt-3 lg:mt-0">
+                            <button
+                              onClick={() => onViewItem && onViewItem(item)}
+                              className="p-2 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200"
+                              title={t("view_info")}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() =>
+                                onEditAllocation && onEditAllocation(item)
+                              }
+                              className="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200"
+                              title={t("edit_recipient")}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => onRecallItem(item)}
+                              className="p-2 text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all duration-200"
+                              title={t("recall_device")}
+                            >
+                              <RotateCcw className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => onMarkDamaged(item)}
+                              className="p-2 text-yellow-500 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 rounded-lg transition-all duration-200"
+                              title={t("maintenance")}
+                            >
+                              <Wrench className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+          )}
         </div>
       </div>
     </div>

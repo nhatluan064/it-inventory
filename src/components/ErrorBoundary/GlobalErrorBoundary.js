@@ -1,15 +1,15 @@
 // src/components/ErrorBoundary/GlobalErrorBoundary.js
-import React from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import React from "react";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 
 class GlobalErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { 
-      hasError: false, 
-      error: null, 
+    this.state = {
+      hasError: false,
+      error: null,
       errorInfo: null,
-      retryCount: 0 
+      retryCount: 0,
     };
   }
 
@@ -21,7 +21,7 @@ class GlobalErrorBoundary extends React.Component {
     this.setState({
       error,
       errorInfo,
-      hasError: true
+      hasError: true,
     });
 
     // Log error to external service if needed
@@ -36,11 +36,11 @@ class GlobalErrorBoundary extends React.Component {
   };
 
   handleRetry = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       hasError: false,
       error: null,
       errorInfo: null,
-      retryCount: prevState.retryCount + 1
+      retryCount: prevState.retryCount + 1,
     }));
   };
 
@@ -58,16 +58,17 @@ class GlobalErrorBoundary extends React.Component {
                 <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
               </div>
             </div>
-            
+
             <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-              {this.props.t ? this.props.t('error_occurred') : 'Something went wrong'}
+              {this.props.t
+                ? this.props.t("error_occurred")
+                : "Something went wrong"}
             </h1>
-            
+
             <p className="text-gray-600 dark:text-gray-300 mb-6">
-              {this.props.t ? 
-                this.props.t('error_boundary_message') : 
-                'An unexpected error occurred. Please try refreshing the page.'
-              }
+              {this.props.t
+                ? this.props.t("error_boundary_message")
+                : "An unexpected error occurred. Please try refreshing the page."}
             </p>
 
             <div className="space-y-3">
@@ -76,18 +77,18 @@ class GlobalErrorBoundary extends React.Component {
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 <RefreshCw className="w-4 h-4" />
-                {this.props.t ? this.props.t('try_again') : 'Try Again'}
+                {this.props.t ? this.props.t("try_again") : "Try Again"}
               </button>
-              
+
               <button
                 onClick={this.handleReload}
                 className="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 py-2 px-4 rounded-lg transition-colors"
               >
-                {this.props.t ? this.props.t('reload_page') : 'Reload Page'}
+                {this.props.t ? this.props.t("reload_page") : "Reload Page"}
               </button>
             </div>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {process.env.NODE_ENV === "development" && this.state.error && (
               <details className="mt-6 text-left">
                 <summary className="cursor-pointer text-sm text-gray-500 mb-2">
                   Error Details (Development Only)

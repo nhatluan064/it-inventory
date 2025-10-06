@@ -1,11 +1,31 @@
 import React, { useMemo, useState, useEffect } from "react";
 import useDebouncedValue from "../hooks/useDebouncedValue";
-import { CheckCircle, XCircle, Edit, Package, ChevronDown, ChevronRight, Search } from "lucide-react";
+import {
+  CheckCircle,
+  XCircle,
+  Edit,
+  Package,
+  ChevronDown,
+  ChevronRight,
+  Search,
+} from "lucide-react";
 import { useSort } from "../hooks/useSort";
 
-const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNote, categories, departmentsList = [], t }) => {
+const MaintenanceView = ({
+  items,
+  onRepairComplete,
+  onMarkUnrepairable,
+  onEditNote,
+  categories,
+  departmentsList = [],
+  t,
+}) => {
   const [expandedRows, setExpandedRows] = useState({});
-  const [filters, setFilters] = useState({ search: "", category: "all", department: "all" });
+  const [filters, setFilters] = useState({
+    search: "",
+    category: "all",
+    department: "all",
+  });
   const subSortConfigs = {};
 
   const debouncedSearch = useDebouncedValue(filters.search, 300);
@@ -15,27 +35,43 @@ const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNo
     let data = items || [];
     if (debouncedSearch) {
       const q = debouncedSearch.toLowerCase();
-      data = data.filter((it) =>
-        (it.name || "").toLowerCase().includes(q) ||
-        (it.serialNumber || "").toLowerCase().includes(q) ||
-        (it.recalledFrom || "").toLowerCase().includes(q)
+      data = data.filter(
+        (it) =>
+          (it.name || "").toLowerCase().includes(q) ||
+          (it.serialNumber || "").toLowerCase().includes(q) ||
+          (it.recalledFrom || "").toLowerCase().includes(q)
       );
     }
     if (filters.category && filters.category !== "all") {
       data = data.filter((it) => it.category === filters.category);
     }
     if (filters.department && filters.department !== "all") {
-      const dept = (departmentsList || []).find((d) => d.id === filters.department);
+      const dept = (departmentsList || []).find(
+        (d) => d.id === filters.department
+      );
       const target = (dept?.name || filters.department || "").toLowerCase();
       data = data.filter((it) => {
         const val = String(it.recalledDepartment || "").toLowerCase();
-        return val === target || val.includes(target) || it.recalledDepartment === filters.department;
+        return (
+          val === target ||
+          val.includes(target) ||
+          it.recalledDepartment === filters.department
+        );
       });
     }
     return data;
-  }, [items, debouncedSearch, filters.category, filters.department, departmentsList]);
+  }, [
+    items,
+    debouncedSearch,
+    filters.category,
+    filters.department,
+    departmentsList,
+  ]);
 
-  const { items: sortedItems } = useSort(filteredItems, { key: "name", direction: "ascending" });
+  const { items: sortedItems } = useSort(filteredItems, {
+    key: "name",
+    direction: "ascending",
+  });
 
   const groupedByCategory = useMemo(() => {
     const grouped = (sortedItems || []).reduce((acc, item) => {
@@ -52,7 +88,8 @@ const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNo
     setExpandedRows({});
   }, [items, filters]);
 
-  const handleFilterChange = (e) => setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleFilterChange = (e) =>
+    setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const toggleExpand = (name) => {
     setExpandedRows((prev) => ({ [name]: !prev[name] }));
@@ -72,12 +109,18 @@ const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNo
   return (
     <div className="h-full flex flex-col gap-6 animate-fadeIn">
       <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">{t("maintenance_management")}</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t("maintenance_desc")}</p>
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+          {t("maintenance_management")}
+        </h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          {t("maintenance_desc")}
+        </p>
         {/* Filters */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end mt-6">
           <div className="sm:col-span-2 lg:col-span-2">
-            <label className="block text-xs font-semibold mb-2">{t("search")}</label>
+            <label className="block text-xs font-semibold mb-2">
+              {t("search")}
+            </label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -91,7 +134,9 @@ const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNo
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-2">{t("category")}</label>
+            <label className="block text-xs font-semibold mb-2">
+              {t("category")}
+            </label>
             <select
               name="category"
               className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
@@ -100,12 +145,16 @@ const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNo
             >
               <option value="all">{t("all")}</option>
               {(categories || []).map((cat) => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
               ))}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-2">{t("department")}</label>
+            <label className="block text-xs font-semibold mb-2">
+              {t("department")}
+            </label>
             <select
               name="department"
               className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
@@ -114,7 +163,9 @@ const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNo
             >
               <option value="all">{t("all")}</option>
               {(departmentsList || []).map((d) => (
-                <option key={d.id} value={d.id}>{d.name}</option>
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
               ))}
             </select>
           </div>
@@ -123,69 +174,139 @@ const MaintenanceView = ({ items, onRepairComplete, onMarkUnrepairable, onEditNo
 
       <div className="flex-grow flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl border overflow-hidden animate-slideInUp p-6">
         <div className="flex-grow overflow-y-auto hide-scrollbar space-y-3">
-          {Object.entries(groupedByCategory).map(([categoryId, items], catIndex) => {
-            const isExpanded = expandedRows[categoryId];
-            const category = (categories || []).find((c) => c.id === categoryId);
-            const subSortConfig = subSortConfigs[categoryId] || { key: "name", direction: "ascending" };
-            const sortedSubItems = [...items].sort((a, b) => {
-              const aValue = a[subSortConfig.key] || "";
-              const bValue = b[subSortConfig.key] || "";
-              const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
-              const comparison = collator.compare(aValue.toString(), bValue.toString());
-              return subSortConfig.direction === "ascending" ? comparison : -comparison;
-            });
+          {Object.entries(groupedByCategory).map(
+            ([categoryId, items], catIndex) => {
+              const isExpanded = expandedRows[categoryId];
+              const category = (categories || []).find(
+                (c) => c.id === categoryId
+              );
+              const subSortConfig = subSortConfigs[categoryId] || {
+                key: "name",
+                direction: "ascending",
+              };
+              const sortedSubItems = [...items].sort((a, b) => {
+                const aValue = a[subSortConfig.key] || "";
+                const bValue = b[subSortConfig.key] || "";
+                const collator = new Intl.Collator(undefined, {
+                  numeric: true,
+                  sensitivity: "base",
+                });
+                const comparison = collator.compare(
+                  aValue.toString(),
+                  bValue.toString()
+                );
+                return subSortConfig.direction === "ascending"
+                  ? comparison
+                  : -comparison;
+              });
 
-            return (
-              <div key={categoryId} className="border-2 border-orange-100 dark:border-orange-700 rounded-lg overflow-hidden animate-fadeIn" style={{ animationDelay: `${catIndex * 0.05}s` }}>
-                <div onClick={() => toggleExpand(categoryId)} className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/30 hover:from-orange-100 hover:to-red-100 cursor-pointer transition-all duration-200">
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 dark:from-orange-400 dark:to-red-500 rounded-lg flex items-center justify-center shadow-md">
-                      {isExpanded ? (<ChevronDown className="w-5 h-5 text-white" />) : (<ChevronRight className="w-5 h-5 text-white" />)}
+              return (
+                <div
+                  key={categoryId}
+                  className="border-2 border-orange-100 dark:border-orange-700 rounded-lg overflow-hidden animate-fadeIn"
+                  style={{ animationDelay: `${catIndex * 0.05}s` }}
+                >
+                  <div
+                    onClick={() => toggleExpand(categoryId)}
+                    className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/30 hover:from-orange-100 hover:to-red-100 cursor-pointer transition-all duration-200"
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 dark:from-orange-400 dark:to-red-500 rounded-lg flex items-center justify-center shadow-md">
+                        {isExpanded ? (
+                          <ChevronDown className="w-5 h-5 text-white" />
+                        ) : (
+                          <ChevronRight className="w-5 h-5 text-white" />
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900 dark:text-white">
+                          {category?.name || categoryId}
+                        </h3>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                          {items.length} {t("label_devices")}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-bold text-gray-900 dark:text-white">{category?.name || categoryId}</h3>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">{items.length} {t("label_devices")}</p>
+                    <div className="text-sm font-medium text-orange-600 dark:text-orange-400">
+                      {isExpanded ? t("collapse") : t("expand")}
                     </div>
                   </div>
-                  <div className="text-sm font-medium text-orange-600 dark:text-orange-400">{isExpanded ? t("collapse") : t("expand")}</div>
-                </div>
 
-                {isExpanded && (
-                  <div className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
-                    {sortedSubItems.map((item, itemIndex) => (
-                      <div key={item.id} className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 animate-slideInLeft border-l-4 border-transparent hover:border-orange-300" style={{ animationDelay: `${itemIndex * 0.03}s` }}>
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="w-2 h-2 bg-orange-400 dark:bg-orange-500 rounded-full flex-shrink-0"></div>
+                  {isExpanded && (
+                    <div className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+                      {sortedSubItems.map((item, itemIndex) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 animate-slideInLeft border-l-4 border-transparent hover:border-orange-300"
+                          style={{ animationDelay: `${itemIndex * 0.03}s` }}
+                        >
                           <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-red-400 dark:from-orange-500 dark:to-red-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow">
-                              <Package className="w-4 h-4 text-white" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium truncate text-gray-900 dark:text-white">{item.name}</p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">{t("serial_number_sn")}: {item.serialNumber || "N/A"}</p>
-                              <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
-                                {t("failure_note")}: <span className="font-medium">{getFailureNote(item.condition)}</span>
-                              </p>
-                              <p className="text-xs text-gray-600 dark:text-gray-300">
-                                {t("recalled_from_user")}: <span className="font-medium">{item.recalledFrom || "---"}</span>{item.recalledDepartment ? ` • ${item.recalledDepartment}` : ""}
-                              </p>
+                            <div className="w-2 h-2 bg-orange-400 dark:bg-orange-500 rounded-full flex-shrink-0"></div>
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-red-400 dark:from-orange-500 dark:to-red-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow">
+                                <Package className="w-4 h-4 text-white" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium truncate text-gray-900 dark:text-white">
+                                  {item.name}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {t("serial_number_sn")}:{" "}
+                                  {item.serialNumber || "N/A"}
+                                </p>
+                                <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                                  {t("failure_note")}:{" "}
+                                  <span className="font-medium">
+                                    {getFailureNote(item.condition)}
+                                  </span>
+                                </p>
+                                <p className="text-xs text-gray-600 dark:text-gray-300">
+                                  {t("recalled_from_user")}:{" "}
+                                  <span className="font-medium">
+                                    {item.recalledFrom || "---"}
+                                  </span>
+                                  {item.recalledDepartment
+                                    ? ` • ${item.recalledDepartment}`
+                                    : ""}
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        <div className="flex items-center gap-2 ml-4">
-                          <div className="text-xs mr-3">{formatDate(item.maintenanceDate)}</div>
-                          <button onClick={() => onEditNote(item)} className="p-2 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200" title={t("edit_failure_note")}><Edit className="w-4 h-4"/></button>
-                          <button onClick={() => onRepairComplete(item)} className="p-2 text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all duration-200" title={t("repair_completed")}><CheckCircle className="w-4 h-4"/></button>
-                          <button onClick={() => onMarkUnrepairable(item)} className="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all duration-200" title={t("mark_unrepairable")}><XCircle className="w-4 h-4"/></button>
+                          <div className="flex items-center gap-2 ml-4">
+                            <div className="text-xs mr-3">
+                              {formatDate(item.maintenanceDate)}
+                            </div>
+                            <button
+                              onClick={() => onEditNote(item)}
+                              className="p-2 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-all duration-200"
+                              title={t("edit_failure_note")}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => onRepairComplete(item)}
+                              className="p-2 text-green-500 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-all duration-200"
+                              title={t("repair_completed")}
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => onMarkUnrepairable(item)}
+                              className="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all duration-200"
+                              title={t("mark_unrepairable")}
+                            >
+                              <XCircle className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+          )}
         </div>
       </div>
     </div>

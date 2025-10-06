@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import {
   Search,
   Edit,
@@ -108,6 +108,68 @@ const InventoryView = ({
 
   // Note: status options limited to Available and In Use per product requirement
 
+  // Helper: resolve department name (avoid exporting raw id like dept_it)
+  const getDepartmentName = useCallback(
+    (deptId) => {
+      if (!deptId) return "";
+      const dept = departmentsList?.find((d) => d.id === deptId);
+      if (dept?.name) return dept.name;
+      // Some legacy data may store a key (e.g., dept_cong_nghe_thong_tin_erp_it) or already plain text
+      // Try translation first (if a translation key exists), else clean up slug-like strings to readable form.
+      const maybeTranslated = t(deptId);
+      if (maybeTranslated && maybeTranslated !== deptId) return maybeTranslated;
+      // Convert slug to Title Case Vietnamese-friendly: replace underscores with spaces
+      if (deptId.includes("_")) {
+        return deptId
+          .replace(/^dept[_-]?/, "")
+          .split(/[_-]+/)
+          .filter(Boolean)
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" ");
+      }
+      return deptId; // final fallback
+    },
+    [departmentsList, t]
+  );
+
+  // CSV Export Data: MUST mirror what user sees in this Inventory screen.
+  // => Only include items with status 'available' or 'in-use' (exclude maintenance etc.)
+  // => Export translated status & real department name (not raw id) for allocated devices.
+  const exportData = useMemo(() => {
+    const source = (unfilteredEquipment || []).filter((item) =>
+      ["available", "in-use"].includes(item.status)
+    );
+    return source.map((item) => ({
+      name: item.name,
+      serialNumber: item.serialNumber || "",
+      status: statusLabels[item.status] || t(item.status) || item.status,
+      category:
+        categories.find((c) => c.id === item.category)?.name ||
+        item.category ||
+        "",
+      importDate: item.importDate
+        ? new Date(item.importDate).toLocaleString(t("locale_string"))
+        : "",
+      handoverDate: item.allocationDetails?.handoverDate
+        ? new Date(item.allocationDetails.handoverDate).toLocaleString(
+            t("locale_string")
+          )
+        : "",
+      recipient: item.allocationDetails?.recipientName || "",
+      // Only show department name when device is in-use & has department
+      department:
+        item.status === "in-use"
+          ? getDepartmentName(item.allocationDetails?.department)
+          : "",
+    }));
+  }, [
+    unfilteredEquipment,
+    statusLabels,
+    categories,
+    t,
+    getDepartmentName,
+  ]);
+
   const formatDateDMY = (dateString) => {
     if (!dateString) return "---";
     const d = new Date(dateString);
@@ -161,16 +223,7 @@ const InventoryView = ({
             </AnimatedButton>
             {/* Download all inventory CSV (in-use + in-stock) */}
             <CSVLink
-              data={(unfilteredEquipment || []).map((item) => ({
-                name: item.name,
-                serialNumber: item.serialNumber || "",
-                status: (statusLabels[item.status] || t(item.status) || item.status),
-                category: (categories.find((c) => c.id === item.category)?.name || item.category || ""),
-                importDate: item.importDate ? new Date(item.importDate).toLocaleString(t("locale_string")) : "",
-                handoverDate: item.allocationDetails?.handoverDate ? new Date(item.allocationDetails.handoverDate).toLocaleString(t("locale_string")) : "",
-                recipient: item.allocationDetails?.recipientName || "",
-                department: item.allocationDetails?.department || "",
-              }))}
+              data={exportData}
               headers={[
                 { label: t("device_name"), key: "name" },
                 { label: t("serial_number_sn"), key: "serialNumber" },
@@ -364,26 +417,24 @@ const InventoryView = ({
                               </div>
                             </div>
 
-                            {/* Dates (1) - moved left */}
+                            {/* Dates (1) - keep only import date on the left */}
                             <div className="col-span-6 md:col-span-2 lg:col-span-2 text-xs text-gray-500 dark:text-gray-400 min-w-0 mt-2 md:mt-0 pr-2 lg:pr-4">
-                              <div className="flex items-center gap-2 truncate" title={`${t('import_date_short')}: ${formatDateDMY(item.importDate)}`}>
+                              <div
+                                className="flex items-center gap-2 truncate"
+                                title={`${t(
+                                  "import_date_short"
+                                )}: ${formatDateDMY(item.importDate)}`}
+                              >
                                 <Calendar className="w-4 h-4 text-gray-400" />
                                 <span className="truncate">
-                                  {t('import_date_short')}: {formatDateDMY(item.importDate)}
+                                  {t("import_date_short")}:{" "}
+                                  {formatDateDMY(item.importDate)}
                                 </span>
                               </div>
-                              {isInUse && (
-                                <div className="flex items-center gap-2 truncate mt-1" title={`${t('export_date_short')}: ${formatDateDMY(item.allocationDetails?.handoverDate)}`}>
-                                  <Calendar className="w-4 h-4 text-gray-400" />
-                                  <span className="truncate">
-                                    {t('export_date_short')}: {formatDateDMY(item.allocationDetails?.handoverDate)}
-                                  </span>
-                                </div>
-                              )}
                             </div>
 
-                            {/* User (3) */}
-                            <div className="col-span-12 md:col-span-3 lg:col-span-2 flex items-center gap-2 min-w-0 mt-2 md:mt-0 lg:pl-4">
+                            {/* User (3) + Department/Location stacked */}
+                            <div className="col-span-12 md:col-span-3 lg:col-span-2 min-w-0 mt-2 md:mt-0 lg:pl-4">
                               {isInUse ? (
                                 <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 min-w-0">
                                   <User className="w-4 h-4 flex-shrink-0" />
@@ -396,25 +447,53 @@ const InventoryView = ({
                                   {t("user_not_use")}
                                 </span>
                               )}
-                            </div>
-
-                            {/* Department / Location (2) */}
-                            <div className="col-span-6 md:col-span-2 lg:col-span-2 text-xs text-gray-600 dark:text-gray-300 min-w-0 mt-2 md:mt-0">
-                              <div className="flex items-center gap-2 truncate">
+                              <div className="flex items-center gap-2 truncate mt-1 text-xs text-gray-600 dark:text-gray-300">
                                 <MapPin className="w-4 h-4 text-gray-400" />
                                 <span
                                   className="truncate whitespace-nowrap"
-                                  title={(item.status === "in-use" && item.allocationDetails?.department
-                                    ? (departmentsList?.find((dept) => dept.id === item.allocationDetails.department)?.name ||
-                                      t(item.allocationDetails.department) ||
-                                      item.allocationDetails.department)
-                                    : t("location_in_stock"))}
+                                  title={
+                                    item.status === "in-use" &&
+                                    item.allocationDetails?.department
+                                      ? departmentsList?.find(
+                                          (dept) =>
+                                            dept.id ===
+                                            item.allocationDetails.department
+                                        )?.name ||
+                                        t(item.allocationDetails.department) ||
+                                        item.allocationDetails.department
+                                      : t("location_in_stock")
+                                  }
                                 >
-                                  {item.status === "in-use" && item.allocationDetails?.department
-                                    ? departmentsList?.find((dept) => dept.id === item.allocationDetails.department)?.name ||
+                                  {item.status === "in-use" &&
+                                  item.allocationDetails?.department
+                                    ? departmentsList?.find(
+                                        (dept) =>
+                                          dept.id ===
+                                          item.allocationDetails.department
+                                      )?.name ||
                                       t(item.allocationDetails.department) ||
                                       item.allocationDetails.department
                                     : t("location_in_stock")}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Handover Date (right) - separate from Department */}
+                            <div className="col-span-6 md:col-span-2 lg:col-span-2 text-xs text-gray-500 dark:text-gray-400 min-w-0 mt-2 md:mt-0">
+                              <div
+                                className="flex items-center gap-2 truncate"
+                                title={`${t(
+                                  "export_date_short"
+                                )}: ${formatDateDMY(
+                                  item.allocationDetails?.handoverDate
+                                )}`}
+                              >
+                                <Calendar className="w-4 h-4 text-gray-400" />
+                                <span className="truncate">
+                                  {t("export_date_short")}:{" "}
+                                  {formatDateDMY(
+                                    item.allocationDetails?.handoverDate
+                                  )}
                                 </span>
                               </div>
                             </div>

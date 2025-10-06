@@ -1,5 +1,12 @@
 import React, { useState, useMemo } from "react";
-import { ShoppingCart, Trash2, Plus, Filter, Layers, ShoppingBag } from "lucide-react";
+import {
+  ShoppingCart,
+  Trash2,
+  Plus,
+  Filter,
+  Layers,
+  ShoppingBag,
+} from "lucide-react";
 import EmptyState from "../../components/EmptyState";
 import toast from "react-hot-toast";
 
@@ -12,8 +19,8 @@ const MobilePendingPurchaseView = ({
   t,
 }) => {
   const [purchaseData, setPurchaseData] = useState({});
-  // Show filters visible by default on mobile
-  const [isFilterOpen, setIsFilterOpen] = useState(true);
+  // Collapse filters by default on mobile; expand when needed
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
     search: "",
     sortKey: "name",
@@ -42,7 +49,6 @@ const MobilePendingPurchaseView = ({
   const handleFilterChange = (e) => {
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
-
 
   const filteredAndSortedItems = useMemo(() => {
     let sortedItems = [...items];

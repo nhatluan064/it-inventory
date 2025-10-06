@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* Import Global Animations */
-@import './styles/animations.css';
+@import "./styles/animations.css";
 
 @layer base {
   /*
@@ -32,6 +32,19 @@
   .dark textarea::placeholder {
     @apply text-gray-400;
   }
+
+  /* Global scrollbar hide (still scrollable) */
+  html,
+  body {
+    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
 }
 
 @layer utilities {
@@ -57,6 +70,53 @@
   .scrollbar-hide {
     -ms-overflow-style: none !important; /* IE & Edge */
     scrollbar-width: none !important; /* Firefox */
+  }
+
+  /* Force hide for any element with overflow that still shows scrollbar */
+  *[class*="overflow-y-auto"],
+  *[class*="overflow-x-auto"],
+  *[class*="overflow-auto"] {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+  *[class*="overflow-y-auto"]::-webkit-scrollbar,
+  *[class*="overflow-x-auto"]::-webkit-scrollbar,
+  *[class*="overflow-auto"]::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* Unified table/list scrollbar hiding (avoid @apply to satisfy current linter) */
+  .table-scroll-hide {
+    overflow-y: auto;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+  .table-scroll-hide::-webkit-scrollbar {
+    display: none !important;
+    width: 0;
+    height: 0;
+  }
+
+  /* Apply scrollbar hiding to common list/grid containers automatically */
+  .hide-scrollbar,
+  .table-scroll-hide,
+  .card > .overflow-y-auto,
+  .flex-grow.overflow-y-auto,
+  .mobile-stagger,
+  .mobile-page-enter .overflow-y-auto {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+  .hide-scrollbar::-webkit-scrollbar,
+  .table-scroll-hide::-webkit-scrollbar,
+  .card > .overflow-y-auto::-webkit-scrollbar,
+  .flex-grow.overflow-y-auto::-webkit-scrollbar,
+  .mobile-stagger::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 
   /* Specific class for dashboard horizontal scrolling */
@@ -151,38 +211,77 @@
   /* Desktop container to center and constrain content */
   .container-desktop {
     /* Expand to full width on desktop to utilize available space */
-    @apply mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-none;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    padding-left: 1rem; /* px-4 */
+    padding-right: 1rem;
+  }
+  @media (min-width: 640px) {
+    .container-desktop {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .container-desktop {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
   }
 
   /* Standard card styles to unify appearance across pages */
   .card {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden;
+    background-color: theme("colors.white");
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
+    border: 1px solid theme("colors.gray.200");
+    overflow: hidden;
+  }
+  .dark .card {
+    background-color: theme("colors.gray.800");
+    border-color: theme("colors.gray.700");
   }
 
   /* Padding variations for cards */
   .card-sm {
-    @apply p-4;
+    padding: 1rem; /* p-4 */
   }
 
   .card-lg {
-    @apply p-6;
+    padding: 1.5rem; /* p-6 */
   }
 
   /* Header block inside card */
   .card-header {
-    @apply flex items-center justify-between gap-4 p-4 border-b border-gray-100 dark:border-gray-700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem; /* gap-4 */
+    padding: 1rem; /* p-4 */
+    border-bottom: 1px solid theme("colors.gray.100");
+  }
+  .dark .card-header {
+    border-bottom-color: theme("colors.gray.700");
   }
 
   .card-title {
-    @apply text-lg font-semibold text-gray-900 dark:text-gray-100;
+    font-size: 1.125rem; /* text-lg */
+    line-height: 1.75rem;
+    font-weight: 600; /* font-semibold */
+    color: theme("colors.gray.900");
+  }
+  .dark .card-title {
+    color: theme("colors.gray.100");
   }
 
   .card-body {
-    @apply p-4;
+    padding: 1rem; /* p-4 */
   }
 
   /* Form control sizing for desktop */
   .form-control-desktop {
-    @apply w-full max-w-md;
+    width: 100%;
+    max-width: 28rem; /* max-w-md */
   }
 }

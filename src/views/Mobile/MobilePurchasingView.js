@@ -1,5 +1,11 @@
 import React, { useState, useMemo } from "react";
-import { CheckCircle, XCircle, Layers, Filter, PackageSearch } from "lucide-react";
+import {
+  CheckCircle,
+  XCircle,
+  Layers,
+  Filter,
+  PackageSearch,
+} from "lucide-react";
 import EmptyState from "../../components/EmptyState";
 
 const MobilePurchasingView = ({
@@ -16,14 +22,15 @@ const MobilePurchasingView = ({
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-
   const formatCurrency = (amount) => {
     if (typeof amount !== "number") return "0";
     return new Intl.NumberFormat(t("locale_string")).format(amount);
   };
 
   const cleanedCategories = (categories || []).filter(
-    (c) => String(c.id).toLowerCase() !== "all" && (c.name || "").toLowerCase() !== (t("all") || "").toLowerCase()
+    (c) =>
+      String(c.id).toLowerCase() !== "all" &&
+      (c.name || "").toLowerCase() !== (t("all") || "").toLowerCase()
   );
 
   const filteredAndSortedItems = useMemo(() => {
@@ -32,7 +39,9 @@ const MobilePurchasingView = ({
     );
 
     if (filters.category && filters.category !== "all") {
-      sortedItems = sortedItems.filter((item) => item.category === filters.category);
+      sortedItems = sortedItems.filter(
+        (item) => item.category === filters.category
+      );
     }
 
     sortedItems.sort((a, b) => {
@@ -47,7 +56,6 @@ const MobilePurchasingView = ({
     });
     return sortedItems;
   }, [items, filters]);
-
 
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 mobile-page-enter">

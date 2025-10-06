@@ -27,8 +27,6 @@ const AppLayout = ({
   purchasedCount,
   masterListCount,
   reportsCount,
-  dashboardScrollPosition,
-  setDashboardScrollPosition,
 }) => {
   const handleTabClick = (tabId) => {
     setActiveTab(tabId);
@@ -79,7 +77,7 @@ const AppLayout = ({
         </header>
 
         {/* Desktop Header (centered container) */}
-        <header className="hidden lg:block bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <header className="hidden lg:block bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 mb-4 lg:mb-6">
           <div className="container-desktop p-4 sm:p-6 lg:p-8">
             <div className="flex-grow min-w-0">
               <DashboardView
@@ -91,15 +89,13 @@ const AppLayout = ({
                 masterListCount={masterListCount}
                 reportsCount={reportsCount}
                 setActiveTab={handleTabClick}
-                scrollPosition={dashboardScrollPosition}
-                setScrollPosition={setDashboardScrollPosition}
               />
             </div>
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 flex flex-col gap-6 overflow-y-auto p-4 sm:p-6 lg:p-0">
+        <main className="flex-1 flex flex-col gap-6 overflow-y-auto p-4 sm:p-6 lg:px-0 lg:pt-0">
           {/* Mobile Dashboard */}
           <div className="lg:hidden flex-shrink-0 -mx-4 -mt-4 sm:-mx-6 sm:-mt-6">
             <div className="p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -112,17 +108,13 @@ const AppLayout = ({
                 masterListCount={masterListCount}
                 reportsCount={reportsCount}
                 setActiveTab={handleTabClick}
-                scrollPosition={dashboardScrollPosition}
-                setScrollPosition={setDashboardScrollPosition}
               />
             </div>
           </div>
 
           <div className="container-desktop w-full">
             {/* View Content */}
-            <div className="flex-1 min-h-0">
-              {children}
-            </div>
+            <div className="flex-1 min-h-0">{children}</div>
           </div>
         </main>
       </div>

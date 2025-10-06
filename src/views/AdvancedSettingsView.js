@@ -122,20 +122,22 @@ const AdvancedSettingsView = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slideInUp">
         {/* Database Management Button */}
         <button
-          onClick={() => handleSectionClick('database')}
+          onClick={() => handleSectionClick("database")}
           className={`p-6 rounded-lg shadow-lg border transition-all duration-300 animate-hoverScale ${
-            activeSection === 'database' 
-              ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600' 
-              : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-xl'
+            activeSection === "database"
+              ? "bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600"
+              : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-xl"
           }`}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className={`p-3 rounded-lg ${
-                activeSection === 'database' 
-                  ? 'bg-blue-100 dark:bg-blue-800' 
-                  : 'bg-blue-50 dark:bg-blue-900/30'
-              }`}>
+              <div
+                className={`p-3 rounded-lg ${
+                  activeSection === "database"
+                    ? "bg-blue-100 dark:bg-blue-800"
+                    : "bg-blue-50 dark:bg-blue-900/30"
+                }`}
+              >
                 <Database className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div className="text-left">
@@ -147,28 +149,32 @@ const AdvancedSettingsView = ({
                 </p>
               </div>
             </div>
-            <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${
-              activeSection === 'database' ? 'rotate-90' : ''
-            }`} />
+            <ChevronRight
+              className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${
+                activeSection === "database" ? "rotate-90" : ""
+              }`}
+            />
           </div>
         </button>
 
         {/* Interface System Button */}
         <button
-          onClick={() => handleSectionClick('system')}
+          onClick={() => handleSectionClick("system")}
           className={`p-6 rounded-lg shadow-lg border transition-all duration-300 animate-hoverScale ${
-            activeSection === 'system' 
-              ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-600' 
-              : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-xl'
+            activeSection === "system"
+              ? "bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-600"
+              : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-xl"
           }`}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className={`p-3 rounded-lg ${
-                activeSection === 'system' 
-                  ? 'bg-green-100 dark:bg-green-800' 
-                  : 'bg-green-50 dark:bg-green-900/30'
-              }`}>
+              <div
+                className={`p-3 rounded-lg ${
+                  activeSection === "system"
+                    ? "bg-green-100 dark:bg-green-800"
+                    : "bg-green-50 dark:bg-green-900/30"
+                }`}
+              >
                 <Settings className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
               <div className="text-left">
@@ -180,16 +186,18 @@ const AdvancedSettingsView = ({
                 </p>
               </div>
             </div>
-            <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${
-              activeSection === 'system' ? 'rotate-90' : ''
-            }`} />
+            <ChevronRight
+              className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${
+                activeSection === "system" ? "rotate-90" : ""
+              }`}
+            />
           </div>
         </button>
       </div>
 
       {/* Content Sections */}
-      {activeSection === 'database' && renderDatabaseSection()}
-      {activeSection === 'system' && renderSystemSection()}
+      {activeSection === "database" && renderDatabaseSection()}
+      {activeSection === "system" && renderSystemSection()}
     </div>
   );
 };

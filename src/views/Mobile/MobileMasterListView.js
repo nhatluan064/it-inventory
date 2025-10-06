@@ -10,8 +10,8 @@ const MobileMasterListView = ({
   categories,
   fullEquipmentList,
 }) => {
-  // Keep filter controls visible on mobile for better discoverability
-  const [isFilterOpen, setIsFilterOpen] = useState(true);
+  // Collapse filter controls by default; user can expand when needed
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
     search: "",
     category: "all",
@@ -161,9 +161,7 @@ const MobileMasterListView = ({
                   onClick={() => onEditItem(item)}
                   className="mobile-btn-icon mobile-optimized"
                   title={
-                    isModelInUse
-                      ? t("cannot_edit_name_item_in_use")
-                      : undefined
+                    isModelInUse ? t("cannot_edit_name_item_in_use") : undefined
                   }
                 >
                   <Edit2 className="w-5 h-5 text-amber-500" />
