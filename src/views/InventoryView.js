@@ -162,13 +162,7 @@ const InventoryView = ({
           ? getDepartmentName(item.allocationDetails?.department)
           : "",
     }));
-  }, [
-    unfilteredEquipment,
-    statusLabels,
-    categories,
-    t,
-    getDepartmentName,
-  ]);
+  }, [unfilteredEquipment, statusLabels, categories, t, getDepartmentName]);
 
   const formatDateDMY = (dateString) => {
     if (!dateString) return "---";

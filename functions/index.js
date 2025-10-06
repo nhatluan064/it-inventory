@@ -8,7 +8,7 @@ admin.initializeApp();
 const transporter = nodemailer.createTransporter({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER || "nhatluan064@gmail.com", // Fallback for local testing
+    user: process.env.EMAIL_USER, // Fallback for local testing
     pass: process.env.EMAIL_PASS, // App password for Gmail
   },
 });

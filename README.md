@@ -1,232 +1,110 @@
-﻿# 🏢 IT Inventory Management System
+﻿🏢 IT Inventory - Hệ thống Quản lý Thiết bị CNTT
+Một hệ thống quản lý kho thiết bị công nghệ thông tin hiện đại, được xây dựng với giao diện thân thiện, tính năng mạnh mẽ và khả năng mở rộng.
 
-Hệ thống quản lý kho thiết bị công nghệ thông tin hiện đại với giao diện thân thiện và tính năng đa nền tảng.
+✨ Tính năng nổi bật
+📊 Quản lý Vòng đời Thiết bị
+Master List: Quản lý danh sách các mẫu thiết bị chuẩn của công ty.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![React](https://img.shields.io/badge/React-19.1.1-61DAFB.svg)
-![Firebase](https://img.shields.io/badge/Firebase-12.2.1-FFCA28.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
+Theo dõi Kho: Nắm bắt số lượng và trạng thái của từng thiết bị thực tế.
 
-## 🚀 Tính năng chính
+Quy trình Mua sắm: Tạo và quản lý các yêu cầu mua sắm thiết bị mới.
 
-### 📊 Quản lý thiết bị
+Cấp phát & Thu hồi: Theo dõi vòng đời của thiết bị từ khi cấp phát cho nhân viên đến khi thu hồi và bảo trì.
 
-- ✅ **Danh sách Master** - Quản lý các mẫu thiết bị chuẩn
-- ✅ **Thiết bị đã mua** - Theo dõi thiết bị thực tế trong kho
-- ✅ **Yêu cầu mua** - Quản lý quy trình mua sắm thiết bị
-- ✅ **Cấp phát thiết bị** - Phân bổ thiết bị cho nhân viên
-- ✅ **Thu hồi thiết bị** - Quy trình thu hồi và bảo trì
+📈 Báo cáo và Phân tích
+Dashboard Trực quan: Biểu đồ thống kê tổng quan về tình trạng kho.
 
-### 📈 Báo cáo và Thống kê
+Báo cáo Động: Xuất báo cáo chi tiết theo nhiều tiêu chí (danh mục, trạng thái, người dùng).
 
-- 📊 **Dashboard tổng quan** với biểu đồ trực quan
-- 📋 **Báo cáo chi tiết** theo danh mục và trạng thái
-- 📉 **Thống kê xu hướng** theo thời gian
-- 🎯 **Phân tích sử dụng** thiết bị
+Phân tích Xu hướng: Theo dõi và dự báo nhu cầu sử dụng thiết bị theo thời gian.
 
-### 🎨 Giao diện và Trải nghiệm
+🎨 Trải nghiệm Người dùng
+Thiết kế Responsive: Giao diện tối ưu, hoạt động mượt mà trên cả máy tính và thiết bị di động.
 
-- 📱 **Responsive Design** - Tối ưu cho mọi thiết bị
-- 🌙 **Dark/Light Mode** - Chế độ sáng/tối
-- 🔍 **Tìm kiếm và Lọc** thông minh
-- ⚡ **Lazy Loading** - Tải nhanh và tối ưu hiệu suất
+Chế độ Sáng/Tối: Tự động chuyển đổi giao diện để bảo vệ mắt người dùng.
 
-## �️ Công nghệ sử dụng
+Tối ưu Hiệu năng: Sử dụng các kỹ thuật Lazy Loading và Code Splitting để đảm bảo tốc độ tải trang nhanh nhất.
 
-### Frontend
+🛠️ Công nghệ sử dụng
+Lĩnh vực Công nghệ Phiên bản
+Frontend React 19.1.1
+Tailwind CSS
+Chart.js 4.5.0
+Backend & Database Firebase 12.2.1
+Firestore, Firebase Auth, Firebase Hosting
+CI/CD GitHub Actions
+Tối ưu hóa Webpack Bundle Analyzer, React.lazy, React.memo
 
-- **React 19.1.1** - Framework chính
-- **Tailwind CSS** - Styling framework
-- **Chart.js 4.5.0** - Thư viện biểu đồ
-- **Lucide React** - Icon library
-- **React Hot Toast** - Notification system
+Xuất sang Trang tính
+🚀 Cài đặt và Chạy dự án
+Yêu cầu hệ thống
+Node.js v16.0.0 trở lên
 
-### Backend & Database
+npm v8.0.0 trở lên
 
-- **Firebase 12.2.1** - Backend as a Service
-- **Firestore** - NoSQL Database
-- **Firebase Auth** - Xác thực người dùng
-- **Firebase Hosting** - Deployment platform
+Một tài khoản Firebase
 
-### Performance & Tools
+Các bước cài đặt
+Clone repository về máy:
 
-- **Webpack Bundle Analyzer** - Phân tích bundle size
-- **React.lazy & Suspense** - Code splitting
-- **React.memo** - Tối ưu re-rendering
-- **Service Workers** - PWA support
+Bash
 
-## 🏗️ Cấu trúc dự án
-
-```
-it-inventory/
-├── public/                 # Static assets
-├── src/
-│   ├── components/        # Reusable components
-│   │   ├── Performance/   # Lazy loading & optimization
-│   │   ├── ErrorBoundary/ # Error handling
-│   │   └── LoadingStates/ # Loading components
-│   ├── views/            # Page components
-│   │   ├── Mobile/       # Mobile-optimized views
-│   │   └── Desktop/      # Desktop views
-│   ├── hooks/            # Custom React hooks
-│   ├── modals/           # Modal components
-│   ├── utils/            # Utility functions
-│   ├── context/          # React Context
-│   └── config/           # Configuration files
-├── scripts/              # Setup and deployment scripts
-├── SECURITY.md          # Security documentation
-├── DEPLOYMENT.md        # Deployment guide
-└── BUNDLE_ANALYSIS.md   # Performance analysis
-```
-
-## 🚀 Cài đặt và Chạy dự án
-
-### Yêu cầu hệ thống
-
-- Node.js >= 16.0.0
-- npm >= 8.0.0
-- Firebase account
-
-### 1. Clone dự án
-
-```bash
 git clone https://github.com/nhatluan064/it-inventory.git
 cd it-inventory
-```
+Cài đặt các gói phụ thuộc:
 
-### 2. Cài đặt dependencies
+Bash
 
-```bash
 npm install
-```
+Cấu hình môi trường (Firebase):
 
-### 3. Cấu hình Firebase
+Sao chép file .env.example thành một file mới tên là .env.
 
-```bash
+Điền các thông tin cấu hình Firebase của bạn vào file .env.
+
+Bash
+
+# Hoặc chạy script để tự động hóa
+
 npm run setup-env
-```
+Chạy dự án ở chế độ development:
 
-Hoặc tạo file `.env` từ `.env.example` và điền thông tin Firebase.
+Bash
 
-### 4. Chạy development server
-
-```bash
 npm start
-```
+Build dự án cho production:
 
-### 5. Build production
+Bash
 
-```bash
 npm run build
-```
+🔐 Bảo mật
+Dự án chú trọng đến bảo mật với các biện pháp:
 
-### 6. Deploy to Firebase
+Biến môi trường (.env): Toàn bộ key nhạy cảm được quản lý qua biến môi trường và không bao giờ commit lên repository.
 
-```bash
-npm run deploy
-```
+Firebase Security Rules: Phân quyền truy cập dữ liệu chi tiết, đảm bảo người dùng chỉ có thể xem/sửa những gì được phép.
 
-## 📊 Performance Optimization
+Content Security Policy (CSP): Giúp ngăn chặn các cuộc tấn công Cross-Site Scripting (XSS).
 
-### Bundle Size Analysis
+🤝 Đóng góp
+Mọi sự đóng góp đều được chào đón! Vui lòng tham khảo quy trình sau:
 
-- **Main Bundle**: 312.3 kB (gzipped)
-- **Chart Chunks**: 5 separate chunks (~1.4-1.8 kB each)
-- **Lazy Loading**: Charts load on-demand
-- **Code Splitting**: Optimal caching strategy
+Fork repository này.
 
-### Performance Features
+Tạo một Feature Branch mới (git checkout -b feature/AmazingFeature).
 
-- ⚡ **React.lazy** - Component-level code splitting
-- 🧠 **React.memo** - Prevent unnecessary re-renders
-- 🔍 **Intersection Observer** - Smart lazy loading
-- 📦 **Webpack optimization** - Bundle analysis tools
+Commit các thay đổi của bạn (git commit -m 'feat: Add some AmazingFeature').
 
-## 🔐 Bảo mật
+Push lên branch (git push origin feature/AmazingFeature).
 
-- 🔒 **Environment Variables** - Sensitive data protection
-- 🛡️ **Firebase Security Rules** - Database access control
-- 🔐 **Content Security Policy** - XSS protection
-- 📋 **Input Validation** - Data sanitization
+Mở một Pull Request với mô tả chi tiết về những thay đổi.
 
-## 📋 Tính năng sắp tới
+Nếu bạn gặp lỗi hoặc có ý tưởng mới, hãy tạo một Issue tại đây.
 
-### Phase 3: Tính năng nâng cao
-
-- [ ] 📸 Upload và quản lý hình ảnh thiết bị
-- [ ] 💾 Backup/restore dữ liệu tự động
-- [ ] 🌙 Dark theme support
-- [ ] ⌨️ Keyboard shortcuts
-- [ ] 📱 PWA offline support
-
-### Security & Dependencies
-
-- [ ] 🔄 Cập nhật dependencies định kỳ
-- [ ] 🔍 Security audit thường xuyên
-- [ ] 🛡️ Advanced authentication methods
-
-## 🔧 Troubleshooting
-
-### Lỗi thường gặp
-
-**Firebase connection error:**
-
-```bash
-# Kiểm tra cấu hình Firebase
-npm run check-firebase-config
-```
-
-**Build fails:**
-
-```bash
-# Clear cache và rebuild
-npm run clean
-npm install
-npm run build
-```
-
-**Performance issues:**
-
-```bash
-# Phân tích bundle size
-npm run analyze
-```
-
-### Debug Steps
-
-1. 🔍 **Firebase Console** - Kiểm tra authentication/database
-2. 🌐 **Browser Console** - Xem client-side errors
-3. 📡 **Network Tab** - Kiểm tra API requests
-4. ⚡ **Performance Tab** - Phân tích load time
-
-## 🤝 Đóng góp & Hỗ trợ
-
-### Liên hệ
-
-- 📧 **Email**: nhatluan064@gmail.com
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/nhatluan064/it-inventory/issues)
-- 💡 **Feature Requests**: [Discussions](https://github.com/nhatluan064/it-inventory/discussions)
-- 📚 **Documentation**: [Wiki](https://github.com/nhatluan064/it-inventory/wiki)
-
-### Quy trình đóng góp
-
-1. **Fork** repository này
-2. **Create** feature branch (`git checkout -b feature/ten-tinh-nang`)
-3. **Commit** changes (`git commit -m 'Thêm tính năng mới'`)
-4. **Push** to branch (`git push origin feature/ten-tinh-nang`)
-5. **Open** Pull Request với mô tả chi tiết
-
-## 📄 License
-
-Dự án này được cấp phép theo **MIT License** - xem file [LICENSE](LICENSE) để biết thêm chi tiết.
-
----
+📄 Giấy phép
+Dự án này được cấp phép theo MIT License. Xem chi tiết tại file LICENSE.
 
 <div align="center">
-  <p><strong>Được tạo với AI Gemini 2.5 Pro, Claude, ChatGPT 5.0 Pro, Copilot Github Pro, bởi Nhật Luân IT Networking</strong></p>
-  <p>© 2024 IT Inventory Management System | Hệ thống Quản lý Thiết bị CNTT</p>
-  
-  [![Vietnam](https://img.shields.io/badge/Made%20in-Vietnam-red.svg)](https://vietnam.travel)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<p>Được phát triển bởi <strong>Nhật Luân IT Networking</strong></p>
+<p><em>Hệ thống Quản lý Thiết bị CNTT - © 2024</em></p>
 </div>
-gti
