@@ -259,9 +259,7 @@ const ReportsView = ({ transactions, t, categories }) => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
           <div className="lg:col-span-2">
-            <label className="block text-xs font-semibold mb-2">
-              {t("search")}
-            </label>
+            <label className="block text-xs font-semibold mb-1">{t("search")}</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -269,18 +267,16 @@ const ReportsView = ({ transactions, t, categories }) => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t("search_inventory_placeholder")}
-                className="w-full pl-9 pr-4 py-2 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+                className="w-full pl-9 pr-4 py-1.5 border-2 rounded-lg text-xs dark:bg-gray-700/50 dark:border-gray-600"
               />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-2">
-              {t("action_type")}
-            </label>
+            <label className="block text-xs font-semibold mb-1">{t("action_type")}</label>
             <select
               value={actionType}
               onChange={(e) => setActionType(e.target.value)}
-              className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              className="w-full py-1.5 px-3 border-2 rounded-lg text-xs dark:bg-gray-700/50 dark:border-gray-600"
             >
               <option value="all">{t("all")}</option>
               {Object.entries(logDetails).map(([key, value]) => (
@@ -291,25 +287,21 @@ const ReportsView = ({ transactions, t, categories }) => {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-2">
-              {t("from_date")}
-            </label>
+            <label className="block text-xs font-semibold mb-1">{t("from_date")}</label>
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              className="w-full py-1.5 px-3 border-2 rounded-lg text-xs dark:bg-gray-700/50 dark:border-gray-600"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-2">
-              {t("to_date")}
-            </label>
+            <label className="block text-xs font-semibold mb-1">{t("to_date")}</label>
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              className="w-full py-1.5 px-3 border-2 rounded-lg text-xs dark:bg-gray-700/50 dark:border-gray-600"
             />
           </div>
         </div>

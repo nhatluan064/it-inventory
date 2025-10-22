@@ -9,6 +9,8 @@ import {
   User,
   ChevronDown,
   ChevronRight,
+  ArrowUp,
+  ArrowDown,
   Package,
   Calendar,
   MapPin,
@@ -36,7 +38,20 @@ const InventoryView = ({
 }) => {
   const [expandedRows, setExpandedRows] = useState({});
   const [, setAnimatingRows] = useState({});
-  const [subSortConfigs] = useState({});
+  const [subSortConfigs, setSubSortConfigs] = useState({});
+  // Handler để đảo chiều sort cho từng nhóm category
+  const handleSubSortToggle = (categoryId) => {
+    setSubSortConfigs((prev) => {
+      const prevConfig = prev[categoryId] || { key: "name", direction: "ascending" };
+      return {
+        ...prev,
+        [categoryId]: {
+          ...prevConfig,
+          direction: prevConfig.direction === "ascending" ? "descending" : "ascending",
+        },
+      };
+    });
+  };
 
   // State để quản lý sorting category riêng
   const [categorySortConfig, setCategorySortConfig] = useState({
@@ -77,8 +92,14 @@ const InventoryView = ({
         : -comparison;
     });
 
+
+    // Sort từng nhóm theo tên thiết bị từ A-Z
     sortedCategories.forEach((categoryId) => {
-      sortedGrouped[categoryId] = grouped[categoryId];
+      sortedGrouped[categoryId] = grouped[categoryId].slice().sort((a, b) => {
+        if (!a.name) return 1;
+        if (!b.name) return -1;
+        return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+      });
     });
 
     return sortedGrouped;
@@ -193,26 +214,26 @@ const InventoryView = ({
     setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   return (
-    <div className="h-full flex flex-col gap-6 animate-fadeIn">
+  <div className="h-full flex flex-col gap-4 animate-fadeIn text-sm">
       {/* Page transition / Filter section */}
-      <div className="card card-lg glass-effect animate-slideInDown">
+  <div className="card card-lg glass-effect animate-slideInDown p-3">
         {/* Filter section animation */}
-        <div className="flex justify-between items-center mb-6">
+  <div className="flex justify-between items-center mb-4">
           <div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
+            <h2 className="text-lg font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
               {t("inventory_list")}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {t("inventory_desc")}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <AnimatedButton
               onClick={onAddLegacyItem}
               variant="primary"
-              className="flex items-center space-x-2 text-sm font-semibold"
+              className="flex items-center space-x-1 text-xs font-semibold px-2 py-1"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-4 h-4" />
               <span>{t("import_unlisted_device")}</span>
             </AnimatedButton>
             {/* Download all inventory CSV (in-use + in-stock) */}
@@ -229,36 +250,36 @@ const InventoryView = ({
                 { label: t("department"), key: "department" },
               ]}
               filename="inventory_devices.csv"
-              className="p-2.5 bg-green-100 dark:bg-green-700/50 rounded-lg text-green-600 dark:text-green-300 animate-hoverScale transition-all duration-200"
+              className="p-2 bg-green-100 dark:bg-green-700/50 rounded-lg text-green-600 dark:text-green-300 animate-hoverScale transition-all duration-200"
             >
-              <Download className="w-5 h-5" />
+              <Download className="w-4 h-4" />
             </CSVLink>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 items-end text-xs">
           <div className="sm:col-span-1">
-            <label className="block text-xs font-semibold mb-2">
+            <label className="block text-xs font-semibold mb-0.5">
               {t("search")}
             </label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
               <input
                 name="search"
                 type="text"
                 placeholder={t("search_inventory_placeholder")}
-                className="w-full pl-9 pr-4 py-2 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+                className="w-full pl-7 pr-2 py-1 border rounded text-xs dark:bg-gray-700/50 dark:border-gray-600 h-7"
                 value={filters.search}
                 onChange={handleFilterChange}
               />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-2">
+            <label className="block text-xs font-semibold mb-0.5">
               {t("category")}
             </label>
             <select
               name="category"
-              className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              className="w-full py-1 px-2 border rounded text-xs dark:bg-gray-700/50 dark:border-gray-600 h-7"
               value={filters.category}
               onChange={handleFilterChange}
             >
@@ -272,12 +293,12 @@ const InventoryView = ({
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-2">
+            <label className="block text-xs font-semibold mb-0.5">
               {t("status")}
             </label>
             <select
               name="status"
-              className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              className="w-full py-1 px-2 border rounded text-xs dark:bg-gray-700/50 dark:border-gray-600 h-7"
               value={filters.status}
               onChange={handleFilterChange}
             >
@@ -291,13 +312,13 @@ const InventoryView = ({
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-2">
+            <label className="block text-xs font-semibold mb-0.5">
               {t("import_date")}
             </label>
             <input
               name="importDate"
               type="date"
-              className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              className="w-full py-1 px-2 border rounded text-xs dark:bg-gray-700/50 dark:border-gray-600 h-7"
               value={filters.importDate}
               onChange={handleFilterChange}
             />
@@ -323,20 +344,24 @@ const InventoryView = ({
                 key: "name",
                 direction: "ascending",
               };
+              const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
               const sortedSubItems = [...items].sort((a, b) => {
-                const aValue = a[subSortConfig.key] || "";
-                const bValue = b[subSortConfig.key] || "";
-                const collator = new Intl.Collator(undefined, {
-                  numeric: true,
-                  sensitivity: "base",
-                });
-                const comparison = collator.compare(
-                  aValue.toString(),
-                  bValue.toString()
-                );
-                return subSortConfig.direction === "ascending"
-                  ? comparison
-                  : -comparison;
+                const aName = a.name || "";
+                const bName = b.name || "";
+                const nameCompare = collator.compare(aName, bName);
+                if (nameCompare !== 0) {
+                  return subSortConfig.direction === "ascending" ? nameCompare : -nameCompare;
+                }
+                // Nếu tên giống nhau, sort theo số cuối của serialNumber
+                const getLastNumber = (sn) => {
+                  if (!sn) return -1;
+                  const match = sn.match(/(\d+)(?!.*\d)/);
+                  return match ? parseInt(match[1], 10) : -1;
+                };
+                const aSN = getLastNumber(a.serialNumber);
+                const bSN = getLastNumber(b.serialNumber);
+                if (aSN === bSN) return 0;
+                return subSortConfig.direction === "ascending" ? aSN - bSN : bSN - aSN;
               });
 
               return (
@@ -348,27 +373,45 @@ const InventoryView = ({
                   {/* Category Header with Blue Gradient */}
                   <div
                     onClick={() => toggleExpand(categoryId)}
-                    className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-800/40 dark:hover:to-indigo-800/40 cursor-pointer transition-all duration-200"
+                    className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-800/40 dark:hover:to-indigo-800/40 cursor-pointer transition-all duration-200"
                   >
                     <div className="flex items-center gap-3 flex-1">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 rounded-lg flex items-center justify-center shadow-md">
+                      <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 rounded-lg flex items-center justify-center shadow-md">
                         {isExpanded ? (
-                          <ChevronDown className="w-5 h-5 text-white" />
+                          <ChevronDown className="w-4 h-4 text-white" />
                         ) : (
-                          <ChevronRight className="w-5 h-5 text-white" />
+                          <ChevronRight className="w-4 h-4 text-white" />
                         )}
                       </div>
-                      <div>
-                        <h3 className="font-bold text-gray-900 dark:text-white">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-xs text-gray-900 dark:text-white">
                           {category?.name || categoryId}
                         </h3>
+                        {/* Button sort tên thiết bị A-Z/Z-A */}
+                        <button
+                          type="button"
+                          className="ml-1 p-1 rounded hover:bg-blue-100 dark:hover:bg-blue-900/30 transition"
+                          title={subSortConfig.direction === "ascending" ? "Sắp xếp A-Z" : "Sắp xếp Z-A"}
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleSubSortToggle(categoryId);
+                          }}
+                        >
+                          {subSortConfig.direction === "ascending" ? (
+                            <ArrowDown className="w-3.5 h-3.5 text-blue-500" />
+                          ) : (
+                            <ArrowUp className="w-3.5 h-3.5 text-blue-500" />
+                          )}
+                        </button>
+                      </div>
+                      <div>
                         <p className="text-xs text-gray-600 dark:text-gray-400">
                           {items.length} {t("label_devices")}
                         </p>
                       </div>
                     </div>
                     <div className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                      {isExpanded ? t("collapse") : t("expand")}
+                      <span className="text-xs font-medium">{isExpanded ? t("collapse") : t("expand")}</span>
                     </div>
                   </div>
 
@@ -473,7 +516,7 @@ const InventoryView = ({
                             </div>
 
                             {/* Handover Date (right) - separate from Department */}
-                            <div className="col-span-6 md:col-span-2 lg:col-span-2 text-xs text-gray-500 dark:text-gray-400 min-w-0 mt-2 md:mt-0">
+                            <div className="col-span-6 md:col-span-2 lg:col-span-2 text-xs text-gray-500 dark:text-gray-400 min-w-0 mt-2 md:mt-0 pl-16">
                               <div
                                 className="flex items-center gap-2 truncate"
                                 title={`${t(

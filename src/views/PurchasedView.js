@@ -6,6 +6,8 @@ import {
   Package,
   ChevronDown,
   ChevronRight,
+  ArrowUp,
+  ArrowDown,
   Inbox,
 } from "lucide-react";
 import EmptyState from "../components/EmptyState";
@@ -15,6 +17,21 @@ const PurchasedView = ({ items, onImportItem, categories, t }) => {
   const [importingIds, setImportingIds] = useState([]);
   const [serialNumbers, setSerialNumbers] = useState({});
   const [expandedRows, setExpandedRows] = useState({});
+  const [subSortConfigs, setSubSortConfigs] = useState({});
+
+  // Handler để đảo chiều sort cho từng nhóm category
+  const handleSubSortToggle = (categoryId) => {
+    setSubSortConfigs((prev) => {
+      const prevConfig = prev[categoryId] || { key: "name", direction: "ascending" };
+      return {
+        ...prev,
+        [categoryId]: {
+          ...prevConfig,
+          direction: prevConfig.direction === "ascending" ? "descending" : "ascending",
+        },
+      };
+    });
+  };
 
   const { items: sortedItems } = useSort(items || [], {
     key: "name",
@@ -66,11 +83,11 @@ const PurchasedView = ({ items, onImportItem, categories, t }) => {
 
   return (
     <div className="h-full flex flex-col gap-6 animate-fadeIn">
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-teal-500 via-emerald-500 to-green-500 bg-clip-text text-transparent">
+      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-4 animate-slideInDown">
+        <h2 className="text-lg font-bold bg-gradient-to-r from-teal-500 via-emerald-500 to-green-500 bg-clip-text text-transparent">
           {t("purchased_list")}
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           {t("purchased_desc")}
         </p>
       </div>
@@ -87,14 +104,26 @@ const PurchasedView = ({ items, onImportItem, categories, t }) => {
           {Object.entries(groupedByCategory).map(
             ([categoryId, items], catIndex) => {
               const isExpanded = expandedRows[categoryId];
+              const subSortConfig = subSortConfigs[categoryId] || { key: "name", direction: "ascending" };
+              // Sort tự nhiên theo tên, nếu trùng thì sort theo số cuối SN
+              const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
               const sortedSubItems = [...items].sort((a, b) => {
-                const aValue = a.name || "";
-                const bValue = b.name || "";
-                const collator = new Intl.Collator(undefined, {
-                  numeric: true,
-                  sensitivity: "base",
-                });
-                return collator.compare(aValue.toString(), bValue.toString());
+                const aName = a.name || "";
+                const bName = b.name || "";
+                const nameCompare = collator.compare(aName, bName);
+                if (nameCompare !== 0) {
+                  return subSortConfig.direction === "ascending" ? nameCompare : -nameCompare;
+                }
+                // Nếu tên giống nhau, sort theo số cuối của serialNumber
+                const getLastNumber = (sn) => {
+                  if (!sn) return -1;
+                  const match = sn.match(/(\d+)(?!.*\d)/);
+                  return match ? parseInt(match[1], 10) : -1;
+                };
+                const aSN = getLastNumber(a.serialNumber);
+                const bSN = getLastNumber(b.serialNumber);
+                if (aSN === bSN) return 0;
+                return subSortConfig.direction === "ascending" ? aSN - bSN : bSN - aSN;
               });
 
               return (
@@ -110,23 +139,39 @@ const PurchasedView = ({ items, onImportItem, categories, t }) => {
                     <div className="flex items-center gap-3 flex-1">
                       <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-teal-600 dark:from-teal-400 dark:to-teal-500 rounded-lg flex items-center justify-center shadow-md">
                         {isExpanded ? (
-                          <ChevronDown className="w-5 h-5 text-white" />
+                          <ChevronDown className="w-4 h-4 text-white" />
                         ) : (
-                          <ChevronRight className="w-5 h-5 text-white" />
+                          <ChevronRight className="w-4 h-4 text-white" />
                         )}
                       </div>
-                      <div>
-                        {/* show category name when available */}
+                      <div className="flex items-center gap-2">
                         <h3 className="font-bold text-gray-900 dark:text-white">
-                          {(categories || []).find((c) => c.id === categoryId)
-                            ?.name || categoryId}
+                          {(categories || []).find((c) => c.id === categoryId)?.name || categoryId}
                         </h3>
+                        {/* Button sort tên thiết bị A-Z/Z-A */}
+                        <button
+                          type="button"
+                          className="ml-1 p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-900/30 transition"
+                          title={subSortConfig.direction === "ascending" ? "Sắp xếp A-Z" : "Sắp xếp Z-A"}
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleSubSortToggle(categoryId);
+                          }}
+                        >
+                          {subSortConfig.direction === "ascending" ? (
+                            <ArrowDown className="w-3.5 h-3.5 text-gray-500" />
+                          ) : (
+                            <ArrowUp className="w-3.5 h-3.5 text-gray-500" />
+                          )}
+                        </button>
+                      </div>
+                      <div>
                         <p className="text-xs text-gray-600 dark:text-gray-400">
                           {items.length} {t("label_devices")}
                         </p>
                       </div>
                     </div>
-                    <div className="text-sm font-medium text-teal-600 dark:text-teal-400">
+                    <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
                       {isExpanded ? t("collapse") : t("expand")}
                     </div>
                   </div>

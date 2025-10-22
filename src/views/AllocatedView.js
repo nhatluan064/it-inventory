@@ -5,6 +5,8 @@ import {
   Wrench,
   ChevronDown,
   ChevronRight,
+  ArrowUp,
+  ArrowDown,
   Package,
   User,
   Eye,
@@ -170,7 +172,7 @@ const AllocatedView = ({
                 name="search"
                 type="text"
                 placeholder={t("search_inventory_placeholder")}
-                className="w-full pl-9 pr-4 py-2 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+                className="w-full pl-7 pr-2 py-1 border rounded text-xs dark:bg-gray-700/50 dark:border-gray-600 h-7"
                 value={filters.search}
                 onChange={handleFilterChange}
               />
@@ -182,7 +184,7 @@ const AllocatedView = ({
             </label>
             <select
               name="category"
-              className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              className="w-full py-1 px-2 border rounded text-xs dark:bg-gray-700/50 dark:border-gray-600 h-7"
               value={filters.category}
               onChange={handleFilterChange}
             >
@@ -201,7 +203,7 @@ const AllocatedView = ({
             </label>
             <select
               name="department"
-              className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              className="w-full py-1 px-2 border rounded text-xs dark:bg-gray-700/50 dark:border-gray-600 h-7"
               value={filters.department}
               onChange={handleFilterChange}
             >
@@ -213,13 +215,13 @@ const AllocatedView = ({
             </select>
           </div>
           <div className="sm:col-span-1">
-            <label className="block text-xs font-semibold mb-2">
+            <label className="block text-xs font-semibold mb-1">
               {t("handover_date")}
             </label>
             <input
               name="handoverDate"
               type="date"
-              className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              className="w-full py-1 px-2 border rounded text-xs dark:bg-gray-700/50 dark:border-gray-600 h-7"
               value={filters.handoverDate}
               onChange={handleFilterChange}
             />
@@ -245,23 +247,24 @@ const AllocatedView = ({
                 key: "name",
                 direction: "ascending",
               };
-              const sortedSubItems = [...items].sort((a, b) => {
-                const getNestedValue = (obj, key) =>
-                  key.split(".").reduce((o, i) => (o ? o[i] : undefined), obj);
-                const aValue = getNestedValue(a, subSortConfig.key) || "";
-                const bValue = getNestedValue(b, subSortConfig.key) || "";
-                const collator = new Intl.Collator(undefined, {
-                  numeric: true,
-                  sensitivity: "base",
+                const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+                const sortedSubItems = [...items].sort((a, b) => {
+                  const aName = a.name || "";
+                  const bName = b.name || "";
+                  const nameCompare = collator.compare(aName, bName);
+                  if (nameCompare !== 0) {
+                    return subSortConfig.direction === "ascending" ? nameCompare : -nameCompare;
+                  }
+                  const getLastNumber = (sn) => {
+                    if (!sn) return -1;
+                    const match = sn.match(/(\d+)(?!.*\d)/);
+                    return match ? parseInt(match[1], 10) : -1;
+                  };
+                  const aSN = getLastNumber(a.serialNumber);
+                  const bSN = getLastNumber(b.serialNumber);
+                  if (aSN === bSN) return 0;
+                  return subSortConfig.direction === "ascending" ? aSN - bSN : bSN - aSN;
                 });
-                const comparison = collator.compare(
-                  aValue.toString(),
-                  bValue.toString()
-                );
-                return subSortConfig.direction === "ascending"
-                  ? comparison
-                  : -comparison;
-              });
 
               return (
                 <div
@@ -272,26 +275,50 @@ const AllocatedView = ({
                   {/* Category Header with Yellow Gradient */}
                   <div
                     onClick={() => toggleExpand(categoryId)}
-                    className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 hover:from-yellow-100 hover:to-amber-100 dark:hover:from-yellow-800/40 dark:hover:to-amber-800/40 cursor-pointer transition-all duration-200"
+                    className="flex items-center justify-between p-3 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 hover:from-yellow-100 hover:to-amber-100 dark:hover:from-yellow-800/40 dark:hover:to-amber-800/40 cursor-pointer transition-all duration-200"
                   >
                     <div className="flex items-center gap-3 flex-1">
-                      <div className="w-8 h-8 bg-gradient-to-br from-yellow-500 to-yellow-600 dark:from-yellow-400 dark:to-yellow-500 rounded-lg flex items-center justify-center shadow-md">
+                      <div className="w-7 h-7 bg-gradient-to-br from-yellow-500 to-yellow-600 dark:from-yellow-400 dark:to-yellow-500 rounded-lg flex items-center justify-center shadow-md">
                         {isExpanded ? (
-                          <ChevronDown className="w-5 h-5 text-white" />
+                          <ChevronDown className="w-4 h-4 text-white" />
                         ) : (
-                          <ChevronRight className="w-5 h-5 text-white" />
+                          <ChevronRight className="w-4 h-4 text-white" />
                         )}
                       </div>
-                      <div>
-                        <h3 className="font-bold text-gray-900 dark:text-white">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-xs text-gray-900 dark:text-white">
                           {category?.name || categoryId}
                         </h3>
+                        {/* Button sort tên thiết bị A-Z/Z-A */}
+                        <button
+                          type="button"
+                          className="ml-1 p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-900/30 transition"
+                          title={subSortConfig.direction === "ascending" ? "Sắp xếp A-Z" : "Sắp xếp Z-A"}
+                          onClick={e => {
+                            e.stopPropagation();
+                            setSubSortConfigs(prev => ({
+                              ...prev,
+                              [categoryId]: {
+                                ...subSortConfig,
+                                direction: subSortConfig.direction === "ascending" ? "descending" : "ascending",
+                              },
+                            }));
+                          }}
+                        >
+                          {subSortConfig.direction === "ascending" ? (
+                            <ArrowDown className="w-3.5 h-3.5 text-gray-500" />
+                          ) : (
+                            <ArrowUp className="w-3.5 h-3.5 text-gray-500" />
+                          )}
+                        </button>
+                      </div>
+                      <div>
                         <p className="text-xs text-gray-600 dark:text-gray-400">
                           {items.length} {t("label_devices")}
                         </p>
                       </div>
                     </div>
-                    <div className="text-sm font-medium text-yellow-600 dark:text-yellow-400">
+                    <div className="text-xs font-medium text-yellow-600 dark:text-yellow-400">
                       {isExpanded ? t("collapse") : t("expand")}
                     </div>
                   </div>

@@ -6,6 +6,8 @@ import {
   Trash2,
   ChevronDown,
   ChevronRight,
+  ArrowUp,
+  ArrowDown,
   Package,
 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -25,7 +27,20 @@ const MasterListView = ({
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [expandedRows, setExpandedRows] = useState({});
   const [, setAnimatingRows] = useState({});
-  const [subSortConfigs] = useState({});
+  const [subSortConfigs, setSubSortConfigs] = useState({});
+  // Handler để đảo chiều sort cho từng nhóm category
+  const handleSubSortToggle = (categoryId) => {
+    setSubSortConfigs((prev) => {
+      const prevConfig = prev[categoryId] || { key: "name", direction: "ascending" };
+      return {
+        ...prev,
+        [categoryId]: {
+          ...prevConfig,
+          direction: prevConfig.direction === "ascending" ? "descending" : "ascending",
+        },
+      };
+    });
+  };
   const [bulkTargets, setBulkTargets] = useState({});
 
   // State để quản lý sorting category riêng
@@ -151,31 +166,23 @@ const MasterListView = ({
             <span>{t("add_new_master_item")}</span>
           </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 items-end text-xs">
           <div className="relative group w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
             <input
               type="text"
               placeholder={t("search_master_item_placeholder")}
-              className="w-full pl-9 pr-4 py-2 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              className="w-full pl-7 pr-2 py-1 border rounded text-xs dark:bg-gray-700/50 dark:border-gray-600 h-7"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <select
-            className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+            className="w-full py-1 px-2 border rounded text-xs dark:bg-gray-700/50 dark:border-gray-600 h-7"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
-            {categoryOptions.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {`${cat.name} (${
-                  cat.id === "all"
-                    ? allItems.length
-                    : categoryCounts[cat.id] || 0
-                })`}
-              </option>
-            ))}
+            ...
           </select>
         </div>
       </div>
@@ -191,20 +198,25 @@ const MasterListView = ({
                 key: "name",
                 direction: "ascending",
               };
+              // Sort tự nhiên theo tên, nếu trùng thì sort theo số cuối SN
+              const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
               const sortedSubItems = [...items].sort((a, b) => {
-                const aValue = a[subSortConfig.key] || "";
-                const bValue = b[subSortConfig.key] || "";
-                const collator = new Intl.Collator(undefined, {
-                  numeric: true,
-                  sensitivity: "base",
-                });
-                const comparison = collator.compare(
-                  aValue.toString(),
-                  bValue.toString()
-                );
-                return subSortConfig.direction === "ascending"
-                  ? comparison
-                  : -comparison;
+                const aName = a.name || "";
+                const bName = b.name || "";
+                const nameCompare = collator.compare(aName, bName);
+                if (nameCompare !== 0) {
+                  return subSortConfig.direction === "ascending" ? nameCompare : -nameCompare;
+                }
+                // Nếu tên giống nhau, sort theo số cuối của serialNumber
+                const getLastNumber = (sn) => {
+                  if (!sn) return -1;
+                  const match = sn.match(/(\d+)(?!.*\d)/);
+                  return match ? parseInt(match[1], 10) : -1;
+                };
+                const aSN = getLastNumber(a.serialNumber);
+                const bSN = getLastNumber(b.serialNumber);
+                if (aSN === bSN) return 0;
+                return subSortConfig.direction === "ascending" ? aSN - bSN : bSN - aSN;
               });
 
               return (
@@ -221,15 +233,33 @@ const MasterListView = ({
                     <div className="flex items-center gap-3 flex-1">
                       <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-cyan-600 dark:from-cyan-400 dark:to-cyan-500 rounded-lg flex items-center justify-center shadow-md">
                         {isExpanded ? (
-                          <ChevronDown className="w-5 h-5 text-white" />
+                          <ChevronDown className="w-4 h-4 text-white" />
                         ) : (
-                          <ChevronRight className="w-5 h-5 text-white" />
+                          <ChevronRight className="w-4 h-4 text-white" />
                         )}
                       </div>
-                      <div>
+                      <div className="flex items-center gap-2">
                         <h3 className="font-bold text-gray-900 dark:text-white">
                           {category?.name || categoryId}
                         </h3>
+                        {/* Button sort tên thiết bị A-Z/Z-A */}
+                        <button
+                          type="button"
+                          className="ml-1 p-1 rounded hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition"
+                          title={subSortConfig.direction === "ascending" ? "Sắp xếp A-Z" : "Sắp xếp Z-A"}
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleSubSortToggle(categoryId);
+                          }}
+                        >
+                          {subSortConfig.direction === "ascending" ? (
+                            <ArrowDown className="w-3.5 h-3.5 text-cyan-500" />
+                          ) : (
+                            <ArrowUp className="w-3.5 h-3.5 text-cyan-500" />
+                          )}
+                        </button>
+                      </div>
+                      <div>
                         <p className="text-xs text-gray-600 dark:text-gray-400">
                           {items.length} {t("label_masters")} |{" "}
                           {(() => {

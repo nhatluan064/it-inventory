@@ -7,6 +7,8 @@ import {
   Package,
   ChevronDown,
   ChevronRight,
+  ArrowUp,
+  ArrowDown,
   ShoppingBag,
 } from "lucide-react";
 import EmptyState from "../components/EmptyState";
@@ -26,7 +28,20 @@ const PendingPurchaseView = ({
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [expandedRows, setExpandedRows] = useState({});
   const [, setAnimatingRows] = useState({});
-  const [subSortConfigs] = useState({});
+  const [subSortConfigs, setSubSortConfigs] = useState({});
+  // Handler để đảo chiều sort cho từng nhóm category
+  const handleSubSortToggle = (categoryId) => {
+    setSubSortConfigs((prev) => {
+      const prevConfig = prev[categoryId] || { key: "name", direction: "ascending" };
+      return {
+        ...prev,
+        [categoryId]: {
+          ...prevConfig,
+          direction: prevConfig.direction === "ascending" ? "descending" : "ascending",
+        },
+      };
+    });
+  };
 
   const { items: sortedItems } = useSort(items || [], {
     key: "name",
@@ -97,38 +112,38 @@ const PendingPurchaseView = ({
 
   return (
     <div className="h-full flex flex-col gap-6 animate-fadeIn">
-      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-6 animate-slideInDown">
-        <div className="flex justify-between items-center mb-6">
+      <div className="flex-shrink-0 glass-effect bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 rounded-2xl shadow-xl border p-4 animate-slideInDown">
+        <div className="flex justify-between items-center mb-4">
           <div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-500 to-gray-600 bg-clip-text text-transparent">
+            <h2 className="text-lg font-bold bg-gradient-to-r from-gray-500 to-gray-600 bg-clip-text text-transparent">
               {t("pending_purchase_list")}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {t("pending_purchase_desc")}
             </p>
           </div>
           <button
             onClick={onOpenAddFromMasterModal}
-            className="bg-gradient-to-r from-gray-500 to-gray-600 text-white py-2 px-3 rounded-lg flex items-center justify-center space-x-2 text-sm font-semibold animate-hoverScale transition-all duration-200"
+            className="bg-gradient-to-r from-gray-500 to-gray-600 text-white py-1.5 px-2 rounded-lg flex items-center justify-center space-x-1 text-xs font-semibold animate-hoverScale transition-all duration-200"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4" />
             <span>{t("add_from_master_list")}</span>
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 items-end text-xs">
           <div className="relative group w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
             <input
               type="text"
               placeholder={t("search_master_item_placeholder")}
-              className="w-full pl-9 pr-4 py-2 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              className="w-full pl-7 pr-2 py-1 border rounded text-xs dark:bg-gray-700/50 dark:border-gray-600 h-7"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <select
-            className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+            className="w-full py-1 px-2 border rounded text-xs dark:bg-gray-700/50 dark:border-gray-600 h-7"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
@@ -160,20 +175,25 @@ const PendingPurchaseView = ({
                 key: "name",
                 direction: "ascending",
               };
+              // Sort tự nhiên theo tên, nếu trùng thì sort theo số cuối SN
+              const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
               const sortedSubItems = [...items].sort((a, b) => {
-                const aValue = a[subSortConfig.key] || "";
-                const bValue = b[subSortConfig.key] || "";
-                const collator = new Intl.Collator(undefined, {
-                  numeric: true,
-                  sensitivity: "base",
-                });
-                const comparison = collator.compare(
-                  aValue.toString(),
-                  bValue.toString()
-                );
-                return subSortConfig.direction === "ascending"
-                  ? comparison
-                  : -comparison;
+                const aName = a.name || "";
+                const bName = b.name || "";
+                const nameCompare = collator.compare(aName, bName);
+                if (nameCompare !== 0) {
+                  return subSortConfig.direction === "ascending" ? nameCompare : -nameCompare;
+                }
+                // Nếu tên giống nhau, sort theo số cuối của serialNumber
+                const getLastNumber = (sn) => {
+                  if (!sn) return -1;
+                  const match = sn.match(/(\d+)(?!.*\d)/);
+                  return match ? parseInt(match[1], 10) : -1;
+                };
+                const aSN = getLastNumber(a.serialNumber);
+                const bSN = getLastNumber(b.serialNumber);
+                if (aSN === bSN) return 0;
+                return subSortConfig.direction === "ascending" ? aSN - bSN : bSN - aSN;
               });
 
               return (
@@ -182,6 +202,7 @@ const PendingPurchaseView = ({
                   className="border-2 border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden animate-fadeIn"
                   style={{ animationDelay: `${catIndex * 0.05}s` }}
                 >
+                  {/* Header nhóm: Chevron, tên nhóm, nút sort, số lượng */}
                   <div
                     onClick={() => toggleExpand(categoryId)}
                     className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/30 dark:to-gray-800/30 hover:from-gray-100 hover:to-gray-200 cursor-pointer transition-all duration-200"
@@ -189,17 +210,35 @@ const PendingPurchaseView = ({
                     <div className="flex items-center gap-3 flex-1">
                       <div className="w-8 h-8 bg-gradient-to-br from-gray-500 to-gray-600 dark:from-gray-400 dark:to-gray-500 rounded-lg flex items-center justify-center shadow-md">
                         {isExpanded ? (
-                          <ChevronDown className="w-5 h-5 text-white" />
+                          <ChevronDown className="w-4 h-4 text-white" />
                         ) : (
-                          <ChevronRight className="w-5 h-5 text-white" />
+                          <ChevronRight className="w-4 h-4 text-white" />
                         )}
                       </div>
-                      <div>
+                      <div className="flex items-center gap-2">
                         <h3 className="font-bold text-gray-900 dark:text-white">
                           {category?.name || categoryId}
                         </h3>
+                        {/* Button sort tên thiết bị A-Z/Z-A */}
+                        <button
+                          type="button"
+                          className="ml-1 p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-900/30 transition"
+                          title={subSortConfig.direction === "ascending" ? "Sắp xếp A-Z" : "Sắp xếp Z-A"}
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleSubSortToggle(categoryId);
+                          }}
+                        >
+                          {subSortConfig.direction === "ascending" ? (
+                            <ArrowDown className="w-3.5 h-3.5 text-gray-500" />
+                          ) : (
+                            <ArrowUp className="w-3.5 h-3.5 text-gray-500" />
+                          )}
+                        </button>
+                      </div>
+                      <div>
                         <p className="text-xs text-gray-600 dark:text-gray-400">
-                          {items.length} {t("label_masters")}
+                          {items.length} {t("label_devices")}
                         </p>
                       </div>
                     </div>
@@ -208,6 +247,7 @@ const PendingPurchaseView = ({
                     </div>
                   </div>
 
+                  {/* Danh sách item con */}
                   {isExpanded && (
                     <div className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
                       {sortedSubItems.map((item, itemIndex) => (
@@ -232,24 +272,12 @@ const PendingPurchaseView = ({
                               </div>
                             </div>
                           </div>
-
-                          <div className="flex items-center gap-2 ml-4">
-                            <input
-                              type="number"
-                              min="1"
-                              value={purchaseData[item.id]?.quantity || 1}
-                              onChange={(e) =>
-                                handleDataChange(
-                                  item.id,
-                                  "quantity",
-                                  e.target.value
-                                )
-                              }
-                              className="w-20 p-1.5 border-2 rounded-lg text-center text-xs dark:bg-gray-700 dark:border-gray-600"
-                            />
+                          {/* Các nút thao tác và input giá */}
+                          <div className="flex items-center gap-2">
                             <input
                               type="number"
                               min="0"
+                              step="any"
                               placeholder={t("enter_price")}
                               value={purchaseData[item.id]?.price || ""}
                               onChange={(e) =>

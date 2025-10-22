@@ -6,9 +6,10 @@ import {
   ChevronDown,
   ChevronRight,
   Search,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import EmptyState from "../components/EmptyState";
-import { useSort } from "../hooks/useSort";
 
 const LiquidationView = ({
   items,
@@ -18,11 +19,8 @@ const LiquidationView = ({
   t,
 }) => {
   const [expandedRows, setExpandedRows] = useState({});
-  const [filters, setFilters] = useState({
-    search: "",
-    category: "all",
-    department: "all",
-  });
+  const [filters, setFilters] = useState({ search: "", category: "all", department: "all" });
+  const [subSortConfigs, setSubSortConfigs] = useState({});
 
   const debouncedSearch = useDebouncedValue(filters.search, 300);
 
@@ -59,18 +57,25 @@ const LiquidationView = ({
     departmentsList,
   ]);
 
-  const { items: sortedItems } = useSort(filteredItems || [], {
-    key: "name",
-    direction: "ascending",
-  });
+  // Sort tự nhiên tổng thể
+  const sortedItems = useMemo(() => {
+    const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+    return [...filteredItems].sort((a, b) => {
+      const cmp = collator.compare(a.name || "", b.name || "");
+      if (cmp !== 0) return cmp;
+      return collator.compare(a.serialNumber || "", b.serialNumber || "");
+    });
+  }, [filteredItems]);
 
+  // Gom nhóm
   const groupedByCategory = useMemo(() => {
-    return (sortedItems || []).reduce((acc, item) => {
+    const grouped = {};
+    (sortedItems || []).forEach((item) => {
       const key = item.category || "uncategorized";
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(item);
-      return acc;
-    }, {});
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(item);
+    });
+    return grouped;
   }, [sortedItems]);
 
   useEffect(() => {
@@ -93,30 +98,26 @@ const LiquidationView = ({
           {t("liquidation_desc")}
         </p>
         {/* Filters placed below title */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 items-end mt-4">
           <div className="sm:col-span-2 lg:col-span-2">
-            <label className="block text-xs font-semibold mb-2">
-              {t("search")}
-            </label>
+            <label className="block text-xs font-semibold mb-1">{t("search")}</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 name="search"
                 type="text"
                 placeholder={t("search")}
-                className="w-full pl-9 pr-4 py-2 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+                className="w-full pl-9 pr-4 py-1.5 border-2 rounded-lg text-xs dark:bg-gray-700/50 dark:border-gray-600"
                 value={filters.search}
                 onChange={handleFilterChange}
               />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-2">
-              {t("category")}
-            </label>
+            <label className="block text-xs font-semibold mb-1">{t("category")}</label>
             <select
               name="category"
-              className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              className="w-full py-1.5 px-3 border-2 rounded-lg text-xs dark:bg-gray-700/50 dark:border-gray-600"
               value={filters.category}
               onChange={handleFilterChange}
             >
@@ -129,12 +130,10 @@ const LiquidationView = ({
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-2">
-              {t("department")}
-            </label>
+            <label className="block text-xs font-semibold mb-1">{t("department")}</label>
             <select
               name="department"
-              className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              className="w-full py-1.5 px-3 border-2 rounded-lg text-xs dark:bg-gray-700/50 dark:border-gray-600"
               value={filters.department}
               onChange={handleFilterChange}
             >
@@ -165,6 +164,17 @@ const LiquidationView = ({
                 (c) => c.id === categoryId
               );
 
+              // Sort từng nhóm
+              const subSortConfig = subSortConfigs[categoryId] || { key: "name", direction: "ascending" };
+              const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+              const sortedSubItems = [...items].sort((a, b) => {
+                const cmp = collator.compare(a[subSortConfig.key] || "", b[subSortConfig.key] || "");
+                if (cmp !== 0) return subSortConfig.direction === "ascending" ? cmp : -cmp;
+                // sort SN tự nhiên
+                const snCmp = collator.compare(a.serialNumber || "", b.serialNumber || "");
+                return subSortConfig.direction === "ascending" ? snCmp : -snCmp;
+              });
+
               return (
                 <div
                   key={categoryId}
@@ -173,33 +183,57 @@ const LiquidationView = ({
                 >
                   <div
                     onClick={() => toggleExpand(categoryId)}
-                    className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-900/30 dark:to-gray-900/30 hover:from-slate-100 hover:to-gray-100 cursor-pointer transition-all duration-200"
+                    className="flex items-center justify-between p-3 bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-900/30 dark:to-gray-900/30 hover:from-slate-100 hover:to-gray-100 cursor-pointer transition-all duration-200"
                   >
                     <div className="flex items-center gap-3 flex-1">
-                      <div className="w-8 h-8 bg-gradient-to-br from-slate-500 to-gray-600 dark:from-slate-400 dark:to-gray-500 rounded-lg flex items-center justify-center shadow-md">
+                      <div className="w-7 h-7 bg-gradient-to-br from-slate-500 to-gray-600 dark:from-slate-400 dark:to-gray-500 rounded-lg flex items-center justify-center shadow-md">
                         {isExpanded ? (
-                          <ChevronDown className="w-5 h-5 text-white" />
+                          <ChevronDown className="w-4 h-4 text-white" />
                         ) : (
-                          <ChevronRight className="w-5 h-5 text-white" />
+                          <ChevronRight className="w-4 h-4 text-white" />
                         )}
                       </div>
-                      <div>
-                        <h3 className="font-bold text-gray-900 dark:text-white">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-xs text-gray-900 dark:text-white">
                           {category?.name || categoryId}
                         </h3>
+                        {/* Nút sort nhóm */}
+                        <button
+                          type="button"
+                          className="ml-1 p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-900/30 transition"
+                          title={subSortConfig.direction === "ascending" ? "Sắp xếp A-Z" : "Sắp xếp Z-A"}
+                          onClick={e => {
+                            e.stopPropagation();
+                            setSubSortConfigs(prev => ({
+                              ...prev,
+                              [categoryId]: {
+                                ...(prev[categoryId] || { key: "name", direction: "ascending" }),
+                                direction: (prev[categoryId]?.direction || "ascending") === "ascending" ? "descending" : "ascending",
+                              },
+                            }));
+                          }}
+                        >
+                          {subSortConfig.direction === "ascending" ? (
+                            <ArrowDown className="w-3.5 h-3.5 text-gray-500" />
+                          ) : (
+                            <ArrowUp className="w-3.5 h-3.5 text-gray-500" />
+                          )}
+                        </button>
+                      </div>
+                      <div>
                         <p className="text-xs text-gray-600 dark:text-gray-400">
                           {items.length} {t("label_devices")}
                         </p>
                       </div>
                     </div>
-                    <div className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                    <div className="text-xs font-medium text-slate-600 dark:text-slate-400">
                       {isExpanded ? t("collapse") : t("expand")}
                     </div>
                   </div>
 
                   {isExpanded && (
                     <div className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
-                      {items.map((item, itemIndex) => (
+                      {sortedSubItems.map((item, itemIndex) => (
                         <div
                           key={item.id}
                           className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 animate-slideInLeft border-l-4 border-transparent hover:border-slate-300"

@@ -1,36 +1,15 @@
 import React, { useMemo, useState, useEffect } from "react";
 import useDebouncedValue from "../hooks/useDebouncedValue";
-import {
-  CheckCircle,
-  XCircle,
-  Edit,
-  Package,
-  ChevronDown,
-  ChevronRight,
-  Search,
-} from "lucide-react";
-import { useSort } from "../hooks/useSort";
-
-const MaintenanceView = ({
-  items,
-  onRepairComplete,
-  onMarkUnrepairable,
-  onEditNote,
-  categories,
-  departmentsList = [],
-  t,
-}) => {
+import { Search, ChevronDown, ChevronRight, ArrowUp, ArrowDown, Edit, CheckCircle, XCircle, Package } from "lucide-react";
+function MaintenanceView(props) {
+  const { t } = props;
+  const { items = [], categories = [], departmentsList = [], onEditNote, onRepairComplete, onMarkUnrepairable } = props;
+  const [filters, setFilters] = useState({ search: "", category: "all", department: "all" });
   const [expandedRows, setExpandedRows] = useState({});
-  const [filters, setFilters] = useState({
-    search: "",
-    category: "all",
-    department: "all",
-  });
-  const subSortConfigs = {};
-
+  const [subSortConfigs, setSubSortConfigs] = useState({});
   const debouncedSearch = useDebouncedValue(filters.search, 300);
 
-  // Apply filters before sort/group
+  // Lọc dữ liệu
   const filteredItems = useMemo(() => {
     let data = items || [];
     if (debouncedSearch) {
@@ -46,9 +25,7 @@ const MaintenanceView = ({
       data = data.filter((it) => it.category === filters.category);
     }
     if (filters.department && filters.department !== "all") {
-      const dept = (departmentsList || []).find(
-        (d) => d.id === filters.department
-      );
+      const dept = (departmentsList || []).find((d) => d.id === filters.department);
       const target = (dept?.name || filters.department || "").toLowerCase();
       data = data.filter((it) => {
         const val = String(it.recalledDepartment || "").toLowerCase();
@@ -60,36 +37,35 @@ const MaintenanceView = ({
       });
     }
     return data;
-  }, [
-    items,
-    debouncedSearch,
-    filters.category,
-    filters.department,
-    departmentsList,
-  ]);
+  }, [items, debouncedSearch, filters.category, filters.department, departmentsList]);
 
-  const { items: sortedItems } = useSort(filteredItems, {
-    key: "name",
-    direction: "ascending",
-  });
+  // Sắp xếp tổng thể
+  const sortedItems = useMemo(() => {
+    const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+    return [...filteredItems].sort((a, b) => {
+      const cmp = collator.compare(a.name || "", b.name || "");
+      if (cmp !== 0) return cmp;
+      // sort SN tự nhiên
+      return collator.compare(a.serialNumber || "", b.serialNumber || "");
+    });
+  }, [filteredItems]);
 
+  // Gom nhóm theo category
   const groupedByCategory = useMemo(() => {
-    const grouped = (sortedItems || []).reduce((acc, item) => {
+    const grouped = {};
+    (sortedItems || []).forEach((item) => {
       const key = item.category || "uncategorized";
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(item);
-      return acc;
-    }, {});
-    // keep category order stable
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(item);
+    });
     return grouped;
   }, [sortedItems]);
 
-  useEffect(() => {
-    setExpandedRows({});
-  }, [items, filters]);
+  // Xử lý filter
+  const handleFilterChange = (e) => {
+  };
 
-  const handleFilterChange = (e) =>
-    setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  // ...existing code...
 
   const toggleExpand = (name) => {
     setExpandedRows((prev) => ({ [name]: !prev[name] }));
@@ -118,28 +94,24 @@ const MaintenanceView = ({
         {/* Filters */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end mt-6">
           <div className="sm:col-span-2 lg:col-span-2">
-            <label className="block text-xs font-semibold mb-2">
-              {t("search")}
-            </label>
+            <label className="block text-xs font-semibold mb-1">{t("search")}</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 name="search"
                 type="text"
                 placeholder={t("search")}
-                className="w-full pl-9 pr-4 py-2 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+                className="w-full pl-9 pr-4 py-1.5 border-2 rounded-lg text-xs dark:bg-gray-700/50 dark:border-gray-600"
                 value={filters.search}
                 onChange={handleFilterChange}
               />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-2">
-              {t("category")}
-            </label>
+            <label className="block text-xs font-semibold mb-1">{t("category")}</label>
             <select
               name="category"
-              className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              className="w-full py-1.5 px-3 border-2 rounded-lg text-xs dark:bg-gray-700/50 dark:border-gray-600"
               value={filters.category}
               onChange={handleFilterChange}
             >
@@ -152,12 +124,10 @@ const MaintenanceView = ({
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-2">
-              {t("department")}
-            </label>
+            <label className="block text-xs font-semibold mb-1">{t("department")}</label>
             <select
               name="department"
-              className="w-full py-2 px-3 border-2 rounded-lg text-sm dark:bg-gray-700/50 dark:border-gray-600"
+              className="w-full py-1.5 px-3 border-2 rounded-lg text-xs dark:bg-gray-700/50 dark:border-gray-600"
               value={filters.department}
               onChange={handleFilterChange}
             >
@@ -208,26 +178,50 @@ const MaintenanceView = ({
                 >
                   <div
                     onClick={() => toggleExpand(categoryId)}
-                    className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/30 hover:from-orange-100 hover:to-red-100 cursor-pointer transition-all duration-200"
+                    className="flex items-center justify-between p-3 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/30 hover:from-orange-100 hover:to-red-100 cursor-pointer transition-all duration-200"
                   >
                     <div className="flex items-center gap-3 flex-1">
-                      <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 dark:from-orange-400 dark:to-red-500 rounded-lg flex items-center justify-center shadow-md">
+                      <div className="w-7 h-7 bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-400 dark:to-orange-500 rounded-lg flex items-center justify-center shadow-md">
                         {isExpanded ? (
-                          <ChevronDown className="w-5 h-5 text-white" />
+                          <ChevronDown className="w-4 h-4 text-white" />
                         ) : (
-                          <ChevronRight className="w-5 h-5 text-white" />
+                          <ChevronRight className="w-4 h-4 text-white" />
                         )}
                       </div>
-                      <div>
-                        <h3 className="font-bold text-gray-900 dark:text-white">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-xs text-gray-900 dark:text-white">
                           {category?.name || categoryId}
                         </h3>
+                        {/* Nút sort nhóm */}
+                        <button
+                          type="button"
+                          className="ml-1 p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-900/30 transition"
+                          title={subSortConfigs[categoryId]?.direction === "ascending" ? "Sắp xếp A-Z" : "Sắp xếp Z-A"}
+                          onClick={e => {
+                            e.stopPropagation();
+                            setSubSortConfigs(prev => ({
+                              ...prev,
+                              [categoryId]: {
+                                ...(prev[categoryId] || { key: "name", direction: "ascending" }),
+                                direction: (prev[categoryId]?.direction || "ascending") === "ascending" ? "descending" : "ascending",
+                              },
+                            }));
+                          }}
+                        >
+                          {subSortConfigs[categoryId]?.direction === "ascending" ? (
+                            <ArrowDown className="w-3.5 h-3.5 text-gray-500" />
+                          ) : (
+                            <ArrowUp className="w-3.5 h-3.5 text-gray-500" />
+                          )}
+                        </button>
+                      </div>
+                      <div>
                         <p className="text-xs text-gray-600 dark:text-gray-400">
                           {items.length} {t("label_devices")}
                         </p>
                       </div>
                     </div>
-                    <div className="text-sm font-medium text-orange-600 dark:text-orange-400">
+                    <div className="text-xs font-medium text-orange-600 dark:text-orange-400">
                       {isExpanded ? t("collapse") : t("expand")}
                     </div>
                   </div>
