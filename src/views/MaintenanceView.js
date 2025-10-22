@@ -1,10 +1,10 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import useDebouncedValue from "../hooks/useDebouncedValue";
 import { Search, ChevronDown, ChevronRight, ArrowUp, ArrowDown, Edit, CheckCircle, XCircle, Package } from "lucide-react";
 function MaintenanceView(props) {
   const { t } = props;
   const { items = [], categories = [], departmentsList = [], onEditNote, onRepairComplete, onMarkUnrepairable } = props;
-  const [filters, setFilters] = useState({ search: "", category: "all", department: "all" });
+  const [filters] = useState({ search: "", category: "all", department: "all" });
   const [expandedRows, setExpandedRows] = useState({});
   const [subSortConfigs, setSubSortConfigs] = useState({});
   const debouncedSearch = useDebouncedValue(filters.search, 300);
@@ -62,7 +62,8 @@ function MaintenanceView(props) {
   }, [sortedItems]);
 
   // Xử lý filter
-  const handleFilterChange = (e) => {
+  const handleFilterChange = (_e) => {
+    // ...existing code or leave empty if not needed
   };
 
   // ...existing code...

@@ -56,20 +56,7 @@ const MasterListView = ({
 
   // Category sort config can be toggled by future UI controls; function removed to keep build clean
 
-  const categoryCounts = useMemo(() => {
-    if (!allItems) return {};
-    return allItems.reduce((acc, item) => {
-      if (item && item.category) {
-        acc[item.category] = (acc[item.category] || 0) + 1;
-      }
-      return acc;
-    }, {});
-  }, [allItems]);
-
-  const categoryOptions = useMemo(() => {
-    const allOption = { id: "all", name: t("all") };
-    return [allOption, ...categories];
-  }, [categories, t]);
+  // Removed unused categoryCounts and categoryOptions to fix eslint errors
 
   const groupedByCategory = useMemo(() => {
     let itemsToGroup = sortedItems;
