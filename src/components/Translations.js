@@ -525,6 +525,8 @@ export const translations = {
     keep_both: "Giữ Cả Hai",
     cannot_edit_name_item_in_use:
       "Không thể thay đổi tên vì mẫu này đang được sử dụng trong hệ thống",
+    "allocation-update": "Cập nhật Bàn giao",
+    "master-list-add": "Thêm Mẫu Mới",
     allocation_update: "Cập nhật Bàn giao",
     master_list_add: "Thêm Mẫu Mới",
   },
@@ -1042,6 +1044,8 @@ export const translations = {
     keep_both: "Keep Both",
     cannot_edit_name_item_in_use:
       "Cannot edit name because this master is currently in use in the system",
+    "allocation-update": "Update Allocation",
+    "master-list-add": "Add New Model",
     allocation_update: "Update Allocation",
     master_list_add: "Add New Model",
   },
@@ -1536,6 +1540,8 @@ export const translations = {
     override_and_move: "删除并移动",
     keep_both: "保留两者",
     cannot_edit_name_item_in_use: "无法编辑名称，因为此模板当前正在系统中使用",
+    "allocation-update": "更新分配",
+    "master-list-add": "新增模板",
     allocation_update: "更新分配",
     master_list_add: "新增模板",
   },
